@@ -22,27 +22,27 @@ import {
 const items = [
     {
         title: "Dashboard",
-        url: "/dashboard/overview",
+        url: "/app/dashboard",
         icon: Home,
     },
     {
         title: "Setup",
-        url: "/setup",
+        url: "/app/setup",
         icon: Inbox,
     },
     {
         title: "Plan",
-        url: "/plan",
+        url: "/app/plan",
         icon: Calendar,
     },
     {
         title: "Track",
-        url: "/track",
+        url: "/app/track",
         icon: Search,
     },
     {
         title: "Settings",
-        url: "/settings",
+        url: "/app/settings",
         icon: Settings,
     },
 ]

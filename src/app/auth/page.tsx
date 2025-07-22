@@ -1,3 +1,17 @@
+"use client"
+
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import {
     Card,
@@ -15,11 +29,111 @@ import {
     TabsList,
     TabsTrigger,
 } from "@/components/ui/tabs"
+import { toast } from "sonner"
+import { Toaster } from "@/components/ui/sonner"
+
+const formSchemaRegistration = z.object({
+    email: z
+        .string()
+        .regex(
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+            { message: "Invalid email address" }
+        ),
+    name: z.string().min(3, {
+        message: "Username must be at least 3 characters.",
+    }),
+    phone: z
+        .string()
+        .min(10, { message: "Phone must be at least 10 digits." })
+        .max(15, { message: "Phone must be at most 15 digits." })
+        .regex(/^\d+$/, { message: "Phone must contain only digits." }),
+    password: z.string().min(5, {
+        message: "Username must be at least 5 characters.",
+    }),
+    passwordConfirmation: z.string().min(5, {
+        message: "Username must be at least 5 characters.",
+    }),
+    company: z.string().min(5, {
+        message: "Username must be at least 5 characters.",
+    })
+})
+
+const formSchemaLogin = z.object({
+    email: z
+        .string()
+        .regex(
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+            { message: "Invalid email address" }
+        ),
+    password: z.string().min(5, {
+        message: "Username must be at least 5 characters.",
+    })
+})
 
 export default function Auth() {
+    const formRegistration = useForm<z.infer<typeof formSchemaRegistration>>({
+        resolver: zodResolver(formSchemaRegistration),
+        defaultValues: {
+            email: "",
+            name: "",
+            phone: "",
+            password: "",
+            passwordConfirmation: "",
+            company: "",
+        },
+    })
+
+    const formLogin = useForm<z.infer<typeof formSchemaLogin>>({
+        resolver: zodResolver(formSchemaLogin),
+        defaultValues: {
+            email: "",
+            password: ""
+        },
+    })
+
+    async function onSubmitRegistration(values: z.infer<typeof formSchemaRegistration>) {
+        if (values.password === values.passwordConfirmation) {
+            const res = await fetch("/api/insertAccount", {
+                method: "POST",
+                body: JSON.stringify(values),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (res.ok) {
+                toast.success("Account has been created")
+                formRegistration.reset();
+            } else {
+                toast.error("Error creating account")
+            }
+        } else {
+            toast.error("The password and confirmation password does not match!")
+        }
+    }
+
+    async function onSubmitLogin(values: z.infer<typeof formSchemaLogin>) {
+        console.log('login form', values)
+        const res = await fetch("/api/getAccountByEmail", {
+            method: "POST",
+            body: JSON.stringify(values),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (res.ok) {
+            toast.success("Account found")
+            formRegistration.reset();
+        } else {
+            toast.error("Error fetching account")
+        }
+    }
+
     return (
         <div className="min-h-screen p-4 overflow-auto px-5 lg:px-20">
-            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg">
+            <Toaster position="top-right" />
+            <div className="fixed left-1/2 -translate-x-1/2 w-full mt-10 max-w-lg">
                 <Tabs defaultValue="login" className="w-full">
                     <TabsList>
                         <TabsTrigger value="login">Login</TabsTrigger>
@@ -34,119 +148,148 @@ export default function Auth() {
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <form>
-                                    <div className="flex flex-col gap-6">
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="email">Email</Label>
-                                            <Input
-                                                id="email"
-                                                type="email"
-                                                placeholder="m@example.com"
-                                                required
-                                            />
-                                        </div>
-                                        <div className="grid gap-2">
-                                            <div className="flex items-center">
-                                                <Label htmlFor="password">Password</Label>
-                                                <a
-                                                    href="#"
-                                                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                                                >
-                                                    Forgot your password?
-                                                </a>
-                                            </div>
-                                            <Input
-                                                id="password"
-                                                type="password"
-                                                placeholder="Password"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                </form>
+                                <Form {...formLogin}>
+                                    <form onSubmit={formLogin.handleSubmit(onSubmitLogin)} className="space-y-5">
+                                        <FormField
+                                            control={formLogin.control}
+                                            name="email"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Email</FormLabel>
+                                                    <FormControl>
+                                                        <Input placeholder="Type your email" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={formLogin.control}
+                                            name="password"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Password</FormLabel>
+                                                    <FormControl>
+                                                        <Input placeholder="Type your password" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <Button type="submit" className="w-full">
+                                            Login
+                                        </Button>
+                                    </form>
+                                </Form>
                             </CardContent>
-                            <CardFooter className="flex-col gap-2">
-                                <Button type="submit" className="w-full">
-                                    Login
-                                </Button>
-                                <Button variant="outline" className="w-full">
-                                    Login with Google
-                                </Button>
-                            </CardFooter>
                         </Card>
                     </TabsContent>
                     <TabsContent value="register">
                         <Card className="max-h-[400px] overflow-y-auto">
                             <CardHeader>
-                                <CardTitle>Please Register Your Account</CardTitle>
+                                <CardTitle>Register Your Account</CardTitle>
                                 <CardDescription>
-                                    Enter your email below
+                                    Please fill all of the field in the form below
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <form>
-                                    <div className="flex flex-col gap-6">
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="email">Email</Label>
-                                            <Input
-                                                id="email"
-                                                type="email"
-                                                placeholder="m@example.com"
-                                                required
-                                            />
-                                        </div>
-                                        <div className="grid gap-2">
-                                            <div className="flex items-center">
-                                                <Label htmlFor="password">Password</Label>
-                                            </div>
-                                            <Input
-                                                id="password"
-                                                type="password"
-                                                placeholder="Password"
-                                                required
-                                            />
-                                        </div>
-                                        <div className="grid gap-2">
-                                            <div className="flex items-center">
-                                                <Label htmlFor="passwordConfirmation">Password Confirmation</Label>
-                                            </div>
-                                            <Input
-                                                id="passwordConfirmation"
-                                                type="passwordConfirmation"
-                                                placeholder="Re-type your password"
-                                                required
-                                            />
-                                        </div>
-                                        <div className="grid gap-2">
-                                            <div className="flex items-center">
-                                                <Label htmlFor="companyName">Company Name</Label>
-                                            </div>
-                                            <Input
-                                                id="companyName"
-                                                type="companyName"
-                                                placeholder="Company Name"
-                                                required
-                                            />
-                                        </div>
-                                        <div className="grid gap-2">
-                                            <div className="flex items-center">
-                                                <Label htmlFor="phone">Phone</Label>
-                                            </div>
-                                            <Input
-                                                id="phone"
-                                                type="phone"
-                                                placeholder="Phone"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                </form>
+                                <Form {...formRegistration}>
+                                    <form onSubmit={formRegistration.handleSubmit(onSubmitRegistration)} className="space-y-5">
+                                        <FormField
+                                            control={formRegistration.control}
+                                            name="email"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Email</FormLabel>
+                                                    <FormControl>
+                                                        <Input placeholder="Type your email" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={formRegistration.control}
+                                            name="name"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Name</FormLabel>
+                                                    <FormControl>
+                                                        <Input placeholder="Type your name" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={formRegistration.control}
+                                            name="phone"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Phone</FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            placeholder="Type your phone"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={formRegistration.control}
+                                            name="password"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Password</FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            placeholder="Type your password"
+                                                            type="password"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={formRegistration.control}
+                                            name="passwordConfirmation"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Password Confirmation</FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            placeholder="Type your confirmation password"
+                                                            type="password"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={formRegistration.control}
+                                            name="company"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Company</FormLabel>
+                                                    <FormControl>
+                                                        <Input placeholder="Type your company" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <Button type="submit" className="w-full">
+                                            Register
+                                        </Button>
+                                    </form>
+                                </Form>
                             </CardContent>
-                            <CardFooter className="flex-col gap-2">
-                                <Button type="submit" className="w-full">
-                                    Register
-                                </Button>
-                            </CardFooter>
                         </Card>
                     </TabsContent>
                 </Tabs>
