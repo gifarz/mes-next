@@ -3,8 +3,7 @@ name: Application Deploy of MES
 on:
   push:
     branches:
-      - branch_name # Change to your specific branch
-      # - deployprod  # Additional branch for deployment
+      - main # Change to your specific branch
 
 jobs:
   deploy:
