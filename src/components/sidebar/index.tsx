@@ -17,6 +17,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import Image from "next/image"
 
 // Menu items.
 const items = [
@@ -54,10 +55,17 @@ export function AppSidebar() {
         <Sidebar>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel className="flex justify-center">
-                        Application
+                    <SidebarGroupLabel className="flex flex-col text-center">
+                        <h1 className="font-bold">MES SYSTEM</h1>
+                        <Image
+                            src="/logo.png"
+                            alt="Centered Logo"
+                            width={95}
+                            height={95}
+                            className="mt-2"
+                        />
                     </SidebarGroupLabel>
-                    <SidebarGroupContent className="mt-10">
+                    <SidebarGroupContent className="mt-28">
                         <SidebarMenu>
                             {items.map((item) => {
                                 const isActive = pathname === item.url

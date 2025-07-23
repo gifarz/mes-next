@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -28,6 +29,7 @@ import {
 } from "@/components/ui/tabs"
 import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
+import { Spinner } from "@/components/ui/spinner"
 
 const formSchemaRegistration = z.object({
     email: z
@@ -68,6 +70,8 @@ const formSchemaLogin = z.object({
 })
 
 export default function Auth() {
+    const [isLogin, setIsLogin] = React.useState(false)
+    const [isRegistration, setIsRegistration] = React.useState(false)
     const formRegistration = useForm<z.infer<typeof formSchemaRegistration>>({
         resolver: zodResolver(formSchemaRegistration),
         defaultValues: {
@@ -89,6 +93,7 @@ export default function Auth() {
     })
 
     async function onSubmitRegistration(values: z.infer<typeof formSchemaRegistration>) {
+        setIsRegistration(true)
         if (values.password === values.passwordConfirmation) {
             const res = await fetch("/api/insertAccount", {
                 method: "POST",
@@ -107,10 +112,11 @@ export default function Auth() {
         } else {
             toast.error("The password and confirmation password does not match!")
         }
+        setIsRegistration(false)
     }
 
     async function onSubmitLogin(values: z.infer<typeof formSchemaLogin>) {
-        console.log('login form', values)
+        setIsLogin(true)
         const res = await fetch("/api/getAccountByEmail", {
             method: "POST",
             body: JSON.stringify(values),
@@ -123,14 +129,15 @@ export default function Auth() {
             toast.success("Account found")
             formRegistration.reset();
         } else {
-            toast.error("Error fetching account")
+            toast.error("Account not found")
         }
+        setIsLogin(false)
     }
 
     return (
-        <div className="min-h-screen p-4 overflow-auto px-5 lg:px-20">
+        <div className="min-h-screen p-4 md:p-0 overflow-auto px-5 md:px-10 lg:px-20">
             <Toaster position="top-right" />
-            <div className="fixed left-1/2 -translate-x-1/2 w-full mt-10 max-w-lg">
+            <div className="fixed left-1/2 -translate-x-1/2 w-full mt-5 max-w-lg">
                 <Tabs defaultValue="login" className="w-full">
                     <TabsList>
                         <TabsTrigger value="login">Login</TabsTrigger>
@@ -167,14 +174,25 @@ export default function Auth() {
                                                 <FormItem>
                                                     <FormLabel>Password</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="Type your password" {...field} />
+                                                        <Input
+                                                            placeholder="Type your password"
+                                                            {...field}
+                                                            type="password"
+                                                        />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
-                                        <Button type="submit" className="w-full">
-                                            Login
+                                        <Button type="submit" className="w-full cursor-pointer" disabled={isLogin}>
+                                            {isLogin ? (
+                                                <>
+                                                    <Spinner />
+                                                    <span className="ml-0">Submitting</span>
+                                                </>
+                                            ) : (
+                                                "Login"
+                                            )}
                                         </Button>
                                     </form>
                                 </Form>
@@ -182,7 +200,7 @@ export default function Auth() {
                         </Card>
                     </TabsContent>
                     <TabsContent value="register">
-                        <Card className="max-h-[400px] overflow-y-auto">
+                        <Card className="max-h-[450px] overflow-y-auto">
                             <CardHeader>
                                 <CardTitle>Register Your Account</CardTitle>
                                 <CardDescription>
@@ -281,8 +299,19 @@ export default function Auth() {
                                                 </FormItem>
                                             )}
                                         />
-                                        <Button type="submit" className="w-full">
-                                            Register
+                                        <Button
+                                            type="submit"
+                                            className="w-full cursor-pointer"
+                                            disabled={isRegistration}
+                                        >
+                                            {isRegistration ? (
+                                                <>
+                                                    <Spinner />
+                                                    <span className="ml-0">Submitting</span>
+                                                </>
+                                            ) : (
+                                                "Registration"
+                                            )}
                                         </Button>
                                     </form>
                                 </Form>
@@ -291,7 +320,6 @@ export default function Auth() {
                     </TabsContent>
                 </Tabs>
             </div>
-
         </div>
     );
 }
