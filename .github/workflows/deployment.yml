@@ -3,7 +3,7 @@ name: Application Deploy of MES
 on:
   push:
     branches:
-      - main # Change to your specific branch
+      - main
 
 jobs:
   deploy:
@@ -30,7 +30,7 @@ jobs:
           HOST: ${{ secrets.HOST }}
           USERNAME: ${{ secrets.USERNAME }}
           TARGET_DIR: ${{ secrets.TARGET_DIR }}
-          APP_NAME: ${{ secrets.APP_NAME }} #should match the name of the server block
+          APP_NAME: ${{ secrets.APP_NAME }}
           PORT: ${{ secrets.PORT }}
           #if multiple deploys are needed from different branches
           #TARGET_DIR: ${{ github.ref == 'refs/heads/deploytest' && '/var/www/folder_name' || github.ref == 'refs/heads/deployprod' && '/var/www/another-location' }}
