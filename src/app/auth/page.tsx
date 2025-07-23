@@ -30,6 +30,7 @@ import {
 import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
 import { Spinner } from "@/components/ui/spinner"
+import { useRouter } from 'next/navigation';
 
 const formSchemaRegistration = z.object({
     email: z
@@ -70,6 +71,7 @@ const formSchemaLogin = z.object({
 })
 
 export default function Auth() {
+    const router = useRouter();
     const [isLogin, setIsLogin] = React.useState(false)
     const [isRegistration, setIsRegistration] = React.useState(false)
     const formRegistration = useForm<z.infer<typeof formSchemaRegistration>>({
@@ -127,6 +129,7 @@ export default function Auth() {
 
         if (res.ok) {
             toast.success("Account found")
+            router.push('/app/dashboard');
             formRegistration.reset();
         } else {
             toast.error("Account not found")
