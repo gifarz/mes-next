@@ -14,6 +14,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 [email]
             );
 
+            console.log('result', result)
+
             res.status(200).json({ message: 'Account found', data: result.rows[0] });
         } catch (error) {
             console.error('Insert error:', error);
