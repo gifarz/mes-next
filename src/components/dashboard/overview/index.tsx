@@ -47,10 +47,10 @@ const items = [
 
 export default function OverviewCard() {
     return (
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
             {
                 items.map((item) => (
-                    <Card className="w-full max-w-sm" key={item.title}>
+                    <Card className="w-full max-w-full" key={item.title}>
                         <CardHeader>
                             <CardTitle>{item.title}</CardTitle>
                         </CardHeader>

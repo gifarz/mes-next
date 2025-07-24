@@ -203,7 +203,7 @@ export default function Auth() {
                         </Card>
                     </TabsContent>
                     <TabsContent value="register">
-                        <Card className="max-h-[450px] overflow-y-auto">
+                        <Card className="max-h-[85vh] overflow-y-auto">
                             <CardHeader>
                                 <CardTitle>Register Your Account</CardTitle>
                                 <CardDescription>

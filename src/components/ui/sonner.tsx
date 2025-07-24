@@ -10,11 +10,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       theme={theme as ToasterProps["theme"]}
       toastOptions={{
-        style: {
-          width: "250px", // ✅ actual enforced width here
-          maxWidth: "90vw",
-        },
-        className: "rounded-md shadow-lg text-sm", // ✅ other visual styles here
+        // style: {
+        //   width: "250px", // ✅ actual enforced width here
+        //   maxWidth: "90vw",
+        // },
+        className: "w-full md:max-w-[250px]", // ✅ other visual styles here
       }}
       style={
         {
