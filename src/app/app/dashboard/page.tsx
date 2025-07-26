@@ -16,10 +16,10 @@ export default function page() {
     return (
         <div className="flex w-full flex-col gap-6 mt-5">
             <Tabs defaultValue="overview">
-                <TabsList>
-                    <TabsTrigger value="overview">Overview</TabsTrigger>
-                    <TabsTrigger value="notification">Notification</TabsTrigger>
-                    <TabsTrigger value="statistic">Statistic</TabsTrigger>
+                <TabsList className="w-full flex">
+                    <TabsTrigger value="overview" className="flex-1">Overview</TabsTrigger>
+                    <TabsTrigger value="notification" className="flex-1">Notification</TabsTrigger>
+                    <TabsTrigger value="statistic" className="flex-1">Statistic</TabsTrigger>
                 </TabsList>
                 <TabsContent value="overview">
                     <Card>

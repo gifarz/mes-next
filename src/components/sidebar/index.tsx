@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
 import {
     Button
@@ -17,6 +17,18 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import Image from "next/image"
 
 // Menu items.
@@ -50,7 +62,18 @@ const items = [
 
 export function AppSidebar() {
     const pathname = usePathname()
+    const router = useRouter()
 
+    const handleLogout = async () => {
+        try {
+            await fetch("/api/auth/logout", {
+                method: "POST",
+            })
+            router.push("/auth")
+        } catch (error) {
+            console.error("Logout failed", error)
+        }
+    }
     return (
         <Sidebar>
             <SidebarContent>
@@ -88,7 +111,31 @@ export function AppSidebar() {
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>
-                <Button className="w-full cursor-pointer">LOGOUT</Button>
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button variant="destructive" className="w-full cursor-pointer">LOGOUT</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle>Logout</DialogTitle>
+                            <DialogDescription>
+                                Are you sure want to logout ?
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <Button className="cursor-pointer" variant="outline">No</Button>
+                            </DialogClose>
+                            <Button
+                                variant="destructive"
+                                className="cursor-pointer"
+                                onClick={handleLogout}
+                            >
+                                Yes
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </SidebarFooter>
         </Sidebar>
     )

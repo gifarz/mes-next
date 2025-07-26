@@ -33,15 +33,9 @@ export const Navbar = () => {
                         </Button>
                     </SheetTrigger>
                     <SheetContent side="left">
-                        <nav className="flex flex-col mt-10 space-y-4 text-center">
-                            <Link href="/" className="text-sm font-medium hover:underline">
-                                Home
-                            </Link>
-                            <Link href="/about" className="text-sm font-medium hover:underline">
-                                About
-                            </Link>
-                            <Link href="/contact" className="text-sm font-medium hover:underline">
-                                Contact
+                        <nav className="flex flex-col mt-14 space-y-4 text-center">
+                            <Link href="/auth" className="hover:text-primary transition-colors">
+                                LOGIN | REGISTRATION
                             </Link>
                         </nav>
                     </SheetContent>

@@ -11,10 +11,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme={theme as ToasterProps["theme"]}
       toastOptions={{
         // style: {
-        //   width: "250px", // ✅ actual enforced width here
+        //   width: "250px",
         //   maxWidth: "90vw",
         // },
-        className: "w-full md:max-w-[250px]", // ✅ other visual styles here
+        className: "w-full md:max-w-[250px]",
       }}
       style={
         {

@@ -14,9 +14,9 @@ export default function page() {
     return (
         <div className="flex w-full flex-col gap-6 mt-5">
             <Tabs defaultValue="production">
-                <TabsList>
-                    <TabsTrigger value="production">Production</TabsTrigger>
-                    <TabsTrigger value="warehouse">Warehouse</TabsTrigger>
+                <TabsList className="w-full flex">
+                    <TabsTrigger value="production" className="flex-1">Production</TabsTrigger>
+                    <TabsTrigger value="warehouse" className="flex-1">Warehouse</TabsTrigger>
                 </TabsList>
                 <TabsContent value="production">
                     <Card>

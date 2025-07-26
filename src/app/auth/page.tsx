@@ -31,6 +31,7 @@ import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
 import { Spinner } from "@/components/ui/spinner"
 import { useRouter } from 'next/navigation';
+import Image from "next/image"
 
 const formSchemaRegistration = z.object({
     email: z
@@ -74,6 +75,8 @@ export default function Auth() {
     const router = useRouter();
     const [isLogin, setIsLogin] = React.useState(false)
     const [isRegistration, setIsRegistration] = React.useState(false)
+    const [tabValue, setTabValue] = React.useState("login")
+
     const formRegistration = useForm<z.infer<typeof formSchemaRegistration>>({
         resolver: zodResolver(formSchemaRegistration),
         defaultValues: {
@@ -97,7 +100,7 @@ export default function Auth() {
     async function onSubmitRegistration(values: z.infer<typeof formSchemaRegistration>) {
         setIsRegistration(true)
         if (values.password === values.passwordConfirmation) {
-            const res = await fetch("/api/insertAccount", {
+            const res = await fetch("/api/auth/register", {
                 method: "POST",
                 body: JSON.stringify(values),
                 headers: {
@@ -107,6 +110,7 @@ export default function Auth() {
 
             if (res.ok) {
                 toast.success("Account has been created")
+                setTabValue("login")
                 formRegistration.reset();
             } else {
                 toast.error("Error creating account")
@@ -119,7 +123,7 @@ export default function Auth() {
 
     async function onSubmitLogin(values: z.infer<typeof formSchemaLogin>) {
         setIsLogin(true)
-        const res = await fetch("/api/getAccountByEmail", {
+        const res = await fetch("/api/auth/login", {
             method: "POST",
             body: JSON.stringify(values),
             headers: {
@@ -141,13 +145,13 @@ export default function Auth() {
         <div className="min-h-screen p-4 md:p-0 overflow-auto px-5 md:px-10 lg:px-20">
             <Toaster position="top-right" />
             <div className="fixed left-1/2 -translate-x-1/2 w-full mt-5 max-w-lg">
-                <Tabs defaultValue="login" className="w-full">
-                    <TabsList>
-                        <TabsTrigger value="login">Login</TabsTrigger>
-                        <TabsTrigger value="register">Register</TabsTrigger>
+                <Tabs value={tabValue} onValueChange={setTabValue} className="w-full">
+                    <TabsList className="w-full flex">
+                        <TabsTrigger value="login" className="flex-1">Login</TabsTrigger>
+                        <TabsTrigger value="register" className="flex-1">Register</TabsTrigger>
                     </TabsList>
                     <TabsContent value="login">
-                        <Card className="max-h-[400px] overflow-y-auto">
+                        <Card className="max-h-[85vh] overflow-y-auto">
                             <CardHeader>
                                 <CardTitle>Login to your account</CardTitle>
                                 <CardDescription>
@@ -155,6 +159,14 @@ export default function Auth() {
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
+                                <div className="flex justify-center mt-2 mb-8">
+                                    <Image
+                                        src="/logo.png"
+                                        alt="MES Logo"
+                                        width={100}
+                                        height={100}
+                                    />
+                                </div>
                                 <Form {...formLogin}>
                                     <form onSubmit={formLogin.handleSubmit(onSubmitLogin)} className="space-y-5">
                                         <FormField
@@ -211,8 +223,19 @@ export default function Auth() {
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
+                                <div className="flex justify-center mt-2 mb-8">
+                                    <Image
+                                        src="/logo.png"
+                                        alt="MES Logo"
+                                        width={100}
+                                        height={100}
+                                    />
+                                </div>
                                 <Form {...formRegistration}>
-                                    <form onSubmit={formRegistration.handleSubmit(onSubmitRegistration)} className="space-y-5">
+                                    <form
+                                        onSubmit={formRegistration.handleSubmit(onSubmitRegistration)}
+                                        className="space-y-5"
+                                    >
                                         <FormField
                                             control={formRegistration.control}
                                             name="email"
