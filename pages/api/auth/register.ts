@@ -1,4 +1,3 @@
-// pages/api/account.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { db } from '@/lib/db';
 import { hashPassword } from '@/lib/hashPassword';

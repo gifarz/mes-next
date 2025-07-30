@@ -41,21 +41,21 @@ const formSchemaRegistration = z.object({
             { message: "Invalid email address" }
         ),
     name: z.string().min(3, {
-        message: "Username must be at least 3 characters.",
+        message: "Name must be at least 3 characters.",
     }),
     phone: z
         .string()
         .min(10, { message: "Phone must be at least 10 digits." })
-        .max(15, { message: "Phone must be at most 15 digits." })
+        .max(15, { message: "Phone must be at most 13 digits." })
         .regex(/^\d+$/, { message: "Phone must contain only digits." }),
     password: z.string().min(5, {
-        message: "Username must be at least 5 characters.",
+        message: "Password must be at least 5 characters.",
     }),
     passwordConfirmation: z.string().min(5, {
-        message: "Username must be at least 5 characters.",
+        message: "Password must be at least 5 characters.",
     }),
     company: z.string().min(5, {
-        message: "Username must be at least 5 characters.",
+        message: "Company must be at least 5 characters.",
     })
 })
 
@@ -67,7 +67,7 @@ const formSchemaLogin = z.object({
             { message: "Invalid email address" }
         ),
     password: z.string().min(5, {
-        message: "Username must be at least 5 characters.",
+        message: "Password must be at least 5 characters.",
     })
 })
 
@@ -109,14 +109,14 @@ export default function Auth() {
             });
 
             if (res.ok) {
-                toast.success("Account has been created")
+                toast.success("Account Has Been Created!")
                 setTabValue("login")
                 formRegistration.reset();
             } else {
-                toast.error("Error creating account")
+                toast.error("Error Creating Account")
             }
         } else {
-            toast.error("The password and confirmation password does not match!")
+            toast.error("The password and Confirmation Password Does Not Match!")
         }
         setIsRegistration(false)
     }
@@ -132,11 +132,11 @@ export default function Auth() {
         });
 
         if (res.ok) {
-            toast.success("Account found")
+            toast.success("Account Found")
             router.push('/app/dashboard');
             formRegistration.reset();
         } else {
-            toast.error("Account not found")
+            toast.error("Account Not Found")
         }
         setIsLogin(false)
     }

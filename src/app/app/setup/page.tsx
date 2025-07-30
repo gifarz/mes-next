@@ -9,6 +9,12 @@ import {
     TabsList,
     TabsTrigger,
 } from "@/components/ui/tabs"
+import FactoryCard from '@/components/setup/factory'
+import MachineCard from '@/components/setup/machine'
+import StationCard from '@/components/setup/station'
+import ProductCard from '@/components/setup/product/main'
+import CustomerCard from '@/components/setup/customer/main'
+import InventoryCard from '@/components/setup/inventory/main'
 
 export default function page() {
     return (
@@ -25,36 +31,42 @@ export default function page() {
                 <TabsContent value="factory">
                     <Card>
                         <CardContent>
+                            <FactoryCard />
                         </CardContent>
                     </Card>
                 </TabsContent>
                 <TabsContent value="machine">
                     <Card>
                         <CardContent>
+                            <MachineCard />
                         </CardContent>
                     </Card>
                 </TabsContent>
                 <TabsContent value="station">
                     <Card>
                         <CardContent>
+                            <StationCard />
                         </CardContent>
                     </Card>
                 </TabsContent>
                 <TabsContent value="product">
                     <Card>
                         <CardContent>
+                            <ProductCard />
                         </CardContent>
                     </Card>
                 </TabsContent>
                 <TabsContent value="customer">
                     <Card>
                         <CardContent>
+                            <CustomerCard />
                         </CardContent>
                     </Card>
                 </TabsContent>
                 <TabsContent value="inventory">
                     <Card>
                         <CardContent>
+                            <InventoryCard />
                         </CardContent>
                     </Card>
                 </TabsContent>

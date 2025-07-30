@@ -78,8 +78,8 @@ export function AppSidebar() {
         <Sidebar>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel className="flex flex-col text-center">
-                        <h1 className="font-bold">MES SYSTEM</h1>
+                    <SidebarGroupLabel className="flex flex-col text-center my-8">
+                        <h1 className="font-bold">IMES-PLATFORM</h1>
                         <Image
                             src="/logo.png"
                             alt="Centered Logo"
