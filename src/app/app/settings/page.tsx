@@ -14,18 +14,7 @@ import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from '@/components/ui/spinner'
-
-interface Account {
-    name: string
-    email: string
-    phone: string
-    company: string
-}
-
-interface ChangePassword {
-    newPassword: string
-    newPasswordConfirmation: string
-}
+import { Account, ChangePassword } from '../../../../types/settings/account'
 
 export default function Settings() {
     const [account, setAccount] = React.useState<Account | null>(null)

@@ -17,6 +17,7 @@ import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
 import { Spinner } from "@/components/ui/spinner"
 import { useUserStore } from '../../../../store/userStore';
+import { replaceString } from '@/lib/regex';
 
 export default function FactoryCard() {
     const [factoryName, setFactoryName] = useState('');
@@ -50,7 +51,7 @@ export default function FactoryCard() {
         setOperationEnd(data.operation_end || '');
         setOvertimeStart(data.overtime_start || '');
         setOvertimeEnd(data.overtime_end || '');
-        setOperationDays(data.operation_day || []);
+        setOperationDays(data.operation_day?.split(",") || []);
         setProductivityOptimization(data.productivity_optimization || '');
         setWorkUtilization(data.work_utilization || '');
         setStandardMachinery(data.standard_machine_efficiency || '');
@@ -74,7 +75,7 @@ export default function FactoryCard() {
             operation_end: operationEnd,
             overtime_start: overtimeStart,
             overtime_end: overtimeEnd,
-            operation_day: operationDays,
+            operation_day: operationDays.join(","),
             productivity_optimization: productivityOptimization,
             work_utilization: workUtilization,
             standard_machine_efficiency: standardMachinery,
@@ -111,7 +112,7 @@ export default function FactoryCard() {
             operation_end: operationEnd,
             overtime_start: overtimeStart,
             overtime_end: overtimeEnd,
-            operation_day: operationDays,
+            operation_day: operationDays.join(","),
             productivity_optimization: productivityOptimization,
             work_utilization: workUtilization,
             standard_machine_efficiency: standardMachinery,
@@ -141,7 +142,7 @@ export default function FactoryCard() {
 
     return (
         <>
-            {console.log('factory', factory)}
+            {console.log('operationDays', operationDays)}
             <Toaster position="top-right" />
             <div className="flex flex-col md:flex-row items-start justify-center min-h-screen gap-4">
                 {/* Left card with form */}
@@ -150,7 +151,7 @@ export default function FactoryCard() {
                         Factory Initialize
                     </h2>
 
-                    <div className="space-y-6">
+                    <div className="space-y-4">
                         {/* Factory Name */}
                         <div className="space-y-1">
                             <Label htmlFor="factoryName">Factory Name</Label>
@@ -243,6 +244,7 @@ export default function FactoryCard() {
                                 id="workUtilization"
                                 placeholder="0"
                                 type="number"
+                                min={0}
                                 onChange={(e) => setWorkUtilization(e.target.value)}
                                 value={workUtilization}
                             />
@@ -255,6 +257,7 @@ export default function FactoryCard() {
                                 id="standardMachinery"
                                 placeholder="0"
                                 type="number"
+                                min={0}
                                 onChange={(e) => setStandardMachinery(e.target.value)}
                                 value={standardMachinery}
                             />
@@ -267,6 +270,7 @@ export default function FactoryCard() {
                                 id="acceptableWaste"
                                 placeholder="0"
                                 type="number"
+                                min={0}
                                 onChange={(e) => setAcceptableWaste(e.target.value)}
                                 value={acceptableWaste}
                             />

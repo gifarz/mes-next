@@ -18,7 +18,7 @@ import InventoryCard from '@/components/setup/inventory/main'
 
 export default function page() {
     return (
-        <div className="flex w-full flex-col gap-6 mt-5">
+        <div className="w-full flex flex-col gap-6 mt-5">
             <Tabs defaultValue="factory">
                 <TabsList className="w-full flex">
                     <TabsTrigger value="factory" className="flex-1">Factory</TabsTrigger>

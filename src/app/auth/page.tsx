@@ -71,7 +71,7 @@ const formSchemaLogin = z.object({
     })
 })
 
-export default function Auth() {
+export default function AuthPage() {
     const router = useRouter();
     const [isLogin, setIsLogin] = React.useState(false)
     const [isRegistration, setIsRegistration] = React.useState(false)
@@ -142,16 +142,16 @@ export default function Auth() {
     }
 
     return (
-        <div className="min-h-screen p-4 md:p-0 overflow-auto px-5 md:px-10 lg:px-20">
+        <div className="p-4 md:p-0 overflow-auto px-5 md:px-10 lg:px-20">
             <Toaster position="top-right" />
-            <div className="fixed left-1/2 -translate-x-1/2 w-full mt-5 max-w-lg">
-                <Tabs value={tabValue} onValueChange={setTabValue} className="w-full">
+            <div className="fixed left-1/2 -translate-x-1/2 w-full mt-2 max-w-lg">
+                <Tabs value={tabValue} onValueChange={setTabValue}>
                     <TabsList className="w-full flex">
                         <TabsTrigger value="login" className="flex-1">Login</TabsTrigger>
                         <TabsTrigger value="register" className="flex-1">Register</TabsTrigger>
                     </TabsList>
                     <TabsContent value="login">
-                        <Card className="max-h-[85vh] overflow-y-auto">
+                        <Card className="max-h-[87vh] overflow-y-auto">
                             <CardHeader>
                                 <CardTitle>Login to your account</CardTitle>
                                 <CardDescription>
@@ -159,7 +159,7 @@ export default function Auth() {
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <div className="flex justify-center mt-2 mb-8">
+                                <div className="flex justify-center my-5">
                                     <Image
                                         src="/logo.png"
                                         alt="MES Logo"
@@ -168,7 +168,7 @@ export default function Auth() {
                                     />
                                 </div>
                                 <Form {...formLogin}>
-                                    <form onSubmit={formLogin.handleSubmit(onSubmitLogin)} className="space-y-5">
+                                    <form onSubmit={formLogin.handleSubmit(onSubmitLogin)} className="space-y-3">
                                         <FormField
                                             control={formLogin.control}
                                             name="email"
@@ -215,7 +215,7 @@ export default function Auth() {
                         </Card>
                     </TabsContent>
                     <TabsContent value="register">
-                        <Card className="max-h-[85vh] overflow-y-auto">
+                        <Card className="max-h-[87vh] overflow-y-auto">
                             <CardHeader>
                                 <CardTitle>Register Your Account</CardTitle>
                                 <CardDescription>
@@ -223,7 +223,7 @@ export default function Auth() {
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <div className="flex justify-center mt-2 mb-8">
+                                <div className="flex justify-center my-5">
                                     <Image
                                         src="/logo.png"
                                         alt="MES Logo"
@@ -234,7 +234,7 @@ export default function Auth() {
                                 <Form {...formRegistration}>
                                     <form
                                         onSubmit={formRegistration.handleSubmit(onSubmitRegistration)}
-                                        className="space-y-5"
+                                        className="space-y-3"
                                     >
                                         <FormField
                                             control={formRegistration.control}

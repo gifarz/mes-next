@@ -9,9 +9,11 @@ import { AppSidebar } from "@/components/sidebar";
 import { Moon, Sun } from 'lucide-react'
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
+import { useSidebarStore } from '../../../store/sidebarStore'
 
 export default function AppLayout({ children }: { children: ReactNode }) {
     const setUser = useUserStore((state) => state.setUser)
+    const { toggle } = useSidebarStore();
     const isInitialized = useRef(false)
     const { setTheme, theme, resolvedTheme } = useTheme()
     const [mounted, setMounted] = useState(false)
@@ -61,7 +63,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                 <AppSidebar />
                 <main className="flex-1 p-4">
                     <div className="flex justify-between">
-                        <SidebarTrigger />
+                        <SidebarTrigger onClick={toggle} />
                         <Button
                             variant="outline"
                             size="icon"

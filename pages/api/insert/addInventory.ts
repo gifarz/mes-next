@@ -13,8 +13,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             quantity,
         } = req.body;
 
-        console.log('req.body', req.body)
-
         try {
             const uuid = generateUUID()
             const cookieHeader = req.headers.cookie || ""
@@ -43,8 +41,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     RETURNING *`,
                     [uuid, factory_id, name, code, cost, quantity, created_by]
                 );
-
-                console.log('result', result.rows)
 
                 if (result.rowCount && result.rowCount > 0) {
                     res.status(200).json({ message: 'Successfully Insert Inventory', data: result.rows[0] });

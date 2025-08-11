@@ -21,8 +21,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             processSetupTime,
         } = req.body;
 
-        console.log('req.body', req.body)
-
         try {
             const uuid = generateUUID()
             const cookieHeader = req.headers.cookie || ""
@@ -56,12 +54,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         process_setup_time,
                         created_by
                     )
-                    VALUES ($1, $2, $3, $4, $5, $6, $7)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
                     RETURNING *`,
                     [uuid, factory_id, productName, productSkuCode, productCost, productDescription, null, partName, partSkuCode, partDependency, partRawMaterial, partRawMaterialQuantity, processNumber, processCycleTime, processSetupTime, created_by]
                 );
-
-                console.log('result', result.rows)
 
                 if (result.rowCount && result.rowCount > 0) {
                     res.status(200).json({ message: 'Successfully Insert Product', data: result.rows[0] });

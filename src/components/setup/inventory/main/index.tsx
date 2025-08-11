@@ -1,37 +1,76 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
 import { Spinner } from "@/components/ui/spinner"
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useUserStore } from '../../../../../store/userStore'
-import AddInventory from "../add"
+import InventoryDataTable from "../table"
+import { formattedDate } from "@/lib/dateUtils"
+import AddEditInventory from "../add-edit"
 
-interface Machines {
+interface Inventory {
     identifier: string
+    factory_id: string
     name: string
-    number: string
-    type: string
-    capacity: string
+    code: string
+    cost: string
+    quantity: string
     created_on: string
 }
 
 export default function InventoryCard() {
+    const [listInventory, setListInventory] = useState<Inventory[]>([])
+    const [openDialog, setOpenDialog] = useState<boolean>(false)
+    const [refreshKey, setRefreshKey] = useState(0)
+
+    const [isFetched, setIsFetched] = useState<boolean>(false)
+
+    const email = useUserStore((state) => state.email)
+
+    useEffect(() => {
+        const payload = {
+            email: email,
+        }
+
+        const getInventoryByEmail = async () => {
+            const res = await fetch("/api/getter/getInventoryByEmail", {
+                method: "POST",
+                body: JSON.stringify(payload),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const response = await res.json()
+
+            const fixedResponse = response.data.map((res: Inventory) => {
+                return {
+                    ...res,
+                    created_on: formattedDate(res.created_on)
+                }
+            })
+
+            setListInventory(fixedResponse)
+            setIsFetched(true)
+        }
+
+        getInventoryByEmail()
+
+    }, [email, openDialog, refreshKey])
 
     return (
         <>
             <Toaster position="top-right" />
+            <AddEditInventory
+                isEdit={false}
+                open={openDialog}
+                onOpenChange={setOpenDialog}
+            />
+
             <div className="flex flex-col min-h-screen gap-4">
                 <div className="w-full max-h-full rounded">
                     <div className="flex flex-row items-center justify-between">
@@ -41,13 +80,22 @@ export default function InventoryCard() {
                         <div className="flex gap-2 ml-auto">
                             <Input
                                 type="text"
-                                placeholder="Search machines..."
-                                className="w-[200px]"
+                                placeholder="Search inventory..."
                             />
-                            <AddInventory />
+                            <Button
+                                className="cursor-pointer"
+                                onClick={() => setOpenDialog(true)}
+                            >
+                                Add Inventory
+                            </Button>
                         </div>
                     </div>
                 </div>
+
+                <InventoryDataTable
+                    data={listInventory}
+                    onInventoryUpdated={() => setRefreshKey((prev) => prev + 1)} // 👈 Refetch trigger
+                />
             </div>
         </>
     )

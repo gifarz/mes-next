@@ -15,8 +15,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             address,
         } = req.body;
 
-        console.log('req.body', req.body)
-
         try {
             const uuid = generateUUID()
             const cookieHeader = req.headers.cookie || ""
@@ -35,14 +33,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     `INSERT INTO mes.customers (
                         identifier,
                         factory_id,
-                        firstName,
-                        lastName,
+                        first_name,
+                        last_name,
                         email,
-                        phoneNumber,
+                        phone_number,
                         address,
                         created_by
                     )
-                    VALUES ($1, $2, $3, $4, $5, $6, $7)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
                     RETURNING *`,
                     [uuid, factory_id, firstName, lastName, email, phoneNumber, address, created_by]
                 );

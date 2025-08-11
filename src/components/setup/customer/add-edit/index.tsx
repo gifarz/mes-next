@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -10,31 +10,106 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { toast } from "sonner"
+import { DialogCustomerProps } from "../../../../../types/setup/customer"
+import { Spinner } from "@/components/ui/spinner"
 
-export default function AddCustomer() {
+export default function AddEditCustomer({ isEdit, customerData, open, onOpenChange }: DialogCustomerProps) {
     const [firstName, setFirstName] = useState<string>("")
     const [lastName, setLastName] = useState<string>("")
     const [email, setEmail] = useState<string>("")
     const [phoneNumber, setPhoneNumber] = useState<string>("")
     const [address, setAddress] = useState<string>("")
 
+    const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
+
+    useEffect(() => {
+        if (customerData) {
+            setFirstName(customerData.first_name.toString());
+            setLastName(customerData.last_name.toString());
+            setEmail(customerData.email.toString());
+            setPhoneNumber(customerData.phone_number);
+            setAddress(customerData.address);
+        } else {
+            setFirstName("");
+            setLastName("");
+            setEmail("");
+            setPhoneNumber("");
+            setAddress("");
+        }
+    }, [customerData, open]); // Also reset fields when dialog opens
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setIsSubmitted(true)
+        const payload = {
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            address,
+        }
+
+        if (isEdit) {
+            const body = {
+                ...payload,
+                identifier: customerData?.identifier
+            }
+
+            const res = await fetch("/api/patcher/updateCustomerByIdentifier", {
+                method: "POST",
+                body: JSON.stringify(body),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (res.ok) {
+                toast.success("The Customer Updated Successfully!")
+                onOpenChange(false)
+                setIsSubmitted(false)
+            } else {
+                toast.error("Failed to Update Customer!")
+                setIsSubmitted(false)
+            }
+
+        } else {
+            const res = await fetch("/api/insert/addCustomer", {
+                method: "POST",
+                body: JSON.stringify(payload),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (res.ok) {
+                toast.success("The Customer Added Successfully!")
+                setIsSubmitted(false)
+                onOpenChange(false)
+            } else {
+                toast.error("Failed to Add Customer!")
+                setIsSubmitted(false)
+            }
+        }
+    }
+
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={onOpenChange}>
             <form>
-                <DialogTrigger asChild>
-                    <Button className="cursor-pointer" variant="default">Add Customer</Button>
-                </DialogTrigger>
                 <DialogContent className="min-w-full min-h-screen max-h-[100vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>Add Customer</DialogTitle>
+                        <DialogTitle>
+                            {
+                                isEdit ? "Edit Customer" : "Add Customer"
+                            }
+                        </DialogTitle>
                         <DialogDescription>
-                            Please complete this form to add the customer
+                            {
+                                isEdit ? "Please complete this form to edit the customer" : "Please complete this form to add the customer"
+                            }
                         </DialogDescription>
                     </DialogHeader>
                     <div>
@@ -63,7 +138,6 @@ export default function AddCustomer() {
                                 <Input
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    type="number"
                                     placeholder="Enter Email"
                                 />
                             </div>
@@ -73,6 +147,7 @@ export default function AddCustomer() {
                                     value={phoneNumber}
                                     onChange={(e) => setPhoneNumber(e.target.value)}
                                     type="number"
+                                    min={0}
                                     placeholder="Enter Phone Number"
                                 />
                             </div>
@@ -90,7 +165,20 @@ export default function AddCustomer() {
                         <DialogClose asChild>
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
-                        <Button type="submit">Submit</Button>
+                        <Button
+                            className="cursor-pointer"
+                            type="submit"
+                            onClick={handleSubmit}
+                        >
+                            {isSubmitted ? (
+                                <>
+                                    <Spinner className="border-white dark:border-black" />
+                                    <span className="ml-0">Submitting</span>
+                                </>
+                            ) :
+                                "Submit"
+                            }
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </form>

@@ -9,12 +9,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       theme={theme as ToasterProps["theme"]}
+      offset={5} // distance from screen edges
       toastOptions={{
-        // style: {
-        //   width: "250px",
-        //   maxWidth: "90vw",
-        // },
-        className: "w-full md:max-w-[250px]",
+        className: "min-w-[250px] max-w-full p-0",
       }}
       style={
         {

@@ -11,8 +11,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 [email]
             );
 
-            console.log('result', result.rows)
-
             if (result.rowCount && result.rowCount > 0) {
                 res.status(200).json({ message: 'Station Found', data: result.rows });
             } else {

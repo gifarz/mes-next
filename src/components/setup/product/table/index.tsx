@@ -4,21 +4,15 @@ import { useState } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { ArrowUpIcon, ArrowDownIcon } from "@radix-ui/react-icons"
-
-type Product = {
-    identifier: string
-    name: string
-    sku_code: number
-    part: string
-    inventory_code: number
-    cost: number
-}
-
-const data: Product[] = [
-    { identifier: '1', name: 'Alice', sku_code: 12345, part: 'qwerty', inventory_code: 12345, cost: 12345 },
-    { identifier: '2', name: 'Bob', sku_code: 12345, part: 'qwerty', inventory_code: 12345, cost: 12345 },
-    { identifier: '3', name: 'Charlie', sku_code: 12345, part: 'qwerty', inventory_code: 12345, cost: 12345 },
-]
+import {
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem,
+} from "@/components/ui/dropdown-menu"
+import AddEditProduct from '../add-edit'
+import { DataProductProps, Product } from '../../../../../types/setup/product'
+import { useSidebarStore } from '../../../../../store/sidebarStore'
 
 type SortKey = keyof Product
 type SortRule = {
@@ -26,9 +20,23 @@ type SortRule = {
     order: 'asc' | 'desc'
 }
 
-export default function SortableTable() {
-    // const [sortKeys, setSortKeys] = useState<SortKey[]>(['name', 'age'])
-    // const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+const columns = [
+    { key: 'created_on', label: 'CREATED_ON' },
+    { key: 'name', label: 'NAME' },
+    { key: 'sku_code', label: 'SKU CODE' },
+    { key: 'part_name', label: 'PART' },
+    { key: 'part_sku_code', label: 'SKU CODE' },
+    { key: 'part_material', label: 'INVENTORY CODE' },
+    { key: 'part_material_quantity', label: 'INVENTORY REQUIRE' },
+    { key: 'cost', label: 'COST' },
+    { key: 'action', label: 'ACTION' },
+] as const
+
+export default function ProductDataTable({ data, onProductUpdated }: DataProductProps) {
+    const [openDialog, setOpenDialog] = useState<boolean>(false);
+    const [productData, setProductData] = useState<Product>();
+    const { open } = useSidebarStore();
+
     const [sortRules, setSortRules] = useState<SortRule[]>([
         { key: 'name', order: 'asc' },
         { key: 'sku_code', order: 'asc' },
@@ -84,37 +92,124 @@ export default function SortableTable() {
         )
     }
 
-
+    const handleDelete = async (product: Product) => {
+        const payload = {
+            identifier: product.identifier
+        }
+        await fetch("/api/remover/deleteProductByIdentifier", {
+            method: "POST",
+            body: JSON.stringify(payload),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        onProductUpdated?.()
+    }
 
     return (
-        <Table className='mt-10'>
-            <TableHeader>
-                <TableRow>
-                    {['name', 'sku code', 'part', 'inventory code', 'cost'].map((key) => (
-                        <TableHead key={key} className='text-center'>
-                            <Button
-                                variant="ghost"
-                                onClick={() => handleSort(key as SortKey)}
-                                className="font-semibold"
-                            >
-                                {key.toUpperCase()} <SortIcon column={key as SortKey} />
-                            </Button>
-                        </TableHead>
+        <div>
+            <AddEditProduct
+                isEdit={true}
+                productData={productData}
+                open={openDialog}
+                onOpenChange={(open) => {
+                    setOpenDialog(open)
+                    if (!open) {
+                        onProductUpdated?.() // 👈 Trigger refresh on close
+                    }
+                }}
+            />
+            <div className="mt-10 overflow-x-auto"
+                style={{
+                    width: open ? "calc(100vw - 380px)" : "calc(100vw - 140px)",
+                }}>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            {columns.map(({ key, label }) => (
+                                <TableHead key={key} className="text-center">
+                                    {key === 'action' ? (
+                                        <span className="font-semibold">{label}</span>
+                                    ) : (
+                                        <Button
+                                            variant="ghost"
+                                            onClick={() => handleSort(key as SortKey)}
+                                            className="font-semibold"
+                                        >
+                                            {label}
+                                            <SortIcon column={key as SortKey} />
+                                        </Button>
+                                    )}
+                                </TableHead>
+                            ))}
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {
+                            sortedData.length === 0 ?
+                                <TableRow>
+                                    <TableCell colSpan={columns.length} className="text-center py-10 text-muted-foreground">
+                                        No data of product available for now
+                                    </TableCell>
+                                </TableRow>
+                                :
+                                sortedData.map((product) => (
+                                    <TableRow key={product.identifier} className="text-center">
+                                        {columns.map(({ key }) => (
+                                            <TableCell key={key}>
+                                                {key === 'action' ? (
+                                                    <div className="flex justify-center">
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="ghost" size="icon" className="h-6 w-6">
+                                                                    <span className="sr-only">Open menu</span>
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        className="h-4 w-4"
+                                                                        fill="none"
+                                                                        viewBox="0 0 24 24"
+                                                                        stroke="currentColor"
+                                                                    >
+                                                                        <path
+                                                                            strokeLinecap="round"
+                                                                            strokeLinejoin="round"
+                                                                            strokeWidth={2}
+                                                                            d="M6 12h.01M12 12h.01M18 12h.01"
+                                                                        />
+                                                                    </svg>
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end">
+                                                                <DropdownMenuItem
+                                                                    className='cursor-pointer'
+                                                                    onClick={() => {
+                                                                        setOpenDialog(true)
+                                                                        setProductData(product)
+                                                                    }}
+                                                                >
+                                                                    EDIT
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem
+                                                                    onClick={() => handleDelete(product)}
+                                                                    className="cursor-pointer text-red-600 focus:text-red-700"
+                                                                >
+                                                                    DELETE
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </div>
+                                                ) : (
+                                                    product[key]
+                                                )}
+                                            </TableCell>
 
-                    ))}
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {sortedData.map((product) => (
-                    <TableRow key={product.identifier} className='text-center'>
-                        <TableCell>{product.name}</TableCell>
-                        <TableCell>{product.sku_code}</TableCell>
-                        <TableCell>{product.part}</TableCell>
-                        <TableCell>{product.inventory_code}</TableCell>
-                        <TableCell>{product.cost}</TableCell>
-                    </TableRow>
-                ))}
-            </TableBody>
-        </Table>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                    </TableBody>
+                </Table>
+
+            </div>
+        </div>
     )
 }

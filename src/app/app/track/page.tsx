@@ -9,6 +9,8 @@ import {
     TabsList,
     TabsTrigger,
 } from "@/components/ui/tabs"
+import ProductionCard from '@/components/track/production'
+import WarehouseCard from '@/components/track/warehouse'
 
 export default function page() {
     return (
@@ -21,12 +23,14 @@ export default function page() {
                 <TabsContent value="production">
                     <Card>
                         <CardContent>
+                            <ProductionCard />
                         </CardContent>
                     </Card>
                 </TabsContent>
                 <TabsContent value="warehouse">
                     <Card>
                         <CardContent>
+                            <WarehouseCard />
                         </CardContent>
                     </Card>
                 </TabsContent>

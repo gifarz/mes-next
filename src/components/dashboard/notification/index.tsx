@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import {
     Select,
     SelectContent,
@@ -11,7 +10,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
-import { ChevronDownIcon } from "lucide-react"
+import { ArrowDownIcon, ArrowUpIcon, ChevronDownIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -29,60 +28,107 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { useEffect, useState } from "react"
+import { useUserStore } from "../../../../store/userStore"
+import { Notification } from "../../../../types/dashboard/notification"
 
-const invoices = [
-    {
-        invoice: "INV001",
-        paymentStatus: "Paid",
-        totalAmount: "$250.00",
-        paymentMethod: "Credit Card",
-    },
-    {
-        invoice: "INV002",
-        paymentStatus: "Pending",
-        totalAmount: "$150.00",
-        paymentMethod: "PayPal",
-    },
-    {
-        invoice: "INV003",
-        paymentStatus: "Unpaid",
-        totalAmount: "$350.00",
-        paymentMethod: "Bank Transfer",
-    },
-    {
-        invoice: "INV004",
-        paymentStatus: "Paid",
-        totalAmount: "$450.00",
-        paymentMethod: "Credit Card",
-    },
-    {
-        invoice: "INV005",
-        paymentStatus: "Paid",
-        totalAmount: "$550.00",
-        paymentMethod: "PayPal",
-    },
-    {
-        invoice: "INV006",
-        paymentStatus: "Pending",
-        totalAmount: "$200.00",
-        paymentMethod: "Bank Transfer",
-    },
-    {
-        invoice: "INV007",
-        paymentStatus: "Unpaid",
-        totalAmount: "$300.00",
-        paymentMethod: "Credit Card",
-    },
-]
+type SortKey = keyof Notification
+type SortRule = {
+    key: SortKey
+    order: 'asc' | 'desc'
+}
+
+const columns = [
+    { key: 'created_on', label: 'CREATED_ON' },
+    { key: 'type', label: 'TYPE' },
+    { key: 'detail', label: 'DETAIL' },
+] as const
 
 export default function NotificationCard() {
-    const [open, setOpen] = React.useState(false)
-    const [date, setDate] = React.useState<Date | undefined>(undefined)
+    const [open, setOpen] = useState<boolean>(false)
+    const [date, setDate] = useState<Date | undefined>(undefined)
+    const [listNotifications, setListNotifications] = useState<Notification[]>([])
+    const [sortRules, setSortRules] = useState<SortRule[]>([
+        { key: 'created_on', order: 'asc' },
+    ])
+
+    const email = useUserStore((state) => state.email)
+
+    useEffect(() => {
+        const payload = { email }
+        const fetcher = async () => {
+            const response = await fetch("/api/getter/getNotificationByEmail", {
+                method: "POST",
+                body: JSON.stringify(payload),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const dataNotification = await response.json()
+            const fixedNotification = Array.isArray(dataNotification?.data)
+                ? dataNotification.data : []
+
+            setListNotifications(fixedNotification)
+        }
+
+        if (email) fetcher()
+    }, [email])
+
+    const sortedData = [...listNotifications].sort((a, b) => {
+        for (const rule of sortRules) {
+            const valueA = a[rule.key]
+            const valueB = b[rule.key]
+
+            if (valueA === valueB) continue
+
+            if (typeof valueA === 'string' && typeof valueB === 'string') {
+                return rule.order === 'asc'
+                    ? valueA.localeCompare(valueB)
+                    : valueB.localeCompare(valueA)
+            }
+
+            if (typeof valueA === 'number' && typeof valueB === 'number') {
+                return rule.order === 'asc' ? valueA - valueB : valueB - valueA
+            }
+        }
+        return 0
+    })
+
+    const handleSort = (key: SortKey) => {
+        setSortRules((prev) => {
+            const existing = prev.find((rule) => rule.key === key)
+
+            if (existing) {
+                // Toggle the order
+                return [
+                    { key, order: existing.order === 'asc' ? 'desc' : 'asc' },
+                    ...prev.filter((r) => r.key !== key),
+                ]
+            } else {
+                // Add new rule to front
+                return [{ key, order: 'asc' }, ...prev]
+            }
+        })
+    }
+
+    const SortIcon = ({ column }: { column: SortKey }) => {
+        const rule = sortRules.find((r) => r.key === column)
+        if (!rule) return null
+
+        return rule.order === 'asc' ? (
+            <ArrowUpIcon className="inline" />
+        ) : (
+            <ArrowDownIcon className="inline" />
+        )
+    }
 
     return (
         <div>
-            <h1 className="text-center">Notification Center</h1>
-            <div className="flex gap-4 my-5">
+            <h2 className="text-2xl font-semibold text-center">
+                Notification Center
+            </h2>
+            <div className="flex justify-center gap-2 my-5">
                 <Select>
                     <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Notification Type" />
@@ -123,32 +169,44 @@ export default function NotificationCard() {
                 </Popover>
             </div>
 
-            <Table>
-                <TableCaption>A list of your recent invoices.</TableCaption>
+            <Table className='mt-2'>
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="w-[100px]">Invoice</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Method</TableHead>
-                        <TableHead className="text-right">Amount</TableHead>
+                        {columns.map(({ key, label }) => (
+                            <TableHead key={key} className="text-center">
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => handleSort(key as SortKey)}
+                                    className="font-semibold"
+                                >
+                                    {label}
+                                    <SortIcon column={key as SortKey} />
+                                </Button>
+                            </TableHead>
+                        ))}
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {invoices.map((invoice) => (
-                        <TableRow key={invoice.invoice}>
-                            <TableCell className="font-medium">{invoice.invoice}</TableCell>
-                            <TableCell>{invoice.paymentStatus}</TableCell>
-                            <TableCell>{invoice.paymentMethod}</TableCell>
-                            <TableCell className="text-right">{invoice.totalAmount}</TableCell>
-                        </TableRow>
-                    ))}
+                    {
+                        sortedData.length === 0 ?
+                            <TableRow>
+                                <TableCell colSpan={columns.length} className="text-center py-10 text-muted-foreground">
+                                    No data of notification available for now
+                                </TableCell>
+                            </TableRow>
+                            :
+                            sortedData.map((notification) => (
+                                <TableRow key={notification.ai} className="text-center">
+                                    {columns.map(({ key }) => (
+                                        <TableCell key={key}>
+
+                                            {notification[key]}
+                                        </TableCell>
+
+                                    ))}
+                                </TableRow>
+                            ))}
                 </TableBody>
-                <TableFooter>
-                    <TableRow>
-                        <TableCell colSpan={3}>Total</TableCell>
-                        <TableCell className="text-right">$2,500.00</TableCell>
-                    </TableRow>
-                </TableFooter>
             </Table>
         </div>
     )

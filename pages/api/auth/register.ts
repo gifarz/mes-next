@@ -25,6 +25,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     RETURNING *`,
                     [email, company, "REGISTRATION", "00", "Success"]
                 );
+
+                res.status(200).json({ message: 'Successfully Created the Account', data: result.rows[0] });
             } else {
                 await db.query(
                     `INSERT INTO mes.customer_logs (email, company, service, result_code, result_desc)
@@ -32,9 +34,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     RETURNING *`,
                     [email, company, "REGISTRATION", "01", "Registration Failed"]
                 );
+
+                res.status(500).json({ message: 'Failed Created the Account' });
             }
 
-            res.status(200).json({ message: 'Account Created', data: result.rows[0] });
         } catch (error) {
             console.error('Insert Error:', error);
             res.status(500).json({ error: 'Failed to Insert Account' });

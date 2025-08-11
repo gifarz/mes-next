@@ -12,8 +12,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             machine_name,
         } = req.body;
 
-        console.log('req.body', req.body)
-
         try {
             const uuid = generateUUID()
             const cookieHeader = req.headers.cookie || ""
@@ -21,30 +19,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const decodedJwt = decodeJWT(token as string)
             const created_by = decodedJwt.email
 
-            const getMachineByEmail = await db.query(
-                `SELECT * FROM mes.machines WHERE created_by = $1 AND name = $2`,
-                [created_by, machine_name]
+            const getFactoryByEmail = await db.query(
+                `SELECT * FROM mes.factories WHERE created_by = $1`,
+                [created_by]
             );
 
-            console.log('getMachineByEmail', getMachineByEmail)
-
-            if (getMachineByEmail.rowCount && getMachineByEmail.rowCount > 0) {
-                const factory_id = getMachineByEmail.rows[0].factory_id
-                const machine_id = getMachineByEmail.rows[0].identifier
+            if (getFactoryByEmail.rowCount && getFactoryByEmail.rowCount > 0) {
+                const factory_id = getFactoryByEmail.rows[0].factory_id
 
                 const result = await db.query(
                     `INSERT INTO mes.stations (
                         identifier,
                         factory_id,
-                        machine_id,
                         machine_name,
                         number,
                         name,
                         created_by
                     )
-                    VALUES ($1, $2, $3, $4, $5, $6, $7)
+                    VALUES ($1, $2, $3, $4, $5, $6)
                     RETURNING *`,
-                    [uuid, factory_id, machine_id, machine_name, number, name, created_by]
+                    [uuid, factory_id, machine_name, number, name, created_by]
                 );
 
                 if (result.rowCount && result.rowCount > 0) {
@@ -53,7 +47,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     res.status(500).json({ message: 'Failed to Insert Station' });
                 }
             }
-
 
         } catch (error) {
             console.error('Insert Error:', error);

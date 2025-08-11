@@ -16,29 +16,23 @@ import {
 } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useUserStore } from '../../../../store/userStore'
-
-interface Machines {
-    identifier: string
-    name: string
-    number: string
-    type: string
-    capacity: string
-    created_on: string
-}
+import { Machine } from "../../../../types/setup/machine"
+import { formattedDate } from "@/lib/dateUtils"
 
 export default function MachineCard() {
     const [search, setSearch] = useState<string>("")
-    const [isAddMachine, setIsAddMachine] = useState<boolean>(false)
-    const [isEditMachine, setIsEditMachine] = useState<boolean>(false)
     const [machineId, setMachineId] = useState<string>("")
     const [machineNumber, setMachineNumber] = useState<string>("")
     const [machineName, setMachineName] = useState<string>("")
     const [maxCapacity, setMaxCapacity] = useState<string>("")
     const [machineType, setMachineType] = useState<string>("")
-    const [listMachines, setListMachines] = useState<Machines[]>([])
+    const [listMachines, setListMachines] = useState<Machine[]>([])
 
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
     const [isFetched, setIsFetched] = useState<boolean>(false)
+    const [isAddMachine, setIsAddMachine] = useState<boolean>(false)
+    const [isEditMachine, setIsEditMachine] = useState<boolean>(false)
+    const [refreshKey, setRefreshKey] = useState(0)
 
     const email = useUserStore((state) => state.email)
 
@@ -58,13 +52,22 @@ export default function MachineCard() {
 
             const response = await res.json()
 
-            setListMachines(response.data)
+            const fixedResponse = Array.isArray(response?.data)
+                ? response.data.map((res: Machine) => {
+                    return {
+                        ...res,
+                        created_on: formattedDate(res.created_on)
+                    }
+                })
+                : []
+
+            setListMachines(fixedResponse)
             setIsFetched(true)
         }
 
         getMachinesByEmail()
 
-    }, [email, search, isAddMachine, isEditMachine])
+    }, [email, search, isAddMachine, isEditMachine, refreshKey])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -132,7 +135,7 @@ export default function MachineCard() {
         return []
     }, [listMachines, search]);
 
-    const handleEdit = async (machine: Machines) => {
+    const handleEdit = async (machine: Machine) => {
         setIsAddMachine(true) // To activate the red cancel button
         setIsEditMachine(true)
 
@@ -144,8 +147,19 @@ export default function MachineCard() {
         setMachineType(machine.type)
     }
 
-    const handleRemove = async (machine: Machines) => {
+    const handleDelete = async (machine: Machine) => {
+        const payload = {
+            identifier: machine.identifier
+        }
+        await fetch("/api/remover/deleteMachineByIdentifier", {
+            method: "POST",
+            body: JSON.stringify(payload),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
 
+        setRefreshKey((prev) => prev + 1)
     }
 
     return (
@@ -221,6 +235,7 @@ export default function MachineCard() {
                                     <Input
                                         id="maxCapacity"
                                         type="number"
+                                        min={0}
                                         value={maxCapacity}
                                         onChange={(e) => setMaxCapacity(e.target.value)}
                                     />
@@ -228,7 +243,7 @@ export default function MachineCard() {
 
                                 <div>
                                     <Label htmlFor="machineType">Machine Type *</Label>
-                                    <Select onValueChange={setMachineType}>
+                                    <Select value={machineType} onValueChange={setMachineType}>
                                         <SelectTrigger className="w-full">
                                             <SelectValue placeholder="Select or type a machine type" />
                                         </SelectTrigger>
@@ -289,18 +304,18 @@ export default function MachineCard() {
                                             <div><strong>Installation Date:</strong> {machine.created_on}</div>
                                             <div className="flex flex-col gap-2 mt-4">
                                                 <Button
-                                                    className="cusrsor-pointer"
+                                                    className="cursor-pointer"
                                                     variant="secondary"
                                                     onClick={() => handleEdit(machine)}
                                                 >
                                                     EDIT
                                                 </Button>
                                                 <Button
-                                                    className="cusrsor-pointer"
+                                                    className="cursor-pointer"
                                                     variant="destructive"
-                                                    onClick={() => handleRemove(machine)}
+                                                    onClick={() => handleDelete(machine)}
                                                 >
-                                                    REMOVE
+                                                    DELETE
                                                 </Button>
                                             </div>
                                         </CardContent>
