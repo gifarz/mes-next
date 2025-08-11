@@ -32,6 +32,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { Spinner } from "@/components/ui/spinner"
 import { useRouter } from 'next/navigation';
 import Image from "next/image"
+import { useUserStore } from "../../../store/userStore"
 
 const formSchemaRegistration = z.object({
     email: z
@@ -76,6 +77,8 @@ export default function AuthPage() {
     const [isLogin, setIsLogin] = React.useState(false)
     const [isRegistration, setIsRegistration] = React.useState(false)
     const [tabValue, setTabValue] = React.useState("login")
+
+    const setUser = useUserStore((state) => state.setUser)
 
     const formRegistration = useForm<z.infer<typeof formSchemaRegistration>>({
         resolver: zodResolver(formSchemaRegistration),
@@ -131,7 +134,14 @@ export default function AuthPage() {
             },
         });
 
+        const json = await res.json()
+
         if (res.ok) {
+            setUser({
+                email: json.data.email,
+                role: json.data.type,
+                factory: json.factory
+            })
             toast.success("Account Found")
             router.push('/app/dashboard');
             formRegistration.reset();

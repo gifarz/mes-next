@@ -12,50 +12,20 @@ import { Button } from "@/components/ui/button";
 import { useSidebarStore } from '../../../store/sidebarStore'
 
 export default function AppLayout({ children }: { children: ReactNode }) {
-    const setUser = useUserStore((state) => state.setUser)
     const { toggle } = useSidebarStore();
     const isInitialized = useRef(false)
-    const { setTheme, theme, resolvedTheme } = useTheme()
+    const { setTheme, resolvedTheme } = useTheme()
     const [mounted, setMounted] = useState(false)
 
     useEffect(() => {
         setMounted(true)
         if (isInitialized.current) return
         isInitialized.current = true
-
-        const token = getCookie("accessToken")
-
-        if (token) {
-            const decoded = decodeJWT(token)
-
-            const init = async () => {
-                try {
-                    const res = await fetch("/api/getter/getFactoryByEmail", {
-                        method: "POST",
-                        body: JSON.stringify({ email: decoded.email }),
-                        headers: { "Content-Type": "application/json" },
-                    })
-
-                    const json = await res.json()
-
-                    setUser({
-                        email: decoded.email,
-                        role: decoded.role,
-                        factory: json?.data || [],
-                    })
-                } catch (err) {
-                    console.error("Invalid Token or Failed to Fetch Factory", err)
-                }
-            }
-
-            init()
-        }
-    }, [setUser])
+    }, [])
 
     if (!mounted) return null
 
     const isDark = resolvedTheme === 'dark'
-
 
     return (
         <div className="flex min-h-screen">

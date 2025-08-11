@@ -1,4 +1,4 @@
-import { addHours, addMinutes, addSeconds, format } from "date-fns"
+import { addHours, addMinutes, addSeconds, format, intervalToDuration } from "date-fns"
 import { addDays, subDays, addMonths, subMonths, addYears, subYears, setHours, setMinutes, setSeconds } from "date-fns";
 
 type Unit = "day" | "month" | "year";
@@ -80,4 +80,13 @@ export function workloadsTime(rateItemsPerHour: number, requestedItems: number):
     const seconds = Math.round((totalMinutes % 1) * 60);
 
     return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+export function compareBetweenDate(date1: string, date2: string): string {
+    const duration = intervalToDuration({
+        start: new Date(date1),
+        end: new Date(date2),
+    })
+
+    return `${duration.hours?.toString().padStart(2, "0")}:${duration.minutes?.toString().padStart(2, "0")}:${duration.seconds?.toString().padStart(2, "0")}`
 }

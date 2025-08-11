@@ -17,16 +17,15 @@ import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
 import { Spinner } from "@/components/ui/spinner"
 import { useUserStore } from '../../../../store/userStore';
-import { replaceString } from '@/lib/regex';
 
 export default function FactoryCard() {
-    const [factoryName, setFactoryName] = useState('');
-    const [factoryType, setFactoryType] = useState('');
-    const [productionModel, setProductionModel] = useState('');
-    const [operationStart, setOperationStart] = useState('');
-    const [operationEnd, setOperationEnd] = useState('');
-    const [overtimeStart, setOvertimeStart] = useState('');
-    const [overtimeEnd, setOvertimeEnd] = useState('');
+    const [factoryName, setFactoryName] = useState<string>('');
+    const [factoryType, setFactoryType] = useState<string>('');
+    const [productionModel, setProductionModel] = useState<string>('');
+    const [operationStart, setOperationStart] = useState<string>('');
+    const [operationEnd, setOperationEnd] = useState<string>('');
+    const [overtimeStart, setOvertimeStart] = useState<string>('');
+    const [overtimeEnd, setOvertimeEnd] = useState<string>('');
     const [operationDays, setOperationDays] = useState<string[]>([]);
     const [productivityOptimization, setProductivityOptimization] = useState('');
     const [workUtilization, setWorkUtilization] = useState('');
@@ -40,9 +39,8 @@ export default function FactoryCard() {
     const factory = useUserStore((state) => state.factory)
 
     useEffect(() => {
-        if (!factory || factory.length === 0) return;
 
-        const data = factory[0];
+        const data = factory[0]
 
         setFactoryName(data.name || '');
         setFactoryType(data.type || '');
@@ -57,6 +55,7 @@ export default function FactoryCard() {
         setStandardMachinery(data.standard_machine_efficiency || '');
         setAcceptableWaste(data.acceptable_waste || '');
         setRescheduleInterval(data.reschedule_interval || '');
+
     }, [factory]);
 
     const toggleDay = (day: string) => {

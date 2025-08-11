@@ -22,7 +22,7 @@ import { Order } from '../../../../types/plan/order';
 import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
 import { Toaster } from '@/components/ui/sonner';
-import { customizeDateString } from '@/lib/dateUtils';
+import { compareBetweenDate, customizeDateString, formattedDate } from '@/lib/dateUtils';
 import DialogComponent from '@/components/dialog';
 import { Input } from '@/components/ui/input';
 
@@ -37,6 +37,7 @@ export default function ProductionCard() {
     const [done, setDone] = useState<number>(0)
 
     const [openDialog, setOpenDialog] = useState<boolean>(false)
+    const [openDialogProgress, setOpenDialogProgress] = useState<boolean>(false)
     const [refreshKey, setRefreshKey] = useState<number>(0)
     const [buttonId, setButtonId] = useState<Set<string>>(new Set());
 
@@ -81,7 +82,6 @@ export default function ProductionCard() {
     }, [email, isSubmitted, refreshKey])
 
     const handleReceiveJob = async (id: string, order_number: string) => {
-        setIsSubmitted(true)
         setButtonId(prev => new Set(prev).add(id));
 
         try {
@@ -112,7 +112,6 @@ export default function ProductionCard() {
                 next.delete(id);
                 return next;
             });
-            setIsSubmitted(false)
         }
 
     }
@@ -140,15 +139,23 @@ export default function ProductionCard() {
         setRefreshKey(prev => prev + 1)
     }
 
-    const handleUpdateProgress = async (identifier: string, quantity: string) => {
-
+    const handleUpdateProgress = async (identifier: string, quantity: string, actual_start: string) => {
+        setIsSubmitted(true)
         const total_items = Number(defect) + Number(done)
         const completed = (Number(done) / Number(quantity)) * 100
 
-        if (total_items === Number(quantity)) {
+        if (total_items <= Number(quantity)) {
+            const actual_end = customizeDateString("yyyy-MM-dd HH:mm:ss")
             const payload = {
-                identifier, defect, done, completed: `${completed}%`
+                identifier,
+                defect,
+                done,
+                completed: `${completed}%`,
+                actual_end: completed === 100 ? actual_end : null,
+                duration: completed === 100 ? compareBetweenDate(actual_start, actual_end) : null,
+                status: completed === 100 ? "Done" : "Work In Progress"
             }
+
             const res = await fetch("/api/patcher/updateProgressOrderByIdentifier", {
                 method: "POST",
                 body: JSON.stringify(payload),
@@ -165,10 +172,13 @@ export default function ProductionCard() {
                 toast.error(json.message)
             }
 
-            setRefreshKey(prev => prev + 1)
+            setOpenDialogProgress(false)
+
         } else {
             toast.error("The total items is not match with quantity")
         }
+
+        setIsSubmitted(false)
     }
 
     return (
@@ -284,7 +294,9 @@ export default function ProductionCard() {
                                         <div className='w-full flex gap-4 pr-2'>
                                             <Button
                                                 disabled={
-                                                    order.status == "Work In Progress" || buttonId.has(order.identifier)
+                                                    order.status == "Work In Progress" ||
+                                                    order.status == "Done" ||
+                                                    buttonId.has(order.identifier)
                                                 }
                                                 className='w-1/2 cursor-pointer'
                                                 onClick={() => handleReceiveJob(order.identifier, order.order_number)}
@@ -299,13 +311,25 @@ export default function ProductionCard() {
                                                         "RECEIVE JOB"
                                                 }
                                             </Button>
-                                            <Dialog>
+                                            <Dialog open={openDialogProgress} onOpenChange={setOpenDialogProgress}>
                                                 <DialogTrigger asChild>
-                                                    <Button variant="destructive" className="w-1/2 cursor-pointer">PROGRESS REPORT</Button>
+                                                    <Button
+                                                        disabled={
+                                                            order.status == "Waiting" ||
+                                                            order.status == "Done"
+                                                        }
+                                                        variant="destructive"
+                                                        className="w-1/2 cursor-pointer"
+                                                    >
+                                                        PROGRESS REPORT
+                                                    </Button>
                                                 </DialogTrigger>
                                                 <DialogContent className="sm:max-w-[425px]">
                                                     <DialogHeader className='mb-4'>
                                                         <DialogTitle>Progress Update</DialogTitle>
+                                                        <DialogDescription>
+                                                            The total item should be equal with quantity ({order.quantity})
+                                                        </DialogDescription>
                                                     </DialogHeader>
                                                     <div className='space-y-2'>
                                                         <div>
@@ -333,14 +357,22 @@ export default function ProductionCard() {
                                                     </div>
                                                     <DialogFooter>
                                                         <DialogClose asChild>
-                                                            <Button className="cursor-pointer" variant="outline">Cancel</Button>
+                                                            <Button className="cursor-pointer" variant="outline">CANCEL</Button>
                                                         </DialogClose>
                                                         <Button
                                                             variant="destructive"
                                                             className="cursor-pointer"
-                                                            onClick={() => handleUpdateProgress(order.identifier, order.quantity)}
+                                                            onClick={() => handleUpdateProgress(order.identifier, order.quantity, order.actual_start)}
                                                         >
-                                                            Update
+                                                            {
+                                                                isSubmitted ?
+                                                                    <>
+                                                                        <Spinner />
+                                                                        <span className="ml-0">Submitting</span>
+                                                                    </>
+                                                                    :
+                                                                    "UPDATE PROGRESS"
+                                                            }
                                                         </Button>
                                                     </DialogFooter>
                                                 </DialogContent>

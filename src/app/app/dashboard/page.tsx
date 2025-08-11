@@ -1,3 +1,5 @@
+"use client"
+
 import NotificationCard from "@/components/dashboard/notification"
 import OverviewCard from "@/components/dashboard/overview"
 import StatisticCard from "@/components/dashboard/statistic"
@@ -11,8 +13,24 @@ import {
     TabsList,
     TabsTrigger,
 } from "@/components/ui/tabs"
+import {
+    Alert,
+    AlertTitle,
+} from "@/components/ui/alert"
+import { AlertCircleIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
+import { useUserStore } from "../../../../store/userStore"
 
-export default function page() {
+export default function Dashboard() {
+    const router = useRouter()
+
+    const factory = useUserStore((state) => state.factory)
+
+    const handleCreateFactory = async () => {
+        router.push("/app/setup")
+    }
+
     return (
         <div className="flex w-full flex-col gap-6 mt-5">
             <Tabs defaultValue="overview">
@@ -22,7 +40,25 @@ export default function page() {
                     <TabsTrigger value="statistic" className="flex-1">Statistic</TabsTrigger>
                 </TabsList>
                 <TabsContent value="overview">
-                    <Card>
+                    {factory.length === 0 && (
+                        <Alert variant="destructive" className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <AlertCircleIcon className="h-5 w-5" />
+                                <AlertTitle>
+                                    You have not created a factory yet. Please click the button to create one.
+                                </AlertTitle>
+                            </div>
+                            <Button
+                                className="cursor-pointer"
+                                variant="destructive"
+                                onClick={handleCreateFactory}
+                            >
+                                Create Factory
+                            </Button>
+                        </Alert>
+                    )}
+
+                    <Card className="mt-2">
                         <CardContent>
                             <OverviewCard />
                         </CardContent>
