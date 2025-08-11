@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import { persist } from 'zustand/middleware'
 
 interface Factory {
     name: string | null
@@ -24,10 +25,26 @@ interface UserState {
     clearUser: () => void
 }
 
-export const useUserStore = create<UserState>((set) => ({
-    email: null,
-    role: null,
-    factory: [],
-    setUser: ({ email, role, factory }) => set({ email, role, factory }),
-    clearUser: () => set({ email: null, role: null, factory: [] }),
-}))
+export const useUserStore = create<UserState>()(
+    persist(
+        (set) => ({
+            email: null,
+            role: null,
+            factory: [],
+            setUser: (user) => set(() => ({
+                email: user.email,
+                role: user.role,
+                factory: user.factory,
+            })),
+            clearUser: () =>
+                set(() => ({
+                    email: null,
+                    role: null,
+                    factory: [],
+                })),
+        }),
+        {
+            name: 'user-store', // key in localStorage
+        }
+    )
+)
