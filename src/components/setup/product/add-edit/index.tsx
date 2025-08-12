@@ -68,10 +68,9 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
 
             const dataInventory = await inventory.json()
 
-            const inventoryResponse = dataInventory.data
+            const inventoryResponse = Array.isArray(dataInventory?.data) ? dataInventory.data : []
 
             setListInventory(inventoryResponse)
-
 
             const stations = await fetch("/api/getter/getStationsByEmail", {
                 method: "POST",
@@ -82,9 +81,7 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
             });
             const dataStations = await stations.json()
 
-            const stationResponse = Array.isArray(dataStations?.data)
-                ? dataStations.data
-                : []
+            const stationResponse = Array.isArray(dataStations?.data) ? dataStations.data : []
 
             setListStation(stationResponse)
         }

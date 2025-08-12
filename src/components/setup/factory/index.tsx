@@ -37,8 +37,11 @@ export default function FactoryCard() {
 
     // For checking is the user has the factory or not
     const factory = useUserStore((state) => state.factory)
+    const setFactory = useUserStore((state) => state.setUser)
 
     useEffect(() => {
+
+        if (factory.length === 0) return
 
         const data = factory[0]
 
@@ -56,7 +59,7 @@ export default function FactoryCard() {
         setAcceptableWaste(data.acceptable_waste || '');
         setRescheduleInterval(data.reschedule_interval || '');
 
-    }, [factory]);
+    }, [factory, isSubmitted]);
 
     const toggleDay = (day: string) => {
         setOperationDays((prev) =>
@@ -92,12 +95,31 @@ export default function FactoryCard() {
 
         if (res.ok) {
             toast.success("The Factory Added Successfully!")
-            setIsSubmitted(false)
+            setFactory({
+                factory: [
+                    {
+                        name: factoryName,
+                        type: factoryType,
+                        production_model: productionModel,
+                        operation_start: operationStart,
+                        operation_end: operationEnd,
+                        overtime_start: overtimeStart,
+                        overtime_end: overtimeEnd,
+                        operation_day: operationDays.join(','),
+                        productivity_optimization: productivityOptimization,
+                        work_utilization: workUtilization,
+                        standard_machine_efficiency: standardMachinery,
+                        acceptable_waste: acceptableWaste,
+                        reschedule_interval: rescheduleInterval,
+                    }
+                ]
+            })
+
         } else {
             toast.success("Failed to Add The Factory!")
-            setIsSubmitted(false)
-
         }
+
+        setIsSubmitted(false)
 
     }
 
@@ -129,12 +151,11 @@ export default function FactoryCard() {
 
         if (res.ok) {
             toast.success("The Factory Updated Successfully!")
-            setIsSubmitted(false)
         } else {
             toast.success("Failed to Update The Factory!")
-            setIsSubmitted(false)
-
         }
+
+        setIsSubmitted(false)
     }
 
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

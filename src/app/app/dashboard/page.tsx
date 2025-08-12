@@ -45,7 +45,7 @@ export default function Dashboard() {
                             <div className="flex items-center gap-2">
                                 <AlertCircleIcon className="h-5 w-5" />
                                 <AlertTitle>
-                                    You have not created a factory yet. Please click the button to create one.
+                                    You have not create the factory yet. Please click the button to create one.
                                 </AlertTitle>
                             </div>
                             <Button
