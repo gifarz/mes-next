@@ -86,7 +86,13 @@ export function compareBetweenDate(date1: string, date2: string): string {
     const duration = intervalToDuration({
         start: new Date(date1),
         end: new Date(date2),
-    })
+    });
 
-    return `${duration.hours?.toString().padStart(2, "0")}:${duration.minutes?.toString().padStart(2, "0")}:${duration.seconds?.toString().padStart(2, "0")}`
+    const hours = duration.hours ?? 0;
+    const minutes = duration.minutes ?? 0;
+    const seconds = duration.seconds ?? 0;
+
+    return `${hours.toString().padStart(2, "0")}:${minutes
+        .toString()
+        .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }

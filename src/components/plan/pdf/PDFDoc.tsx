@@ -1,104 +1,108 @@
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 
 // Styles
 const styles = StyleSheet.create({
     page: {
-        backgroundColor: '#1a1a1a',
-        color: '#fff',
+        backgroundColor: "#1a1a1a",
+        color: "#fff",
         padding: 50,
         fontSize: 12,
-        fontFamily: 'Helvetica',
+        fontFamily: "Helvetica",
     },
     title: {
         fontSize: 20,
-        textAlign: 'center',
-        fontWeight: 'bold',
-        marginTop: 50,
-        marginBottom: 30,
+        textAlign: "center",
+        fontWeight: "bold",
+        marginTop: 20,
+        marginBottom: 50,
     },
     row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        borderBottom: '1px solid #444',
+        flexDirection: "row",
+        justifyContent: "space-between",
+        borderBottom: "1px solid #444",
         paddingVertical: 15,
     },
     label: {
-        color: '#bbb',
+        color: "#bbb",
     },
     value: {
-        color: '#fff',
+        color: "#fff",
     },
 });
 
 // Data
 interface DetailPDF {
-    orderNumber: string,
-    customerName: string,
-    productionName: string,
-    skuCode: string,
-    productPart: string,
-    actualQuantity: string,
-    orderDuration: string,
-    deliveryDate: string,
-    cost: string
+    orderNumber?: string;
+    customerName?: string;
+    productionName?: string;
+    skuCode?: string;
+    productPart?: string;
+    actualQuantity?: string;
+    assyGroup?: string;
+    partRequst?: string;
+    noMode?: string;
+    totalLength?: string;
+    strippingFront?: string;
+    strippingRear?: string;
+    halfStripFront?: string;
+    halfStripEnd?: string;
+    insulationFront?: string;
+    insulationBack?: string;
+    coreDiameter?: string;
+    bladeMoveBack?: string;
+    depthOfBlade?: string;
+    lengthOfMb?: string;
+    orderDuration: string;
+    deliveryDate: string;
+    cost: string;
 }
 
 type DetailPDFProps = {
-    order: DetailPDF
-}
+    order: DetailPDF;
+};
 
 // Component
-const OrderDetailPDF = ({ order }: DetailPDFProps) => (
-    <Document>
-        <Page size="A4" style={styles.page}>
-            <Text style={styles.title}>Detail Order</Text>
+const OrderDetailPDF = ({ order }: DetailPDFProps) => {
+    const fields = [
+        { label: "Order Number", value: order.orderNumber || "-" },
+        { label: "Customer Name", value: order.customerName || "-" },
+        { label: "Production Name", value: order.productionName || "-" },
+        { label: "SKU Code", value: order.skuCode || "-" },
+        { label: "Product Part", value: order.productPart || "-" },
+        { label: "Actual Quantity", value: order.actualQuantity || "-" },
+        { label: "Assy Group", value: order.assyGroup || "-" },
+        { label: "Part Request", value: order.partRequst || "-" },
+        { label: "No Mode", value: order.noMode || "-" },
+        { label: "Total Length", value: order.totalLength || "-" },
+        { label: "Stripping Front", value: order.strippingFront || "-" },
+        { label: "Stripping Rear", value: order.strippingRear || "-" },
+        { label: "Half Strip Front", value: order.halfStripFront || "-" },
+        { label: "Half Strip End", value: order.halfStripEnd || "-" },
+        { label: "Insulation Front", value: order.insulationFront || "-" },
+        { label: "Insulation Back", value: order.insulationBack || "-" },
+        { label: "Core Diameter", value: order.coreDiameter || "-" },
+        { label: "Blade Move Back", value: order.bladeMoveBack || "-" },
+        { label: "Depth Of Blade", value: order.depthOfBlade || "-" },
+        { label: "Length Of MB", value: order.lengthOfMb || "-" },
+        { label: "Order Duration", value: order.orderDuration || "-" },
+        { label: "Delivery Date", value: order.deliveryDate || "-" },
+        { label: "Cost", value: order.cost || "-" },
+    ];
 
-            <View style={styles.row}>
-                <Text style={styles.label}>Order Number</Text>
-                <Text style={styles.value}>{order.orderNumber}</Text>
-            </View>
+    return (
+        <Document>
+            <Page size="A4" style={styles.page}>
+                <Text style={styles.title}>Order Detail Infomation</Text>
 
-            <View style={styles.row}>
-                <Text style={styles.label}>Customer Name</Text>
-                <Text style={styles.value}>{order.customerName}</Text>
-            </View>
-
-            <View style={styles.row}>
-                <Text style={styles.label}>Production Name</Text>
-                <Text style={styles.value}>{order.productionName}</Text>
-            </View>
-
-            <View style={styles.row}>
-                <Text style={styles.label}>SKU Code</Text>
-                <Text style={styles.value}>{order.skuCode}</Text>
-            </View>
-
-            <View style={styles.row}>
-                <Text style={styles.label}>Product Part</Text>
-                <Text style={styles.value}>{order.productPart}</Text>
-            </View>
-
-            <View style={styles.row}>
-                <Text style={styles.label}>Actual Quantity</Text>
-                <Text style={styles.value}>{order.actualQuantity}</Text>
-            </View>
-
-            <View style={styles.row}>
-                <Text style={styles.label}>Order Duration</Text>
-                <Text style={styles.value}>{order.orderDuration || '-'}</Text>
-            </View>
-
-            <View style={styles.row}>
-                <Text style={styles.label}>Delivery Date</Text>
-                <Text style={styles.value}>{order.deliveryDate || '-'}</Text>
-            </View>
-
-            <View style={styles.row}>
-                <Text style={styles.label}>Cost</Text>
-                <Text style={styles.value}>{order.cost || '-'}</Text>
-            </View>
-        </Page>
-    </Document>
-);
+                {fields.map(({ label, value }, index) => (
+                    <View key={index} style={styles.row}>
+                        <Text style={styles.label}>{label}</Text>
+                        <Text style={styles.value}>{value}</Text>
+                    </View>
+                ))}
+            </Page>
+        </Document>
+    );
+};
 
 export default OrderDetailPDF;

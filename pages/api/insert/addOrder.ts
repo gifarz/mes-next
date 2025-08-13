@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { generateUUID } from '@/lib/uuidGenerator';
 import { getCookieFromServer } from '@/lib/cookie';
 import { decodeJWT } from '@/lib/decodeJWT';
-import { adjustDayWithTime, formattedDateOnly, itemsPerHourToTime, workloadsTime } from '@/lib/dateUtils';
+import { adjustDayWithTime, formattedDateOnly, workloadsTime } from '@/lib/dateUtils';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
@@ -13,6 +13,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             product_id,
             product_name,
             quantity,
+            assy_group,
+            part,
+            no_mode,
+            total_length,
+            stripping_front,
+            stripping_rear,
+            half_strip_front,
+            half_strip_end,
+            insulation_front,
+            insulation_back,
+            core_diameter,
+            blade_move_back,
+            depth_of_blade,
+            length_of_mb,
             delivery_date,
             status
         } = req.body;
@@ -65,16 +79,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 const estimate_start = adjustDayWithTime(new Date(), 1, operation_start + ":00")
                 const estimate_end = adjustDayWithTime(new Date(), 1, operation_start + ":00", workloads)
 
-                console.log("factory_id", factory_id);
-                console.log("product_name", product_name);
-                console.log("product_part", product_part);
-                console.log("product_sku", product_sku);
-                console.log("station_id", station_id);
-                console.log("machine_name", machine_name);
-                console.log("used_machine", used_machine);
-                console.log("workloads", workloads);
-                console.log("estimate_start", estimate_start);
-                console.log("estimate_end", estimate_end);
+                // console.log("factory_id", factory_id);
+                // console.log("product_name", product_name);
+                // console.log("product_part", product_part);
+                // console.log("product_sku", product_sku);
+                // console.log("station_id", station_id);
+                // console.log("machine_name", machine_name);
+                // console.log("used_machine", used_machine);
+                // console.log("workloads", workloads);
+                // console.log("estimate_start", estimate_start);
+                // console.log("estimate_end", estimate_end);
 
                 const result = await db.query(
                     `INSERT INTO mes.orders (
@@ -93,12 +107,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         workloads,
                         estimate_start,
                         estimate_end,
+                        assy_group,
+                        part,
+                        no_mode,
+                        total_length,
+                        stripping_front,
+                        stripping_rear,
+                        half_strip_front,
+                        half_strip_end,
+                        insulation_front,
+                        insulation_back,
+                        core_diameter,
+                        blade_move_back,
+                        depth_of_blade,
+                        length_of_mb,
                         status,
                         created_by
                     )
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31)
                     RETURNING *`,
-                    [uuid, factory_id, station_id, station_name, order_number, customer_name, product_name, product_part, product_sku, quantity, formattedDateOnly(delivery_date), used_machine, workloads, estimate_start, estimate_end, status, created_by]
+                    [uuid, factory_id, station_id, station_name, order_number, customer_name, product_name, product_part, product_sku, quantity, formattedDateOnly(delivery_date), used_machine, workloads, estimate_start, estimate_end, assy_group, part, no_mode, total_length, stripping_front, stripping_rear, half_strip_front, half_strip_end, insulation_front, insulation_back, core_diameter, blade_move_back, depth_of_blade, length_of_mb, status, created_by]
                 );
 
                 if (result.rowCount && result.rowCount > 0) {

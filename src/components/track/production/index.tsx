@@ -114,6 +114,8 @@ export default function ProductionCard() {
             });
         }
 
+        setRefreshKey((prev) => prev + 1)
+
     }
 
     const handleDelete = async (id: string) => {
@@ -139,7 +141,9 @@ export default function ProductionCard() {
         setRefreshKey(prev => prev + 1)
     }
 
-    const handleUpdateProgress = async (identifier: string, quantity: string, actual_start: string) => {
+    const handleUpdateProgress = async (
+        identifier: string, quantity: string, actual_start: string, product_name: string, created_by: string
+    ) => {
         setIsSubmitted(true)
         const total_items = Number(defect) + Number(done)
         const completed = (Number(done) / Number(quantity)) * 100
@@ -167,7 +171,27 @@ export default function ProductionCard() {
             const json = await res.json()
 
             if (res.ok) {
-                toast.success(json.message)
+                toast.success(`Order Completed Updated to ${completed}%`)
+
+                if (completed === 100) {
+                    const payload = {
+                        product_name,
+                        quantity,
+                        created_by
+                    }
+                    const res = await fetch("/api/patcher/updateQuantityInventoryByName", {
+                        method: "POST",
+                        body: JSON.stringify(payload),
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    });
+
+                    if (res.ok) {
+                        toast.success("Order Has Been Done!")
+                    }
+                }
+
             } else {
                 toast.error(json.message)
             }
@@ -316,7 +340,8 @@ export default function ProductionCard() {
                                                     <Button
                                                         disabled={
                                                             order.status == "Waiting" ||
-                                                            order.status == "Done"
+                                                            order.status == "Done" ||
+                                                            order.status == "Scheduled"
                                                         }
                                                         variant="destructive"
                                                         className="w-1/2 cursor-pointer"
@@ -362,7 +387,7 @@ export default function ProductionCard() {
                                                         <Button
                                                             variant="destructive"
                                                             className="cursor-pointer"
-                                                            onClick={() => handleUpdateProgress(order.identifier, order.quantity, order.actual_start)}
+                                                            onClick={() => handleUpdateProgress(order.identifier, order.quantity, order.actual_start, order.product_name, order.created_by)}
                                                         >
                                                             {
                                                                 isSubmitted ?

@@ -385,28 +385,28 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
                                         <label className="block text-sm font-medium">Name</label>
                                         <Input
                                             disabled
-                                            value={productName}
+                                            value={productName ? productName : "-"}
                                         />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium">SKU Code</label>
                                         <Input
                                             disabled
-                                            value={productSkuCode}
+                                            value={productSkuCode ? productSkuCode : "-"}
                                         />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium">Cost</label>
                                         <Input
                                             disabled
-                                            value={productCost}
+                                            value={productCost ? productCost : "-"}
                                         />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium">Description</label>
                                         <Textarea
                                             disabled
-                                            value={productDescription}
+                                            value={productDescription ? productDescription : "-"}
                                         />
                                     </div>
                                 </div>
@@ -417,42 +417,42 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
                                         <label className="block text-sm font-medium">Name</label>
                                         <Input
                                             disabled
-                                            value={partName}
+                                            value={partName ? partName : "-"}
                                         />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium">SKU Code</label>
                                         <Input
                                             disabled
-                                            value={partSkuCode}
+                                            value={partSkuCode ? partSkuCode : "-"}
                                         />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium">Dependency</label>
                                         <Input
                                             disabled
-                                            value={partDependency}
+                                            value={partDependency ? partDependency : "-"}
                                         />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium">Raw Material</label>
                                         <Input
                                             disabled
-                                            value={partRawMaterial}
+                                            value={partRawMaterial ? partRawMaterial : "-"}
                                         />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium">Raw Material Quantity</label>
                                         <Input
                                             disabled
-                                            value={partRawMaterialQuantity}
+                                            value={partRawMaterialQuantity ? partRawMaterialQuantity : "-"}
                                         />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium">Process Number</label>
                                         <Input
                                             disabled
-                                            value={processNumber}
+                                            value={processNumber ? processNumber : "-"}
                                         />
                                     </div>
                                     <div>
@@ -461,7 +461,7 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
                                         </label>
                                         <Input
                                             disabled
-                                            value={processCycleTime}
+                                            value={processCycleTime ? processCycleTime : "-"}
                                         />
                                     </div>
                                     <div>
@@ -470,7 +470,7 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
                                         </label>
                                         <Input
                                             disabled
-                                            value={processSetupTime}
+                                            value={processSetupTime ? processSetupTime : "-"}
                                         />
                                     </div>
                                 </div>
@@ -501,7 +501,7 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
                             <Button className="cursor-pointer" variant="outline">Cancel</Button>
                         </DialogClose>
                         <Button
-                            disabled={!productName || !productSkuCode || !productCost || !productDescription || !partName || !partSkuCode || !partDependency || !partRawMaterial || !partRawMaterialQuantity || !processNumber || !processCycleTime || !processSetupTime}
+                            disabled={!productName || !productSkuCode || !productCost || !partName || !partSkuCode || !partDependency || !partRawMaterial || !partRawMaterialQuantity || !processNumber || !processCycleTime || !processSetupTime}
                             className="cursor-pointer"
                             type="submit"
                             onClick={handleSubmit}

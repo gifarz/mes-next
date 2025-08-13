@@ -33,4 +33,5 @@ export interface Order {
     done_item: string
     completed: string
     status: string
+    created_by: string
 }

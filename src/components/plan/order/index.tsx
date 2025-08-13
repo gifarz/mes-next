@@ -19,7 +19,6 @@ import { ChevronDownIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { pdf } from "@react-pdf/renderer";
 import OrderDetailPDF from "../pdf/PDFDoc";
-import { length } from "zod";
 
 export default function OrderCard() {
     const [orderNumber, setOrderNumber] = useState<string>("");
@@ -101,6 +100,20 @@ export default function OrderCard() {
             product_id: productId,
             product_name: product,
             quantity: quantity,
+            assy_group: assyGroup,
+            part: partRequst,
+            no_mode: noMode,
+            total_length: totalLength,
+            stripping_front: strippingFront,
+            stripping_rear: strippingRear,
+            half_strip_front: halfStripFront,
+            half_strip_end: halfStripEnd,
+            insulation_front: insulationFront,
+            insulation_back: insulationBack,
+            core_diameter: coreDiameter,
+            blade_move_back: bladeMoveBack,
+            depth_of_blade: depthOfBlade,
+            length_of_mb: lengthOfMb,
             delivery_date: deliveryDate,
             status: "Waiting",
         }
@@ -146,6 +159,20 @@ export default function OrderCard() {
             skuCode: SKUCode,
             productPart: part,
             actualQuantity: quantity,
+            assyGroup: assyGroup,
+            partRequst: partRequst,
+            noMode: noMode,
+            totalLength: totalLength,
+            strippingFront: strippingFront,
+            strippingRear: strippingRear,
+            halfStripFront: halfStripFront,
+            halfStripEnd: halfStripEnd,
+            insulationFront: insulationFront,
+            insulationBack: insulationBack,
+            coreDiameter: coreDiameter,
+            bladeMoveBack: bladeMoveBack,
+            depthOfBlade: depthOfBlade,
+            lengthOfMb: lengthOfMb,
             orderDuration: '-',
             deliveryDate: deliveryDate ? formattedDateOnly(deliveryDate.toISOString()) : "N/A",
             cost: (Number(cost) * Number(quantity)).toString(),
@@ -229,7 +256,7 @@ export default function OrderCard() {
                         <div>
                             <Label>Quantity</Label>
                             <Input
-                                placeholder="Input the quantity"
+                                placeholder="Input the Quantity"
                                 type="number"
                                 min={1}
                                 value={quantity}
@@ -240,8 +267,6 @@ export default function OrderCard() {
                             <Label>Assy Group</Label>
                             <Input
                                 placeholder="Input the Assy Group"
-                                type="number"
-                                min={1}
                                 value={assyGroup}
                                 onChange={(e) => setAssyGroup((e.target.value))}
                             />
@@ -250,8 +275,6 @@ export default function OrderCard() {
                             <Label>Part Request</Label>
                             <Input
                                 placeholder="Input the Part Request"
-                                type="number"
-                                min={1}
                                 value={partRequst}
                                 onChange={(e) => setPartRequst((e.target.value))}
                             />
@@ -260,8 +283,6 @@ export default function OrderCard() {
                             <Label>No Mode</Label>
                             <Input
                                 placeholder="Input the No Mode"
-                                type="number"
-                                min={1}
                                 value={noMode}
                                 onChange={(e) => setNoMode((e.target.value))}
                             />
@@ -269,9 +290,9 @@ export default function OrderCard() {
                         <div>
                             <Label>Total Length</Label>
                             <Input
-                                placeholder="Input the Total Length"
                                 type="number"
-                                min={1}
+                                min={0}
+                                placeholder="Input the Total Length"
                                 value={totalLength}
                                 onChange={(e) => setTotalLength((e.target.value))}
                             />
@@ -279,9 +300,9 @@ export default function OrderCard() {
                         <div>
                             <Label>Stripping Front</Label>
                             <Input
-                                placeholder="Input the Stripping Front"
                                 type="number"
-                                min={1}
+                                min={0}
+                                placeholder="Input the Stripping Front"
                                 value={strippingFront}
                                 onChange={(e) => setStrippingFront((e.target.value))}
                             />
@@ -289,9 +310,9 @@ export default function OrderCard() {
                         <div>
                             <Label>Stripping Rear</Label>
                             <Input
-                                placeholder="Input the Stripping Rear"
                                 type="number"
-                                min={1}
+                                min={0}
+                                placeholder="Input the Stripping Rear"
                                 value={strippingRear}
                                 onChange={(e) => setStrippingRear((e.target.value))}
                             />
@@ -299,9 +320,9 @@ export default function OrderCard() {
                         <div>
                             <Label>Half Strip Front</Label>
                             <Input
-                                placeholder="Input the Half Strip Front"
                                 type="number"
-                                min={1}
+                                min={0}
+                                placeholder="Input the Half Strip Front"
                                 value={halfStripFront}
                                 onChange={(e) => setHalfStripFront((e.target.value))}
                             />
@@ -309,9 +330,9 @@ export default function OrderCard() {
                         <div>
                             <Label>Half Strip End</Label>
                             <Input
-                                placeholder="Input the Half Strip End"
                                 type="number"
-                                min={1}
+                                min={0}
+                                placeholder="Input the Half Strip End"
                                 value={halfStripEnd}
                                 onChange={(e) => setHalfStripEnd((e.target.value))}
                             />
@@ -319,9 +340,9 @@ export default function OrderCard() {
                         <div>
                             <Label>Insulation Back</Label>
                             <Input
-                                placeholder="Input the Insulation Back"
                                 type="number"
-                                min={1}
+                                min={0}
+                                placeholder="Input the Insulation Back"
                                 value={insulationBack}
                                 onChange={(e) => setInsulationBack((e.target.value))}
                             />
@@ -329,9 +350,9 @@ export default function OrderCard() {
                         <div>
                             <Label>Insulation Front</Label>
                             <Input
-                                placeholder="Input the Insulation Front"
                                 type="number"
-                                min={1}
+                                min={0}
+                                placeholder="Input the Insulation Front"
                                 value={insulationFront}
                                 onChange={(e) => setInsulationFront((e.target.value))}
                             />
@@ -339,9 +360,9 @@ export default function OrderCard() {
                         <div>
                             <Label>Core Diameter</Label>
                             <Input
-                                placeholder="Input the Core Diameter"
                                 type="number"
-                                min={1}
+                                min={0}
+                                placeholder="Input the Core Diameter"
                                 value={coreDiameter}
                                 onChange={(e) => setCoreDiameter((e.target.value))}
                             />
@@ -349,9 +370,9 @@ export default function OrderCard() {
                         <div>
                             <Label>Blade Move Back</Label>
                             <Input
-                                placeholder="Input the Blade Move Back"
                                 type="number"
-                                min={1}
+                                min={0}
+                                placeholder="Input the Blade Move Back"
                                 value={bladeMoveBack}
                                 onChange={(e) => setBladeMoveBack((e.target.value))}
                             />
@@ -359,9 +380,9 @@ export default function OrderCard() {
                         <div>
                             <Label>Depth Of Blade</Label>
                             <Input
-                                placeholder="Input the Depth Of Blade"
                                 type="number"
-                                min={1}
+                                min={0}
+                                placeholder="Input the Depth Of Blade"
                                 value={depthOfBlade}
                                 onChange={(e) => setDepthOfBlade((e.target.value))}
                             />
@@ -369,9 +390,9 @@ export default function OrderCard() {
                         <div>
                             <Label>Length of MB</Label>
                             <Input
-                                placeholder="Input the Length of MB"
                                 type="number"
-                                min={1}
+                                min={0}
+                                placeholder="Input the Length of MB"
                                 value={lengthOfMb}
                                 onChange={(e) => setLengthOfMb((e.target.value))}
                             />
@@ -385,7 +406,7 @@ export default function OrderCard() {
                                         id="date"
                                         className="w-full justify-between font-normal"
                                     >
-                                        {deliveryDate ? deliveryDate.toLocaleDateString() : "Select date"}
+                                        {deliveryDate ? deliveryDate.toLocaleDateString() : "Select Delivery Date"}
                                         <ChevronDownIcon />
                                     </Button>
                                 </PopoverTrigger>
@@ -404,7 +425,7 @@ export default function OrderCard() {
                         </div>
 
                         <Button
-                            disabled={!customerName || !product || !quantity || !deliveryDate}
+                            disabled={!customerName || !product || !quantity || !deliveryDate || !assyGroup || !partRequst || !noMode || !totalLength || !strippingFront || !strippingRear || !halfStripFront || !halfStripEnd || !insulationFront || !insulationBack || !coreDiameter || !bladeMoveBack || !depthOfBlade || !lengthOfMb}
                             className="w-full cursor-pointer"
                             variant="outline"
                             onClick={handleSubmit}
