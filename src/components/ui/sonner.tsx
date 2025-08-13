@@ -11,7 +11,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme={theme as ToasterProps["theme"]}
       offset={5} // distance from screen edges
       toastOptions={{
-        className: "min-w-[250px] max-w-full p-0",
+        className: "w-fit max-w-[300px] break-words p-0",
       }}
       style={
         {

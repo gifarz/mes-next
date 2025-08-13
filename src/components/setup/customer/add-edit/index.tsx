@@ -172,7 +172,7 @@ export default function AddEditCustomer({ isEdit, customerData, open, onOpenChan
                         >
                             {isSubmitted ? (
                                 <>
-                                    <Spinner className="border-white dark:border-black" />
+                                    <Spinner />
                                     <span className="ml-0">Submitting</span>
                                 </>
                             ) :

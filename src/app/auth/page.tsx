@@ -154,14 +154,14 @@ export default function AuthPage() {
     return (
         <div className="p-4 md:p-0 overflow-auto px-5 md:px-10 lg:px-20">
             <Toaster position="top-right" />
-            <div className="fixed left-1/2 -translate-x-1/2 w-full mt-2 max-w-lg">
+            <div className="fixed left-1/2 -translate-x-1/2 w-full mt-1 max-w-lg">
                 <Tabs value={tabValue} onValueChange={setTabValue}>
                     <TabsList className="w-full flex">
                         <TabsTrigger value="login" className="flex-1">Login</TabsTrigger>
                         <TabsTrigger value="register" className="flex-1">Register</TabsTrigger>
                     </TabsList>
                     <TabsContent value="login">
-                        <Card className="max-h-[87vh] overflow-y-auto">
+                        <Card className="h-[87vh] overflow-y-auto">
                             <CardHeader>
                                 <CardTitle>Login to your account</CardTitle>
                                 <CardDescription>
@@ -169,7 +169,7 @@ export default function AuthPage() {
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <div className="flex justify-center my-5">
+                                <div className="flex justify-center mt-5 mb-8">
                                     <Image
                                         src="/logo.png"
                                         alt="MES Logo"
@@ -178,7 +178,7 @@ export default function AuthPage() {
                                     />
                                 </div>
                                 <Form {...formLogin}>
-                                    <form onSubmit={formLogin.handleSubmit(onSubmitLogin)} className="space-y-3">
+                                    <form onSubmit={formLogin.handleSubmit(onSubmitLogin)} className="space-y-5">
                                         <FormField
                                             control={formLogin.control}
                                             name="email"
@@ -233,7 +233,7 @@ export default function AuthPage() {
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <div className="flex justify-center my-5">
+                                <div className="flex justify-center mt-5 mb-8">
                                     <Image
                                         src="/logo.png"
                                         alt="MES Logo"

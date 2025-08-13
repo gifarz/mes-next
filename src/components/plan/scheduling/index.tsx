@@ -173,7 +173,7 @@ export default function SchedulingCard() {
                             {
                                 isSubmitted ?
                                     <>
-                                        <Spinner className="border-white dark:border-black" />
+                                        <Spinner />
                                         <span className="ml-0">Submitting</span>
                                     </>
                                     :

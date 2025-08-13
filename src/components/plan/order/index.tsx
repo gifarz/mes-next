@@ -19,6 +19,7 @@ import { ChevronDownIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { pdf } from "@react-pdf/renderer";
 import OrderDetailPDF from "../pdf/PDFDoc";
+import { length } from "zod";
 
 export default function OrderCard() {
     const [orderNumber, setOrderNumber] = useState<string>("");
@@ -31,6 +32,21 @@ export default function OrderCard() {
     const [partMaterial, setPartMaterial] = useState<string>("");
     const [SKUCode, setSKUCode] = useState<string>("");
     const [cost, setCost] = useState<string>("");
+    const [assyGroup, setAssyGroup] = useState<string>("");
+    const [partRequst, setPartRequst] = useState<string>("");
+    const [noMode, setNoMode] = useState<string>("");
+    const [totalLength, setTotalLength] = useState<string>("");
+    const [strippingFront, setStrippingFront] = useState<string>("");
+    const [strippingRear, setStrippingRear] = useState<string>("");
+    const [halfStripFront, setHalfStripFront] = useState<string>("");
+    const [halfStripEnd, setHalfStripEnd] = useState<string>("");
+    const [insulationFront, setInsulationFront] = useState<string>("");
+    const [insulationBack, setInsulationBack] = useState<string>("");
+    const [coreDiameter, setCoreDiameter] = useState<string>("");
+    const [bladeMoveBack, setBladeMoveBack] = useState<string>("");
+    const [depthOfBlade, setDepthOfBlade] = useState<string>("");
+    const [lengthOfMb, setLengthOfMb] = useState<string>("");
+
     const [listCustomers, setListCustomers] = useState<Customer[]>([]);
     const [listProducts, setListProducts] = useState<Product[]>([]);
 
@@ -152,7 +168,7 @@ export default function OrderCard() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div>
-                            <Label htmlFor="customer_name">Customer Name *</Label>
+                            <Label htmlFor="customer_name">Customer Name</Label>
                             <Select value={customerName} onValueChange={setCustomerName}>
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Select customer" />
@@ -174,7 +190,7 @@ export default function OrderCard() {
                             </Select>
                         </div>
                         <div>
-                            <Label>Product *</Label>
+                            <Label>Product</Label>
                             <Select
                                 value={product}
                                 onValueChange={(name) => {
@@ -211,7 +227,7 @@ export default function OrderCard() {
                             </Select>
                         </div>
                         <div>
-                            <Label>Quantity *</Label>
+                            <Label>Quantity</Label>
                             <Input
                                 placeholder="Input the quantity"
                                 type="number"
@@ -221,7 +237,147 @@ export default function OrderCard() {
                             />
                         </div>
                         <div>
-                            <Label>Delivery Date *</Label>
+                            <Label>Assy Group</Label>
+                            <Input
+                                placeholder="Input the Assy Group"
+                                type="number"
+                                min={1}
+                                value={assyGroup}
+                                onChange={(e) => setAssyGroup((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>Part Request</Label>
+                            <Input
+                                placeholder="Input the Part Request"
+                                type="number"
+                                min={1}
+                                value={partRequst}
+                                onChange={(e) => setPartRequst((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>No Mode</Label>
+                            <Input
+                                placeholder="Input the No Mode"
+                                type="number"
+                                min={1}
+                                value={noMode}
+                                onChange={(e) => setNoMode((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>Total Length</Label>
+                            <Input
+                                placeholder="Input the Total Length"
+                                type="number"
+                                min={1}
+                                value={totalLength}
+                                onChange={(e) => setTotalLength((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>Stripping Front</Label>
+                            <Input
+                                placeholder="Input the Stripping Front"
+                                type="number"
+                                min={1}
+                                value={strippingFront}
+                                onChange={(e) => setStrippingFront((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>Stripping Rear</Label>
+                            <Input
+                                placeholder="Input the Stripping Rear"
+                                type="number"
+                                min={1}
+                                value={strippingRear}
+                                onChange={(e) => setStrippingRear((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>Half Strip Front</Label>
+                            <Input
+                                placeholder="Input the Half Strip Front"
+                                type="number"
+                                min={1}
+                                value={halfStripFront}
+                                onChange={(e) => setHalfStripFront((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>Half Strip End</Label>
+                            <Input
+                                placeholder="Input the Half Strip End"
+                                type="number"
+                                min={1}
+                                value={halfStripEnd}
+                                onChange={(e) => setHalfStripEnd((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>Insulation Back</Label>
+                            <Input
+                                placeholder="Input the Insulation Back"
+                                type="number"
+                                min={1}
+                                value={insulationBack}
+                                onChange={(e) => setInsulationBack((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>Insulation Front</Label>
+                            <Input
+                                placeholder="Input the Insulation Front"
+                                type="number"
+                                min={1}
+                                value={insulationFront}
+                                onChange={(e) => setInsulationFront((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>Core Diameter</Label>
+                            <Input
+                                placeholder="Input the Core Diameter"
+                                type="number"
+                                min={1}
+                                value={coreDiameter}
+                                onChange={(e) => setCoreDiameter((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>Blade Move Back</Label>
+                            <Input
+                                placeholder="Input the Blade Move Back"
+                                type="number"
+                                min={1}
+                                value={bladeMoveBack}
+                                onChange={(e) => setBladeMoveBack((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>Depth Of Blade</Label>
+                            <Input
+                                placeholder="Input the Depth Of Blade"
+                                type="number"
+                                min={1}
+                                value={depthOfBlade}
+                                onChange={(e) => setDepthOfBlade((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>Length of MB</Label>
+                            <Input
+                                placeholder="Input the Length of MB"
+                                type="number"
+                                min={1}
+                                value={lengthOfMb}
+                                onChange={(e) => setLengthOfMb((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>Delivery Date</Label>
                             <Popover open={open} onOpenChange={setOpen}>
                                 <PopoverTrigger asChild>
                                     <Button
@@ -256,7 +412,7 @@ export default function OrderCard() {
                             {
                                 isSubmitted ? (
                                     <>
-                                        <Spinner className="border-white dark:border-black" />
+                                        <Spinner />
                                         <span className="ml-0">Submitting</span>
                                     </>
                                 ) : "ADD TO SCHEDULE"
@@ -277,14 +433,28 @@ export default function OrderCard() {
                             <h2 className="text-2xl font-semibold mb-6 text-center">Detail Order</h2>
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="divide-y">
+                    <CardContent>
+                        <div className="space-y-3 divide-y">
                             <InfoRow label="Order Number" value={orderNumber} />
                             <InfoRow label="Customer Name" value={customerName ? customerName : "N/A"} />
                             <InfoRow label="Production Name" value={product ? product : "N/A"} />
                             <InfoRow label="SKU Code" value={SKUCode ? SKUCode : "N/A"} />
                             <InfoRow label="Product Part" value={part ? part : "N/A"} />
                             <InfoRow label="Actual Quantity" value={quantity ? quantity : "N/A"} />
+                            <InfoRow label="Assy Group" value={assyGroup ? assyGroup : "N/A"} />
+                            <InfoRow label="Part Request" value={partRequst ? partRequst : "N/A"} />
+                            <InfoRow label="No Mode" value={noMode ? noMode : "N/A"} />
+                            <InfoRow label="Total Length" value={totalLength ? totalLength : "N/A"} />
+                            <InfoRow label="Stripping Front" value={strippingFront ? strippingFront : "N/A"} />
+                            <InfoRow label="Stripping Rear" value={strippingRear ? strippingRear : "N/A"} />
+                            <InfoRow label="Half Strip" value={halfStripFront ? halfStripFront : "N/A"} />
+                            <InfoRow label="Half Strip" value={halfStripEnd ? halfStripEnd : "N/A"} />
+                            <InfoRow label="Insulation Back" value={insulationFront ? insulationFront : "N/A"} />
+                            <InfoRow label="Insulation Front" value={insulationBack ? insulationBack : "N/A"} />
+                            <InfoRow label="Core Diameter" value={coreDiameter ? coreDiameter : "N/A"} />
+                            <InfoRow label="Blade Move Back" value={bladeMoveBack ? bladeMoveBack : "N/A"} />
+                            <InfoRow label="Depth Of Blade" value={depthOfBlade ? depthOfBlade : "N/A"} />
+                            <InfoRow label="Length of MB" value={lengthOfMb ? lengthOfMb : "N/A"} />
                             <InfoRow
                                 label="Delivery Date"
                                 value={deliveryDate ? formattedDateOnly(deliveryDate.toISOString()) : "N/A"}
