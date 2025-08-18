@@ -2,13 +2,6 @@
 import { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TimeInput } from "@/components/ui/time-input";
 import { InfoRow } from "@/components/ui/info-row";
@@ -17,21 +10,16 @@ import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
 import { Spinner } from "@/components/ui/spinner"
 import { useUserStore } from '../../../../store/userStore';
+import { Textarea } from '@/components/ui/textarea';
 
 export default function FactoryCard() {
     const [factoryName, setFactoryName] = useState<string>('');
-    const [factoryType, setFactoryType] = useState<string>('');
-    const [productionModel, setProductionModel] = useState<string>('');
+    const [factoryDescription, setFactoryDescription] = useState<string>('');
     const [operationStart, setOperationStart] = useState<string>('');
     const [operationEnd, setOperationEnd] = useState<string>('');
     const [overtimeStart, setOvertimeStart] = useState<string>('');
     const [overtimeEnd, setOvertimeEnd] = useState<string>('');
     const [operationDays, setOperationDays] = useState<string[]>([]);
-    const [productivityOptimization, setProductivityOptimization] = useState('');
-    const [workUtilization, setWorkUtilization] = useState('');
-    const [standardMachinery, setStandardMachinery] = useState('');
-    const [acceptableWaste, setAcceptableWaste] = useState('');
-    const [rescheduleInterval, setRescheduleInterval] = useState('');
 
     const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -40,24 +28,17 @@ export default function FactoryCard() {
     const setFactory = useUserStore((state) => state.setUser)
 
     useEffect(() => {
-
         if (factory.length === 0) return
 
         const data = factory[0]
 
         setFactoryName(data.name || '');
-        setFactoryType(data.type || '');
-        setProductionModel(data.production_model || '');
+        setFactoryDescription(data.description || '');
         setOperationStart(data.operation_start || '');
         setOperationEnd(data.operation_end || '');
         setOvertimeStart(data.overtime_start || '');
         setOvertimeEnd(data.overtime_end || '');
         setOperationDays(data.operation_day?.split(",") || []);
-        setProductivityOptimization(data.productivity_optimization || '');
-        setWorkUtilization(data.work_utilization || '');
-        setStandardMachinery(data.standard_machine_efficiency || '');
-        setAcceptableWaste(data.acceptable_waste || '');
-        setRescheduleInterval(data.reschedule_interval || '');
 
     }, [factory, isSubmitted]);
 
@@ -71,18 +52,12 @@ export default function FactoryCard() {
         setIsSubmitted(true)
         const payload = {
             name: factoryName,
-            type: factoryType,
-            production_model: productionModel,
+            description: factoryDescription,
             operation_start: operationStart,
             operation_end: operationEnd,
             overtime_start: overtimeStart,
             overtime_end: overtimeEnd,
             operation_day: operationDays.join(","),
-            productivity_optimization: productivityOptimization,
-            work_utilization: workUtilization,
-            standard_machine_efficiency: standardMachinery,
-            acceptable_waste: acceptableWaste,
-            reschedule_interval: rescheduleInterval,
         };
 
         const res = await fetch("/api/insert/addFactory", {
@@ -93,24 +68,21 @@ export default function FactoryCard() {
             },
         });
 
+        const responseFactory = await res.json()
+
         if (res.ok) {
             toast.success("The Factory Added Successfully!")
             setFactory({
                 factory: [
                     {
+                        identifier: responseFactory.data[0].identifier,
                         name: factoryName,
-                        type: factoryType,
-                        production_model: productionModel,
+                        description: factoryDescription,
                         operation_start: operationStart,
                         operation_end: operationEnd,
                         overtime_start: overtimeStart,
                         overtime_end: overtimeEnd,
                         operation_day: operationDays.join(','),
-                        productivity_optimization: productivityOptimization,
-                        work_utilization: workUtilization,
-                        standard_machine_efficiency: standardMachinery,
-                        acceptable_waste: acceptableWaste,
-                        reschedule_interval: rescheduleInterval,
                     }
                 ]
             })
@@ -127,18 +99,12 @@ export default function FactoryCard() {
         setIsSubmitted(true)
         const payload = {
             name: factoryName,
-            type: factoryType,
-            production_model: productionModel,
+            description: factoryDescription,
             operation_start: operationStart,
             operation_end: operationEnd,
             overtime_start: overtimeStart,
             overtime_end: overtimeEnd,
-            operation_day: operationDays.join(","),
-            productivity_optimization: productivityOptimization,
-            work_utilization: workUtilization,
-            standard_machine_efficiency: standardMachinery,
-            acceptable_waste: acceptableWaste,
-            reschedule_interval: rescheduleInterval,
+            operation_day: operationDays.join(",")
         };
 
         const res = await fetch("/api/patcher/updateFactoryByEmail", {
@@ -162,7 +128,6 @@ export default function FactoryCard() {
 
     return (
         <>
-            {console.log('operationDays', operationDays)}
             <Toaster position="top-right" />
             <div className="flex flex-col md:flex-row items-start justify-center min-h-screen gap-4">
                 {/* Left card with form */}
@@ -183,38 +148,15 @@ export default function FactoryCard() {
                             />
                         </div>
 
-                        {/* Factory Type */}
-                        <div className="w-full space-y-1">
-                            <Label>Factory Type *</Label>
-                            <Select
-                                value={factoryType}
-                                onValueChange={(value) => setFactoryType(value)}
-                            >
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select factory type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Job Shop">Job Shop</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        {/* Production Model */}
-                        <div className="w-full space-y-1">
-                            <Label>Production Model *</Label>
-                            <Select
-                                value={productionModel}
-                                onValueChange={(value) => setProductionModel(value)}
-                            >
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select model" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Serial">Serial</SelectItem>
-                                    <SelectItem value="Parallel">Parallel</SelectItem>
-                                    <SelectItem value="Single-Multi Component">Single-Multi Component</SelectItem>
-                                </SelectContent>
-                            </Select>
+                        {/* Factory Description */}
+                        <div className="space-y-1">
+                            <Label htmlFor="factoryDescription">Factory Description</Label>
+                            <Textarea
+                                id="factoryDescription"
+                                placeholder="Enter factory name"
+                                onChange={(e) => setFactoryDescription(e.target.value)}
+                                value={factoryDescription}
+                            />
                         </div>
 
                         {/* Time Pickers */}
@@ -238,93 +180,13 @@ export default function FactoryCard() {
                                 ))}
                             </div>
                         </div>
-
-                        {/* Productivity Optimization */}
-                        <div className="w-full space-y-1">
-                            <Label>Productivity Optimization</Label>
-                            <Select
-                                value={productivityOptimization}
-                                onValueChange={(value) => setProductivityOptimization(value)}
-                            >
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select model" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Reduce Cost">Reduce Cost</SelectItem>
-                                    <SelectItem value="Increase Profit">Increase Profit</SelectItem>
-                                    <SelectItem value="Disabled">Disabled</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        {/* Work Utilization */}
-                        <div className="space-y-1">
-                            <Label htmlFor="workUtilization">Work Utilization (30 - 100%)</Label>
-                            <Input
-                                id="workUtilization"
-                                placeholder="0"
-                                type="number"
-                                min={0}
-                                onChange={(e) => setWorkUtilization(e.target.value)}
-                                value={workUtilization}
-                            />
-                        </div>
-
-                        {/* Standard Machinery Effieciency */}
-                        <div className="space-y-1">
-                            <Label htmlFor="standardMachinery">Standard Machinery Effieciency (30 - 100%)</Label>
-                            <Input
-                                id="standardMachinery"
-                                placeholder="0"
-                                type="number"
-                                min={0}
-                                onChange={(e) => setStandardMachinery(e.target.value)}
-                                value={standardMachinery}
-                            />
-                        </div>
-
-                        {/* Acceptable Waste */}
-                        <div className="space-y-1">
-                            <Label htmlFor="acceptableWaste">Acceptable Waste(0.00 - 1.00)</Label>
-                            <Input
-                                id="acceptableWaste"
-                                placeholder="0"
-                                type="number"
-                                min={0}
-                                onChange={(e) => setAcceptableWaste(e.target.value)}
-                                value={acceptableWaste}
-                            />
-                        </div>
-
-                        {/* Reschedule Interval */}
-                        <div className="w-full space-y-1">
-                            <Label>Reschedule Interval (Days)</Label>
-                            <Select
-                                value={rescheduleInterval}
-                                onValueChange={(value) => setRescheduleInterval(value)}
-                            >
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select model" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="1">1</SelectItem>
-                                    <SelectItem value="2">2</SelectItem>
-                                    <SelectItem value="3">3</SelectItem>
-                                    <SelectItem value="4">4</SelectItem>
-                                    <SelectItem value="5">5</SelectItem>
-                                    <SelectItem value="6">6</SelectItem>
-                                    <SelectItem value="7">7</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        {/* Delay Between Station */}
                     </div>
 
                     <Button
                         variant="secondary"
                         className="w-full cursor-pointer mt-6"
                         onClick={factory.length > 0 ? handleUpdateFactory : handleAddFactory}
-                        disabled={!factoryName || !factoryType || !productionModel || !operationStart || !operationEnd || !overtimeStart || !overtimeEnd || !productivityOptimization || !workUtilization || !standardMachinery || !acceptableWaste || !rescheduleInterval || !operationDays || isSubmitted}
+                        disabled={!factoryName || !factoryDescription || !operationStart || !operationEnd || !overtimeStart || !overtimeEnd || !operationDays || isSubmitted}
                     >
                         {isSubmitted ? (
                             <>
@@ -345,30 +207,14 @@ export default function FactoryCard() {
                             Factory Information
                         </h2>
 
-                        <div className="divide-y">
+                        <div className="divide-y space-y-4">
                             <InfoRow label="Factory Name" value={factoryName} />
-                            <InfoRow label="Factory Type" value={factoryType} />
-                            <InfoRow label="Production Model" value={productionModel} />
+                            <InfoRow label="Factory Description" value={factoryDescription} />
                             <InfoRow label="Operation Start" value={operationStart} />
                             <InfoRow label="Operation End" value={operationEnd} />
                             <InfoRow label="Overtime Start" value={overtimeStart} />
                             <InfoRow label="Overtime End" value={overtimeEnd} />
                             <InfoRow label="Operation Day" value={operationDays.toString()} />
-                        </div>
-                    </div>
-                    <div className="border-1 w-full max-h-full rounded p-4">
-                        <h2 className="text-2xl font-semibold mb-6 text-center">
-                            Factory Global Standard
-                        </h2>
-                        <div className="divide-y">
-                            <InfoRow label="Productivity Optimization" value={productivityOptimization} />
-                            <InfoRow label="Work Utilization" value={workUtilization} />
-                            <InfoRow label="Standard Machine Efficiency" value={standardMachinery} />
-                            <InfoRow label="Acceptable Waste" value={acceptableWaste} />
-                            <InfoRow label="Reschedule Interval" value={rescheduleInterval} />
-                            <InfoRow label="Last Reschedule" value="" />
-                            <InfoRow label="Next Reschedule" value="" />
-                            <InfoRow label="Delay Between Station" value="" />
                         </div>
                     </div>
                 </div>

@@ -23,12 +23,11 @@ type SortRule = {
 const columns = [
     { key: 'created_on', label: 'CREATED_ON' },
     { key: 'name', label: 'NAME' },
-    { key: 'sku_code', label: 'SKU CODE' },
+    { key: 'code', label: 'PRODUCT CODE' },
     { key: 'part_name', label: 'PART' },
-    { key: 'part_sku_code', label: 'SKU CODE' },
+    { key: 'part_code', label: 'PART CODE' },
     { key: 'part_material', label: 'INVENTORY CODE' },
-    { key: 'part_material_quantity', label: 'INVENTORY REQUIRE' },
-    { key: 'cost', label: 'COST' },
+    { key: 'part_material_quantity', label: 'INVENTORY QUANTITY' },
     { key: 'action', label: 'ACTION' },
 ] as const
 
@@ -39,7 +38,7 @@ export default function ProductDataTable({ data, onProductUpdated }: DataProduct
 
     const [sortRules, setSortRules] = useState<SortRule[]>([
         { key: 'name', order: 'asc' },
-        { key: 'sku_code', order: 'asc' },
+        { key: 'code', order: 'asc' },
     ])
 
     const sortedData = [...data].sort((a, b) => {

@@ -16,7 +16,6 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
-import { Toaster } from "@/components/ui/sonner"
 import { Spinner } from "@/components/ui/spinner"
 import { DialogProductProps } from "../../../../../types/setup/product"
 import { Inventory } from "../../../../../types/setup/inventory"
@@ -32,33 +31,26 @@ const steps = [
 export default function AddEditProduct({ isEdit, productData, open, onOpenChange }: DialogProductProps) {
     const [step, setStep] = useState(0)
     const [productName, setProductName] = useState<string>("")
-    const [productSkuCode, setProductSkuCode] = useState<string>("")
-    const [productCost, setProductCost] = useState<string>("")
+    const [productCode, setProductCode] = useState<string>("")
     const [productDescription, setProductDescription] = useState<string>("")
     const [partName, setPartName] = useState<string>("")
-    const [partSkuCode, setPartSkuCode] = useState<string>("")
-    const [partDependency, setPartDependency] = useState<string>("")
+    const [partCode, setPartCode] = useState<string>("")
     const [partRawMaterial, setPartRawMaterial] = useState<string>("")
     const [partRawMaterialQuantity, setPartRawMaterialQuantity] = useState<string>("")
-    const [processNumber, setProcessNumber] = useState<string>("")
-    const [processCycleTime, setProcessCycleTime] = useState<string>("")
-    const [processSetupTime, setprocessSetupTime] = useState<string>("")
 
-    const [search, setSearch] = useState<string>("")
     const [productId, setProductId] = useState<string>("")
     const [listInventory, setListInventory] = useState<Inventory[]>([])
     const [listStation, setListStation] = useState<Station[]>([])
 
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
-    const [isEditProduct, setIsEditProduct] = useState<boolean>(false)
-    const email = useUserStore((state) => state.email)
+    const user_id = useUserStore((state) => state.user_id)
 
     useEffect(() => {
         const payload = {
-            email: email,
+            user_id: user_id,
         }
         const fetcher = async () => {
-            const inventory = await fetch("/api/getter/getInventoryByEmail", {
+            const inventory = await fetch("/api/getter/getInventoryByUserId", {
                 method: "POST",
                 body: JSON.stringify(payload),
                 headers: {
@@ -72,7 +64,7 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
 
             setListInventory(inventoryResponse)
 
-            const stations = await fetch("/api/getter/getStationsByEmail", {
+            const stations = await fetch("/api/getter/getStationsByUserId", {
                 method: "POST",
                 body: JSON.stringify(payload),
                 headers: {
@@ -87,36 +79,29 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
         }
 
         if (productData) {
+            setProductId(productData.identifier)
             setProductName(productData.name)
-            setProductSkuCode(productData.sku_code)
-            setProductCost(productData.cost)
+            setProductCode(productData.code)
             setProductDescription(productData.description)
             setPartName(productData.part_name)
-            setPartSkuCode(productData.part_sku_code)
-            setPartDependency(productData.part_dependency)
+            setPartCode(productData.part_code)
             setPartRawMaterial(productData.part_material)
             setPartRawMaterialQuantity(productData.part_material_quantity)
-            setProcessNumber(productData.process_number)
-            setProcessCycleTime(productData.process_cycle_time)
-            setprocessSetupTime(productData.process_setup_time)
+
         } else {
+            setProductId("");
             setProductName("");
-            setProductSkuCode("");
-            setProductCost("");
+            setProductCode("");
             setProductDescription("");
             setPartName("");
-            setPartSkuCode("");
-            setPartDependency("");
+            setPartCode("");
             setPartRawMaterial("");
             setPartRawMaterialQuantity("");
-            setProcessNumber("");
-            setProcessCycleTime("");
-            setprocessSetupTime("");
         }
 
         fetcher()
 
-    }, [email, productData, open]); // Also reset fields when dialog opens
+    }, [user_id, productData, open]); // Also reset fields when dialog opens
 
     const nextStep = () => {
         if (step < steps.length - 1) setStep(step + 1)
@@ -131,20 +116,15 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
         setIsSubmitted(true)
         const payload = {
             productName,
-            productSkuCode,
-            productCost,
+            productCode,
             productDescription,
             partName,
-            partSkuCode,
-            partDependency,
+            partCode,
             partRawMaterial,
             partRawMaterialQuantity,
-            processNumber,
-            processCycleTime,
-            processSetupTime,
         }
 
-        if (isEditProduct) {
+        if (isEdit) {
             const body = {
                 ...payload,
                 identifier: productId
@@ -232,21 +212,12 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium">SKU code*</label>
+                                        <label className="block text-sm font-medium">Product Code *</label>
                                         <Input
-                                            value={productSkuCode}
-                                            onChange={(e) => setProductSkuCode(e.target.value)}
-                                            placeholder="Enter SKU"
+                                            value={productCode}
+                                            onChange={(e) => setProductCode(e.target.value)}
+                                            placeholder="Enter Product Code"
                                             required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium">Cost</label>
-                                        <Input
-                                            type="number"
-                                            value={productCost}
-                                            onChange={(e) => setProductCost(e.target.value)}
-                                            placeholder="Enter Cost"
                                         />
                                     </div>
                                     <div>
@@ -266,7 +237,7 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
                                 <h2 className="text-2xl font-semibold mb-4">Part Information</h2>
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium">Name</label>
+                                        <label className="block text-sm font-medium">Part Name</label>
                                         <Input
                                             value={partName}
                                             onChange={(e) => setPartName(e.target.value)}
@@ -275,20 +246,12 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium">SKU Code</label>
+                                        <label className="block text-sm font-medium">Part Code</label>
                                         <Input
-                                            value={partSkuCode}
-                                            onChange={(e) => setPartSkuCode(e.target.value)}
-                                            placeholder="Enter SKU"
+                                            value={partCode}
+                                            onChange={(e) => setPartCode(e.target.value)}
+                                            placeholder="Enter Part Code"
                                             required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium">Part Dependency</label>
-                                        <Input
-                                            value={partDependency}
-                                            onChange={(e) => setPartDependency(e.target.value)}
-                                            placeholder="Enter Part Dependency"
                                         />
                                     </div>
                                     <div>
@@ -328,51 +291,6 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
                                         />
                                     </div>
                                 </div>
-
-                                <h2 className="text-2xl font-semibold mb-4 mt-10">Part Process</h2>
-                                <div className="space-y-4 mb-4">
-                                    <div>
-                                        <label className="block text-sm font-medium">Process Number</label>
-                                        <Select value={processNumber} onValueChange={setProcessNumber}>
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select Process Number" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {
-                                                    listStation.map((station) => (
-                                                        <SelectItem
-                                                            value={station.name}
-                                                            key={station.identifier}
-                                                        >
-                                                            {station.name}
-                                                        </SelectItem>
-                                                    ))
-                                                }
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium">Process Cycle Time (second)</label>
-                                        <Input
-                                            type="number"
-                                            min={0}
-                                            value={processCycleTime}
-                                            onChange={(e) => setProcessCycleTime(e.target.value)}
-                                            placeholder="Enter Cycle Time"
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium">Process Setup Time (second)</label>
-                                        <Input
-                                            type="number"
-                                            min={0}
-                                            value={processSetupTime}
-                                            onChange={(e) => setprocessSetupTime(e.target.value)}
-                                            placeholder="Enter Setup Time"
-                                        />
-                                    </div>
-                                </div>
                             </div>
                         )}
 
@@ -389,17 +307,10 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium">SKU Code</label>
+                                        <label className="block text-sm font-medium">Product Code</label>
                                         <Input
                                             disabled
-                                            value={productSkuCode ? productSkuCode : "-"}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium">Cost</label>
-                                        <Input
-                                            disabled
-                                            value={productCost ? productCost : "-"}
+                                            value={productCode ? productCode : "-"}
                                         />
                                     </div>
                                     <div>
@@ -421,17 +332,10 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium">SKU Code</label>
+                                        <label className="block text-sm font-medium">Part Code</label>
                                         <Input
                                             disabled
-                                            value={partSkuCode ? partSkuCode : "-"}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium">Dependency</label>
-                                        <Input
-                                            disabled
-                                            value={partDependency ? partDependency : "-"}
+                                            value={partCode ? partCode : "-"}
                                         />
                                     </div>
                                     <div>
@@ -446,31 +350,6 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
                                         <Input
                                             disabled
                                             value={partRawMaterialQuantity ? partRawMaterialQuantity : "-"}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium">Process Number</label>
-                                        <Input
-                                            disabled
-                                            value={processNumber ? processNumber : "-"}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium">
-                                            Process Cycle Time (second)
-                                        </label>
-                                        <Input
-                                            disabled
-                                            value={processCycleTime ? processCycleTime : "-"}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium">
-                                            Process Setup Time (second)
-                                        </label>
-                                        <Input
-                                            disabled
-                                            value={processSetupTime ? processSetupTime : "-"}
                                         />
                                     </div>
                                 </div>
@@ -501,7 +380,7 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
                             <Button className="cursor-pointer" variant="outline">Cancel</Button>
                         </DialogClose>
                         <Button
-                            disabled={!productName || !productSkuCode || !productCost || !partName || !partSkuCode || !partDependency || !partRawMaterial || !partRawMaterialQuantity || !processNumber || !processCycleTime || !processSetupTime}
+                            disabled={!productName || !productCode || !partName || !partCode || !partRawMaterial || !partRawMaterialQuantity}
                             className="cursor-pointer"
                             type="submit"
                             onClick={handleSubmit}

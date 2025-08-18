@@ -4,8 +4,6 @@ import { useEffect, useState } from 'react'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Order } from '../../../../types/plan/order'
-import { useUserStore } from '../../../../store/userStore'
-import GanttChart from '../chart/GanttTaskReactWrapper'
 import { Station } from '../../../../types/setup/station'
 import { Toaster } from '@/components/ui/sonner'
 import ProductionScheduling from '../tables/production-scheduling'
@@ -28,15 +26,15 @@ export default function SchedulingCard() {
     const [refreshKey, setRefreshKey] = useState<number>(0)
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
 
-    const email = useUserStore((state) => state.email)
+    // const email = useUserStore((state) => state.email)
     const { open } = useSidebarStore();
 
     useEffect(() => {
-        const payload = { email, status: "Waiting" }
+        const payload = { status: "Waiting" }
 
         const fetcher = async () => {
             try {
-                const res = await fetch("/api/getter/getOrderByEmailStatus", {
+                const res = await fetch("/api/getter/getOrderByStatus", {
                     method: "POST",
                     body: JSON.stringify(payload),
                     headers: {
@@ -48,15 +46,8 @@ export default function SchedulingCard() {
                 const orders = Array.isArray(json.data) ? json.data : []
                 setListOrders(orders)
 
-                const payloadStation = {
-                    email: email
-                }
-                const stations = await fetch("/api/getter/getStationsByEmail", {
-                    method: "POST",
-                    body: JSON.stringify(payloadStation),
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                const stations = await fetch("/api/getter/getAllStations", {
+                    method: "GET"
                 });
                 const dataStations = await stations.json()
 
@@ -66,12 +57,8 @@ export default function SchedulingCard() {
 
                 setListStations(fixedResponse)
 
-                const resCustomer = await fetch("/api/getter/getCustomerByEmail", {
-                    method: "POST",
-                    body: JSON.stringify(payload),
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                const resCustomer = await fetch("/api/getter/getAllCustomers", {
+                    method: "GET"
                 });
 
                 const dataCustomer = await resCustomer.json()
@@ -80,12 +67,8 @@ export default function SchedulingCard() {
 
                 setListCustomers(fixedCustomer)
 
-                const resProduct = await fetch("/api/getter/getProductByEmail", {
-                    method: "POST",
-                    body: JSON.stringify(payload),
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                const resProduct = await fetch("/api/getter/getAllProducts", {
+                    method: "GET"
                 });
 
                 const dataProduct = await resProduct.json()
@@ -100,9 +83,9 @@ export default function SchedulingCard() {
             }
         }
 
-        if (email) fetcher()
+        fetcher()
 
-    }, [email, refreshKey, open, selectedRows, isSubmitted])
+    }, [refreshKey, open, selectedRows, isSubmitted])
 
     const handleApplySchedule = async () => {
         setIsSubmitted(true)
@@ -190,7 +173,7 @@ export default function SchedulingCard() {
                 </CardContent>
             </Card>
 
-            <Card className="mt-5">
+            {/* <Card className="mt-5">
                 <CardHeader>
                     <CardTitle>
                         <h2 className="text-2xl font-semibold mb-4 text-center">Scheduling Chart</h2>
@@ -199,7 +182,7 @@ export default function SchedulingCard() {
                 <CardContent>
                     <GanttChart isSidebarOpen={open} />
                 </CardContent>
-            </Card>
+            </Card> */}
         </div>
     )
 }

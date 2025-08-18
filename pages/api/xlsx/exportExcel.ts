@@ -10,8 +10,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // Headers with merged group names
     const header = [
-      ["ORDER NUMBER", "PROCESS TIME", "", "ASSY GROUP", "PART NO", "MODE", "TOTAL LENGTH", "STRIPPING LENGTH", "", "HALF STRIP LENGTH", "", "INSULATION", "", "CORE DIAMETER", "BLADE MOVE BLACK", "DEPTH OF BLADE", "LENGTH OF MB"],
-      ["", "START", "FINISH", "", "", "", "", "FRONT", "REAR", "FRONT", "REAR", "FRONT", "REAR", "", "", "", ""],
+      ["STATION", "SHIFT", "OPERATOR", "PROCESS TIME", "", "ORDER NUMBER", "PART CODE", "TOTAL LENGTH", "STRIPPING LENGTH", "", "OUTPUT QUANTITY", "", "QC", ""],
+      ["", "", "", "START", "FINISH", "", "", "", "FRONT", "REAR", "PLAN", "ACT", "QC", "CHECKER"],
     ];
 
     // Combine headers and data
@@ -23,21 +23,18 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     // Merge cells for headers
     worksheet["!merges"] = [
       //COLUMN MERGE
-      { s: { r: 0, c: 1 }, e: { r: 0, c: 2 } }, // PROCESS TIME span 2 cols
-      { s: { r: 0, c: 7 }, e: { r: 0, c: 8 } }, // STRIPPING LENGTH span 2 cols
-      { s: { r: 0, c: 9 }, e: { r: 0, c: 10 } }, // HALF STRIP LENGTH span 2 cols
-      { s: { r: 0, c: 11 }, e: { r: 0, c: 12 } }, // INSULATION span 2 cols
+      { s: { r: 0, c: 3 }, e: { r: 0, c: 4 } }, // PROCESS TIME span 2 cols
+      { s: { r: 0, c: 8 }, e: { r: 0, c: 9 } }, // STRIPPING LENGTH span 2 cols
+      { s: { r: 0, c: 10 }, e: { r: 0, c: 11 } }, // OUTPUT QUANTITY span 2 cols
+      { s: { r: 0, c: 12 }, e: { r: 0, c: 13 } }, // QC span 2 cols
 
       //ROW MERGE
-      { s: { r: 0, c: 0 }, e: { r: 1, c: 0 } }, // ORDER NUMBER
-      { s: { r: 0, c: 3 }, e: { r: 1, c: 3 } }, // ASSY GROUP
-      { s: { r: 0, c: 4 }, e: { r: 1, c: 4 } }, // PART NO
-      { s: { r: 0, c: 5 }, e: { r: 1, c: 5 } }, // MODE
-      { s: { r: 0, c: 6 }, e: { r: 1, c: 6 } }, // TOTAL LENGTH
-      { s: { r: 0, c: 13 }, e: { r: 1, c: 13 } }, // CORE DIAMETER
-      { s: { r: 0, c: 14 }, e: { r: 1, c: 14 } }, // BLADE MOVE BLACK
-      { s: { r: 0, c: 15 }, e: { r: 1, c: 15 } }, // DEPTH OF BLADE
-      { s: { r: 0, c: 16 }, e: { r: 1, c: 16 } }, // LENGTH OF MB
+      { s: { r: 0, c: 0 }, e: { r: 1, c: 0 } }, // STATION
+      { s: { r: 0, c: 1 }, e: { r: 1, c: 1 } }, // SHIFT
+      { s: { r: 0, c: 2 }, e: { r: 1, c: 2 } }, // OPERATOR
+      { s: { r: 0, c: 5 }, e: { r: 1, c: 5 } }, // ORDER NUMBER
+      { s: { r: 0, c: 6 }, e: { r: 1, c: 6 } }, // PART CODE
+      { s: { r: 0, c: 7 }, e: { r: 1, c: 7 } }, // TOTAL LENGTH
 
     ];
 

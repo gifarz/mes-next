@@ -21,6 +21,7 @@ import { ChevronDownIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Product } from "../../../../types/setup/product";
 import { Customer } from "../../../../types/setup/customer";
+import { formattedDateOnly } from "@/lib/dateUtils";
 
 type EditOrderTablePropd = {
     orderData: Order
@@ -28,37 +29,55 @@ type EditOrderTablePropd = {
     listCustomers: Customer[]
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    onOrderUpdated?: () => void
 }
 
 export default function EditOrderTable(
-    { orderData, listProducts, listCustomers, open, onOpenChange }: EditOrderTablePropd
+    { orderData, listProducts, listCustomers, open, onOpenChange, onOrderUpdated }: EditOrderTablePropd
 ) {
 
     const [customerName, setCustomerName] = useState<string>("");
     const [product, setProduct] = useState<string>("");
-    const [productId, setProductId] = useState<string>("");
     const [quantity, setQuantity] = useState<string>("");
     const [part, setPart] = useState<string>("");
-    const [partMaterial, setPartMaterial] = useState<string>("");
-    const [SKUCode, setSKUCode] = useState<string>("");
-    const [cost, setCost] = useState<string>("");
+    const [partCode, setPartCode] = useState<string>("");
+    const [productCode, setProductCode] = useState<string>("");
     const [deliveryDate, setDeliveryDate] = useState<Date | undefined>(undefined);
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
     const [openDate, setOpenDate] = useState<boolean>(false)
 
+    useEffect(() => {
+        if (!orderData) return
+
+        setCustomerName(orderData.customer_name || "")
+        setProduct(orderData.product_name || "")
+        setProductCode(orderData.product_code || "")
+        setPart(orderData.part_name || "")
+        setPartCode(orderData.part_code || "")
+        setQuantity(orderData.quantity || "")
+        setDeliveryDate(new Date(orderData.delivery_date) || undefined)
+
+    }, [orderData])
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsSubmitted(true)
-        const payload = {}
-
-        const body = {
-            ...payload,
-            identifier: orderData?.identifier
+        const payload = {
+            customerName,
+            product,
+            productCode,
+            quantity,
+            part,
+            partCode,
         }
 
         const res = await fetch("/api/patcher/updateOrderByIdentifier", {
             method: "POST",
-            body: JSON.stringify(body),
+            body: JSON.stringify({
+                ...payload,
+                deliveryDate: deliveryDate && formattedDateOnly(deliveryDate.toISOString()),
+                identifier: orderData.identifier
+            }),
             headers: {
                 "Content-Type": "application/json",
             },
@@ -66,9 +85,13 @@ export default function EditOrderTable(
 
         if (res.ok) {
             toast.success("The Customer Updated Successfully!")
+            onOrderUpdated?.()
+            onOpenChange(false)
         } else {
             toast.error("Failed to Update Customer!")
         }
+
+        setIsSubmitted(false)
     }
 
     return (
@@ -96,7 +119,7 @@ export default function EditOrderTable(
                             </div>
                             <div>
                                 <label className="block text-sm font-medium">Customer Name</label>
-                                <Select value={orderData.customer_name} onValueChange={setCustomerName}>
+                                <Select value={customerName} onValueChange={setCustomerName}>
                                     <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Select customer" />
                                     </SelectTrigger>
@@ -119,17 +142,15 @@ export default function EditOrderTable(
                             <div>
                                 <label className="block text-sm font-medium">Product Name</label>
                                 <Select
-                                    value={orderData.product_name}
+                                    value={product}
                                     onValueChange={(name) => {
                                         const selectedProduct = listProducts.find(p => p.name === name);
 
                                         if (selectedProduct) {
-                                            setProductId(selectedProduct.identifier)
                                             setProduct(selectedProduct.name);
-                                            setSKUCode(selectedProduct.sku_code);
+                                            setProductCode(selectedProduct.code);
                                             setPart(selectedProduct.part_name);
-                                            setPartMaterial(selectedProduct.part_material)
-                                            setCost(selectedProduct.cost);
+                                            setPartCode(selectedProduct.part_code)
                                         }
                                     }}
                                 >
@@ -156,7 +177,7 @@ export default function EditOrderTable(
                             <div>
                                 <label className="block text-sm font-medium">Quantity</label>
                                 <Input
-                                    value={orderData.quantity}
+                                    value={quantity}
                                     onChange={(e) => setQuantity(e.target.value)}
                                     type="number"
                                     min={0}
@@ -172,7 +193,7 @@ export default function EditOrderTable(
                                             id="date"
                                             className="w-full justify-between font-normal"
                                         >
-                                            {orderData.delivery_date ? orderData.delivery_date : "Select date"}
+                                            {deliveryDate ? deliveryDate.toLocaleDateString() : "Select date"}
                                             <ChevronDownIcon />
                                         </Button>
                                     </PopoverTrigger>

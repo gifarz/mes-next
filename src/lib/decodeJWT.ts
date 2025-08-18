@@ -1,7 +1,7 @@
 import { decodeJwt } from "jose"
 
 interface DecodedPayload {
-  email: string
+  user_id: string
   role: string
 }
 

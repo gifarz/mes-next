@@ -29,22 +29,11 @@ export default function OrderCard() {
     const [deliveryDate, setDeliveryDate] = useState<Date | undefined>(undefined);
     const [part, setPart] = useState<string>("");
     const [partMaterial, setPartMaterial] = useState<string>("");
-    const [SKUCode, setSKUCode] = useState<string>("");
+    const [productCode, setProductCode] = useState<string>("");
     const [cost, setCost] = useState<string>("");
-    const [assyGroup, setAssyGroup] = useState<string>("");
-    const [partRequst, setPartRequst] = useState<string>("");
-    const [noMode, setNoMode] = useState<string>("");
     const [totalLength, setTotalLength] = useState<string>("");
     const [strippingFront, setStrippingFront] = useState<string>("");
     const [strippingRear, setStrippingRear] = useState<string>("");
-    const [halfStripFront, setHalfStripFront] = useState<string>("");
-    const [halfStripEnd, setHalfStripEnd] = useState<string>("");
-    const [insulationFront, setInsulationFront] = useState<string>("");
-    const [insulationBack, setInsulationBack] = useState<string>("");
-    const [coreDiameter, setCoreDiameter] = useState<string>("");
-    const [bladeMoveBack, setBladeMoveBack] = useState<string>("");
-    const [depthOfBlade, setDepthOfBlade] = useState<string>("");
-    const [lengthOfMb, setLengthOfMb] = useState<string>("");
 
     const [listCustomers, setListCustomers] = useState<Customer[]>([]);
     const [listProducts, setListProducts] = useState<Product[]>([]);
@@ -53,18 +42,14 @@ export default function OrderCard() {
     const [refreshKey, setRefreshKey] = useState<number>(0)
     const [open, setOpen] = useState(false)
 
-    const email = useUserStore((state) => state.email)
+    const user_id = useUserStore((state) => state.user_id)
 
     useEffect(() => {
-        const payload = { email }
         setOrderNumber(customizeDateString("yyyyMMddHHmmsss"))
+
         const fetcher = async () => {
-            const resCustomer = await fetch("/api/getter/getCustomerByEmail", {
-                method: "POST",
-                body: JSON.stringify(payload),
-                headers: {
-                    "Content-Type": "application/json",
-                },
+            const resCustomer = await fetch("/api/getter/getAllCustomers", {
+                method: "GET"
             });
 
             const dataCustomer = await resCustomer.json()
@@ -73,12 +58,8 @@ export default function OrderCard() {
 
             setListCustomers(fixedCustomer)
 
-            const resProduct = await fetch("/api/getter/getProductByEmail", {
-                method: "POST",
-                body: JSON.stringify(payload),
-                headers: {
-                    "Content-Type": "application/json",
-                },
+            const resProduct = await fetch("/api/getter/getAllProducts", {
+                method: "GET"
             });
 
             const dataProduct = await resProduct.json()
@@ -88,8 +69,8 @@ export default function OrderCard() {
             setListProducts(fixedProduct)
         }
 
-        if (email) fetcher()
-    }, [email, refreshKey])
+        if (user_id) fetcher()
+    }, [user_id, refreshKey])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -100,20 +81,9 @@ export default function OrderCard() {
             product_id: productId,
             product_name: product,
             quantity: quantity,
-            assy_group: assyGroup,
-            part: partRequst,
-            no_mode: noMode,
             total_length: totalLength,
             stripping_front: strippingFront,
             stripping_rear: strippingRear,
-            half_strip_front: halfStripFront,
-            half_strip_end: halfStripEnd,
-            insulation_front: insulationFront,
-            insulation_back: insulationBack,
-            core_diameter: coreDiameter,
-            blade_move_back: bladeMoveBack,
-            depth_of_blade: depthOfBlade,
-            length_of_mb: lengthOfMb,
             delivery_date: deliveryDate,
             status: "Waiting",
         }
@@ -128,7 +98,7 @@ export default function OrderCard() {
 
         const inventoryData = await response.json()
 
-        if (inventoryData.data[0].quantity >= quantity) {
+        if (Number(inventoryData.data[0].quantity) >= Number(quantity)) {
             const res = await fetch("/api/insert/addOrder", {
                 method: "POST",
                 body: JSON.stringify(payload),
@@ -155,24 +125,13 @@ export default function OrderCard() {
         const data = {
             orderNumber: orderNumber,
             customerName: customerName,
-            productionName: product,
-            skuCode: SKUCode,
+            productName: product,
+            productCode: productCode,
             productPart: part,
             actualQuantity: quantity,
-            assyGroup: assyGroup,
-            partRequst: partRequst,
-            noMode: noMode,
             totalLength: totalLength,
             strippingFront: strippingFront,
             strippingRear: strippingRear,
-            halfStripFront: halfStripFront,
-            halfStripEnd: halfStripEnd,
-            insulationFront: insulationFront,
-            insulationBack: insulationBack,
-            coreDiameter: coreDiameter,
-            bladeMoveBack: bladeMoveBack,
-            depthOfBlade: depthOfBlade,
-            lengthOfMb: lengthOfMb,
             orderDuration: '-',
             deliveryDate: deliveryDate ? formattedDateOnly(deliveryDate.toISOString()) : "N/A",
             cost: (Number(cost) * Number(quantity)).toString(),
@@ -226,7 +185,7 @@ export default function OrderCard() {
                                     if (selectedProduct) {
                                         setProductId(selectedProduct.identifier)
                                         setProduct(selectedProduct.name);
-                                        setSKUCode(selectedProduct.sku_code);
+                                        setProductCode(selectedProduct.code);
                                         setPart(selectedProduct.part_name);
                                         setPartMaterial(selectedProduct.part_material)
                                         setCost(selectedProduct.cost);
@@ -264,30 +223,6 @@ export default function OrderCard() {
                             />
                         </div>
                         <div>
-                            <Label>Assy Group</Label>
-                            <Input
-                                placeholder="Input the Assy Group"
-                                value={assyGroup}
-                                onChange={(e) => setAssyGroup((e.target.value))}
-                            />
-                        </div>
-                        <div>
-                            <Label>Part Request</Label>
-                            <Input
-                                placeholder="Input the Part Request"
-                                value={partRequst}
-                                onChange={(e) => setPartRequst((e.target.value))}
-                            />
-                        </div>
-                        <div>
-                            <Label>No Mode</Label>
-                            <Input
-                                placeholder="Input the No Mode"
-                                value={noMode}
-                                onChange={(e) => setNoMode((e.target.value))}
-                            />
-                        </div>
-                        <div>
                             <Label>Total Length</Label>
                             <Input
                                 type="number"
@@ -318,86 +253,6 @@ export default function OrderCard() {
                             />
                         </div>
                         <div>
-                            <Label>Half Strip Front</Label>
-                            <Input
-                                type="number"
-                                min={0}
-                                placeholder="Input the Half Strip Front"
-                                value={halfStripFront}
-                                onChange={(e) => setHalfStripFront((e.target.value))}
-                            />
-                        </div>
-                        <div>
-                            <Label>Half Strip End</Label>
-                            <Input
-                                type="number"
-                                min={0}
-                                placeholder="Input the Half Strip End"
-                                value={halfStripEnd}
-                                onChange={(e) => setHalfStripEnd((e.target.value))}
-                            />
-                        </div>
-                        <div>
-                            <Label>Insulation Back</Label>
-                            <Input
-                                type="number"
-                                min={0}
-                                placeholder="Input the Insulation Back"
-                                value={insulationBack}
-                                onChange={(e) => setInsulationBack((e.target.value))}
-                            />
-                        </div>
-                        <div>
-                            <Label>Insulation Front</Label>
-                            <Input
-                                type="number"
-                                min={0}
-                                placeholder="Input the Insulation Front"
-                                value={insulationFront}
-                                onChange={(e) => setInsulationFront((e.target.value))}
-                            />
-                        </div>
-                        <div>
-                            <Label>Core Diameter</Label>
-                            <Input
-                                type="number"
-                                min={0}
-                                placeholder="Input the Core Diameter"
-                                value={coreDiameter}
-                                onChange={(e) => setCoreDiameter((e.target.value))}
-                            />
-                        </div>
-                        <div>
-                            <Label>Blade Move Back</Label>
-                            <Input
-                                type="number"
-                                min={0}
-                                placeholder="Input the Blade Move Back"
-                                value={bladeMoveBack}
-                                onChange={(e) => setBladeMoveBack((e.target.value))}
-                            />
-                        </div>
-                        <div>
-                            <Label>Depth Of Blade</Label>
-                            <Input
-                                type="number"
-                                min={0}
-                                placeholder="Input the Depth Of Blade"
-                                value={depthOfBlade}
-                                onChange={(e) => setDepthOfBlade((e.target.value))}
-                            />
-                        </div>
-                        <div>
-                            <Label>Length of MB</Label>
-                            <Input
-                                type="number"
-                                min={0}
-                                placeholder="Input the Length of MB"
-                                value={lengthOfMb}
-                                onChange={(e) => setLengthOfMb((e.target.value))}
-                            />
-                        </div>
-                        <div>
                             <Label>Delivery Date</Label>
                             <Popover open={open} onOpenChange={setOpen}>
                                 <PopoverTrigger asChild>
@@ -425,7 +280,7 @@ export default function OrderCard() {
                         </div>
 
                         <Button
-                            disabled={!customerName || !product || !quantity || !deliveryDate || !assyGroup || !partRequst || !noMode || !totalLength || !strippingFront || !strippingRear || !halfStripFront || !halfStripEnd || !insulationFront || !insulationBack || !coreDiameter || !bladeMoveBack || !depthOfBlade || !lengthOfMb}
+                            disabled={!customerName || !product || !quantity || !deliveryDate || !totalLength || !strippingFront || !strippingRear}
                             className="w-full cursor-pointer"
                             variant="outline"
                             onClick={handleSubmit}
@@ -459,28 +314,16 @@ export default function OrderCard() {
                             <InfoRow label="Order Number" value={orderNumber} />
                             <InfoRow label="Customer Name" value={customerName ? customerName : "N/A"} />
                             <InfoRow label="Production Name" value={product ? product : "N/A"} />
-                            <InfoRow label="SKU Code" value={SKUCode ? SKUCode : "N/A"} />
+                            <InfoRow label="Product Code" value={productCode ? productCode : "N/A"} />
                             <InfoRow label="Product Part" value={part ? part : "N/A"} />
                             <InfoRow label="Actual Quantity" value={quantity ? quantity : "N/A"} />
-                            <InfoRow label="Assy Group" value={assyGroup ? assyGroup : "N/A"} />
-                            <InfoRow label="Part Request" value={partRequst ? partRequst : "N/A"} />
-                            <InfoRow label="No Mode" value={noMode ? noMode : "N/A"} />
                             <InfoRow label="Total Length" value={totalLength ? totalLength : "N/A"} />
                             <InfoRow label="Stripping Front" value={strippingFront ? strippingFront : "N/A"} />
                             <InfoRow label="Stripping Rear" value={strippingRear ? strippingRear : "N/A"} />
-                            <InfoRow label="Half Strip" value={halfStripFront ? halfStripFront : "N/A"} />
-                            <InfoRow label="Half Strip" value={halfStripEnd ? halfStripEnd : "N/A"} />
-                            <InfoRow label="Insulation Back" value={insulationFront ? insulationFront : "N/A"} />
-                            <InfoRow label="Insulation Front" value={insulationBack ? insulationBack : "N/A"} />
-                            <InfoRow label="Core Diameter" value={coreDiameter ? coreDiameter : "N/A"} />
-                            <InfoRow label="Blade Move Back" value={bladeMoveBack ? bladeMoveBack : "N/A"} />
-                            <InfoRow label="Depth Of Blade" value={depthOfBlade ? depthOfBlade : "N/A"} />
-                            <InfoRow label="Length of MB" value={lengthOfMb ? lengthOfMb : "N/A"} />
                             <InfoRow
                                 label="Delivery Date"
                                 value={deliveryDate ? formattedDateOnly(deliveryDate.toISOString()) : "N/A"}
                             />
-                            <InfoRow label="Cost" value={(Number(cost) * Number(quantity)).toString()} />
                         </div>
                     </CardContent>
                 </Card>

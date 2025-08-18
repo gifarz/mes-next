@@ -5,25 +5,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method === 'POST') {
         const {
             productName,
-            productSkuCode,
-            productCost,
+            productCode,
             productDescription,
             partName,
-            partSkuCode,
-            partDependency,
+            partCode,
             partRawMaterial,
             partRawMaterialQuantity,
-            processNumber,
-            processCycleTime,
-            processSetupTime,
             identifier
         } = req.body;
 
         try {
             const result = await db.query(
-                `UPDATE mes.products SET name = $1, sku_code = $2, cost = $3, description = $4, part_name = $5, part_sku_code = $6, part_dependecy = $7, part_material = $8, part_material_quantity = $9, process_number = $10, process_cycle_time = $11, process_setup_time = $12,
-                WHERE identifier = $13 RETURNING *`,
-                [productName, productSkuCode, productCost, productDescription, partName, partSkuCode, partDependency, partRawMaterial, partRawMaterialQuantity, processNumber, processCycleTime, processSetupTime, identifier]
+                `UPDATE mes.products SET name = $1, code = $2, description = $3, part_name = $4, part_code = $5, part_material = $6, part_material_quantity = $7 WHERE identifier = $8 RETURNING *`,
+                [productName, productCode, productDescription, partName, partCode, partRawMaterial, partRawMaterialQuantity, identifier]
             );
 
             console.log(result.rows)

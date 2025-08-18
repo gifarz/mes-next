@@ -3,12 +3,12 @@ import { db } from '@/lib/db';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
-        const { station_id, email } = req.body;
+        const { station_id, user_id } = req.body;
 
         try {
             const result = await db.query(
                 `SELECT * FROM mes.orders WHERE ($1 IS NULL OR station_id = $1) and created_by = $2`,
-                [station_id, email]
+                [station_id, user_id]
             );
 
             if (result.rowCount && result.rowCount > 0) {

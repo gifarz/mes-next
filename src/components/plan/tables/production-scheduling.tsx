@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { ArrowUpIcon, ArrowDownIcon } from "@radix-ui/react-icons"
 import { Scheduling } from '../../../../types/plan/scheduling'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Order } from '../../../../types/plan/order'
 
 type SortKey = keyof Scheduling
 type SortRule = {
@@ -19,13 +18,13 @@ const columns = [
     { key: 'order_number', label: 'ORDER_NUMBER' },
     { key: 'customer_name', label: 'CUSTOMER' },
     { key: 'product_name', label: 'PRODUCT' },
-    { key: 'product_part', label: 'PART' },
-    { key: 'product_sku', label: 'SKU' },
+    { key: 'product_code', label: 'CODE' },
+    { key: 'part_name', label: 'PART' },
     { key: 'quantity', label: 'QUANTITY' },
-    { key: 'workloads', label: 'WORKLOADS' },
-    { key: 'estimate_start', label: 'ESTIMATE_START' },
-    { key: 'estimate_end', label: 'ESTIMATE_END' },
-    { key: 'used_machine', label: 'USED_MACHINE' },
+    // { key: 'workloads', label: 'WORKLOADS' },
+    // { key: 'estimate_start', label: 'ESTIMATE_START' },
+    // { key: 'estimate_end', label: 'ESTIMATE_END' },
+    // { key: 'used_machine', label: 'USED_MACHINE' },
     { key: 'status', label: 'STATUS' }
 ] as const
 

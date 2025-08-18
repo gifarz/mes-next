@@ -4,8 +4,9 @@ export interface Scheduling {
     order_number: string
     customer_name: string
     product_name: string
-    product_part: string
-    product_sku: string
+    product_code: string
+    part_name: string
+    part_code: string
     quantity: string
     workloads: string
     estimate_start: string

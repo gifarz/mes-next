@@ -19,15 +19,15 @@ export default function ProductCard() {
 
     const [isFetched, setIsFetched] = useState<boolean>(false)
 
-    const email = useUserStore((state) => state.email)
+    const user_id = useUserStore((state) => state.user_id)
 
     useEffect(() => {
         const payload = {
-            email: email,
+            user_id: user_id,
         }
 
-        const getProductByEmail = async () => {
-            const res = await fetch("/api/getter/getProductByEmail", {
+        const fetcher = async () => {
+            const res = await fetch("/api/getter/getProductByUserId", {
                 method: "POST",
                 body: JSON.stringify(payload),
                 headers: {
@@ -50,9 +50,9 @@ export default function ProductCard() {
             setIsFetched(true)
         }
 
-        getProductByEmail()
+        fetcher()
 
-    }, [email, openDialog, refreshKey])
+    }, [user_id, openDialog, refreshKey])
 
     return (
         <>

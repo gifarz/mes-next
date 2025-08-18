@@ -88,11 +88,15 @@ export function compareBetweenDate(date1: string, date2: string): string {
         end: new Date(date2),
     });
 
+    const days = duration.days ?? 0;
     const hours = duration.hours ?? 0;
     const minutes = duration.minutes ?? 0;
     const seconds = duration.seconds ?? 0;
 
-    return `${hours.toString().padStart(2, "0")}:${minutes
+    // convert days into hours
+    const totalHours = days * 24 + hours;
+
+    return `${totalHours.toString().padStart(2, "0")}:${minutes
         .toString()
         .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }

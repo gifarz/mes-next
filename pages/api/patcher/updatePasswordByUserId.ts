@@ -4,17 +4,17 @@ import { hashPassword } from '@/lib/hashPassword';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
-        const { email, newPassword } = req.body;
+        const { user_id, newPassword } = req.body;
 
-        if (!email && !newPassword) {
+        if (!user_id && !newPassword) {
             return res.status(400).json({ error: 'Invalid Parameter' });
         }
 
         try {
             const hashedPassword = await hashPassword(newPassword)
             const result = await db.query(
-                `UPDATE mes.accounts SET password = $1 WHERE email = $2 RETURNING *`,
-                [hashedPassword, email]
+                `UPDATE mes.accounts SET password = $1 WHERE user_id = $2 RETURNING *`,
+                [hashedPassword, user_id]
             );
 
             if (result.rowCount && result.rows.length > 0) {

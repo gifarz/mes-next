@@ -31,6 +31,7 @@ import {
 import { useEffect, useState } from "react"
 import { useUserStore } from "../../../../store/userStore"
 import { Notification } from "../../../../types/dashboard/notification"
+import { formattedDate } from "@/lib/dateUtils"
 
 type SortKey = keyof Notification
 type SortRule = {
@@ -52,12 +53,12 @@ export default function NotificationCard() {
         { key: 'created_on', order: 'asc' },
     ])
 
-    const email = useUserStore((state) => state.email)
+    const user_id = useUserStore((state) => state.user_id)
 
     useEffect(() => {
-        const payload = { email }
+        const payload = { user_id }
         const fetcher = async () => {
-            const response = await fetch("/api/getter/getNotificationByEmail", {
+            const response = await fetch("/api/getter/getNotificationByUserId", {
                 method: "POST",
                 body: JSON.stringify(payload),
                 headers: {
@@ -66,14 +67,20 @@ export default function NotificationCard() {
             });
 
             const dataNotification = await response.json()
-            const fixedNotification = Array.isArray(dataNotification?.data)
-                ? dataNotification.data : []
+            const fixedNotification = Array.isArray(dataNotification?.data) ?
+                dataNotification.data.map((data: Notification) => {
+                    return {
+                        ...data,
+                        created_on: formattedDate(data.created_on)
+                    }
+                })
+                : []
 
             setListNotifications(fixedNotification)
         }
 
-        if (email) fetcher()
-    }, [email])
+        if (user_id) fetcher()
+    }, [user_id])
 
     const sortedData = [...listNotifications].sort((a, b) => {
         for (const rule of sortRules) {

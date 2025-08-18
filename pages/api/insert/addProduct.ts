@@ -8,17 +8,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method === 'POST') {
         const {
             productName,
-            productSkuCode,
-            productCost,
+            productCode,
             productDescription,
             partName,
-            partSkuCode,
-            partDependency,
+            partCode,
             partRawMaterial,
             partRawMaterialQuantity,
-            processNumber,
-            processCycleTime,
-            processSetupTime,
         } = req.body;
 
         try {
@@ -26,37 +21,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const cookieHeader = req.headers.cookie || ""
             const token = getCookieFromServer(cookieHeader, "accessToken")
             const decodedJwt = decodeJWT(token as string)
-            const created_by = decodedJwt.email
+            const created_by = decodedJwt.user_id
 
-            const getFactoryByEmail = await db.query(
-                `SELECT * FROM mes.factories WHERE created_by = $1`,
-                [created_by]
-            );
+            const getFactory = await db.query(`SELECT * FROM mes.factories`);
 
-            if (getFactoryByEmail.rowCount && getFactoryByEmail.rowCount > 0) {
-                const factory_id = getFactoryByEmail.rows[0].identifier
+            if (getFactory.rowCount && getFactory.rowCount > 0) {
+                const factory_id = getFactory.rows[0].identifier
                 const result = await db.query(
                     `INSERT INTO mes.products (
                         identifier,
                         factory_id,
                         name,
-                        sku_code,
-                        cost,
+                        code,
                         description,
-                        image_path,
                         part_name,
-                        part_sku_code,
-                        part_dependency,
+                        part_code,
                         part_material,
                         part_material_quantity,
-                        process_number,
-                        process_cycle_time,
-                        process_setup_time,
                         created_by
                     )
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                     RETURNING *`,
-                    [uuid, factory_id, productName, productSkuCode, productCost, productDescription, null, partName, partSkuCode, partDependency, partRawMaterial, partRawMaterialQuantity, processNumber, processCycleTime, processSetupTime, created_by]
+                    [uuid, factory_id, productName, productCode, productDescription, partName, partCode, partRawMaterial, partRawMaterialQuantity, created_by]
                 );
 
                 if (result.rowCount && result.rowCount > 0) {
@@ -66,7 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }
 
             } else {
-                res.status(500).json({ message: 'The Email Has Not Factory Yet' });
+                res.status(500).json({ message: 'The User Has Not Factory Yet' });
             }
 
 

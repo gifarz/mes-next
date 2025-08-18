@@ -4,5 +4,7 @@ export interface Station {
     machine_name: string
     number: string
     name: string
+    line: string
+    address: string
     created_on: string
 }

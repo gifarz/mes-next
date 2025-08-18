@@ -3,10 +3,7 @@
 import { useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
-import { Spinner } from "@/components/ui/spinner"
-import { Skeleton } from "@/components/ui/skeleton"
 import { useUserStore } from '../../../../../store/userStore'
 import InventoryDataTable from "../table"
 import { formattedDate } from "@/lib/dateUtils"
@@ -29,15 +26,15 @@ export default function InventoryCard() {
 
     const [isFetched, setIsFetched] = useState<boolean>(false)
 
-    const email = useUserStore((state) => state.email)
+    const user_id = useUserStore((state) => state.user_id)
 
     useEffect(() => {
         const payload = {
-            email: email,
+            user_id: user_id,
         }
 
-        const getInventoryByEmail = async () => {
-            const res = await fetch("/api/getter/getInventoryByEmail", {
+        const fetcher = async () => {
+            const res = await fetch("/api/getter/getInventoryByUserId", {
                 method: "POST",
                 body: JSON.stringify(payload),
                 headers: {
@@ -45,22 +42,22 @@ export default function InventoryCard() {
                 },
             });
 
-            const response = await res.json()
+            const dataInventory = await res.json()
 
-            const fixedResponse = response.data.map((res: Inventory) => {
-                return {
+            const fixedResponse = Array.isArray(dataInventory?.data)
+                ? dataInventory.data.map((res: Inventory) => ({
                     ...res,
-                    created_on: formattedDate(res.created_on)
-                }
-            })
+                    created_on: formattedDate(res.created_on),
+                }))
+                : []
 
             setListInventory(fixedResponse)
             setIsFetched(true)
         }
 
-        getInventoryByEmail()
+        fetcher()
 
-    }, [email, openDialog, refreshKey])
+    }, [user_id, openDialog, refreshKey])
 
     return (
         <>

@@ -10,18 +10,31 @@ import { Moon, Sun } from 'lucide-react'
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { useSidebarStore } from '../../../store/sidebarStore'
+import OperatorInitiation from '@/components/dialog/operator-initiation'
+import { Account } from '../../../types/settings/account'
+import { decrypt } from '@/lib/crypto'
 
 export default function AppLayout({ children }: { children: ReactNode }) {
     const { toggle } = useSidebarStore();
-    const isInitialized = useRef(false)
+    const user_id = useUserStore((state) => state.user_id)
+    const isInitialized = useRef<boolean>(false)
     const { setTheme, resolvedTheme } = useTheme()
-    const [mounted, setMounted] = useState(false)
+    const [mounted, setMounted] = useState<boolean>(false)
+    const [role, setRole] = useState<string>("")
+
 
     useEffect(() => {
+        const storageRole = localStorage.getItem("role")
+
+        if (!storageRole) return
+        const decryptedRole = decrypt(JSON.parse(storageRole))
+
+        setRole(decryptedRole)
+
         setMounted(true)
         if (isInitialized.current) return
         isInitialized.current = true
-    }, [])
+    }, [user_id])
 
     if (!mounted) return null
 
@@ -29,27 +42,37 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 
     return (
         <div className="flex min-h-screen">
-            <SidebarProvider>
-                <AppSidebar />
-                <main className="flex-1 p-4">
-                    <div className="flex justify-between">
-                        <SidebarTrigger onClick={toggle} />
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => setTheme(isDark ? 'light' : 'dark')}
-                        >
-                            {isDark ? (
-                                <Sun className="h-4 w-4" />
-                            ) : (
-                                <Moon className="h-4 w-4" />
-                            )}
-                            <span className="sr-only">Toggle theme</span>
-                        </Button>
+            {
+                !role ?
+                    <div className='flex items-center justify-center w-full h-full'>
+                        Loading...
                     </div>
-                    {children}
-                </main>
-            </SidebarProvider>
+                    :
+                    <>
+                        {role === "Operator" && <OperatorInitiation />}
+                        <SidebarProvider>
+                            <AppSidebar role={role} />
+                            <main className="flex-1 p-4">
+                                <div className="flex justify-between">
+                                    <SidebarTrigger onClick={toggle} />
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={() => setTheme(isDark ? 'light' : 'dark')}
+                                    >
+                                        {isDark ? (
+                                            <Sun className="h-4 w-4" />
+                                        ) : (
+                                            <Moon className="h-4 w-4" />
+                                        )}
+                                        <span className="sr-only">Toggle theme</span>
+                                    </Button>
+                                </div>
+                                {children}
+                            </main>
+                        </SidebarProvider>
+                    </>
+            }
         </div>
     )
 }

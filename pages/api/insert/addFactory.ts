@@ -8,18 +8,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method === 'POST') {
         const {
             name,
-            type,
-            production_model,
+            description,
             operation_start,
             operation_end,
             overtime_start,
             overtime_end,
             operation_day,
-            productivity_optimization,
-            work_utilization,
-            standard_machine_efficiency,
-            acceptable_waste,
-            reschedule_interval,
         } = req.body;
 
         try {
@@ -27,29 +21,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const uuid = generateUUID()
             const token = getCookieFromServer(cookieHeader, "accessToken")
             const decodedJwt = decodeJWT(token as string)
-            const created_by = decodedJwt.email
+            const created_by = decodedJwt.user_id
 
             const result = await db.query(
                 `INSERT INTO mes.factories (
                     identifier,
                     name,
-                    type,
-                    production_model,
+                    description,
                     operation_start,
                     operation_end,
                     overtime_start,
                     overtime_end,
                     operation_day,
-                    productivity_optimization,
-                    work_utilization,
-                    standard_machine_efficiency,
-                    acceptable_waste,
-                    reschedule_interval,
                     created_by
                 )
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
                 RETURNING *`,
-                [uuid, name, type, production_model, operation_start, operation_end, overtime_start, overtime_end, operation_day, productivity_optimization, work_utilization, standard_machine_efficiency, acceptable_waste, reschedule_interval, created_by]
+                [uuid, name, description, operation_start, operation_end, overtime_start, overtime_end, operation_day, created_by]
             );
 
             if (result.rowCount && result.rowCount > 0) {

@@ -9,25 +9,25 @@ import {
     TabsList,
     TabsTrigger,
 } from "@/components/ui/tabs"
-import ProductionCard from '@/components/track/production'
-import WarehouseCard from '@/components/track/warehouse'
+import ListOrdersCard from '@/components/track/list-orders'
+import WarehouseCard from '@/components/track/production-process'
 
 export default function page() {
     return (
         <div className="flex w-full flex-col gap-6 mt-5">
-            <Tabs defaultValue="production">
+            <Tabs defaultValue="list_order">
                 <TabsList className="w-full flex">
-                    <TabsTrigger value="production" className="flex-1">Production</TabsTrigger>
-                    <TabsTrigger value="warehouse" className="flex-1">Warehouse</TabsTrigger>
+                    <TabsTrigger value="list_order" className="flex-1">List Order</TabsTrigger>
+                    <TabsTrigger value="production_process" className="flex-1">Production Process</TabsTrigger>
                 </TabsList>
-                <TabsContent value="production">
+                <TabsContent value="list_order">
                     <Card>
                         <CardContent>
-                            <ProductionCard />
+                            <ListOrdersCard />
                         </CardContent>
                     </Card>
                 </TabsContent>
-                <TabsContent value="warehouse">
+                <TabsContent value="production_process">
                     <Card>
                         <CardContent>
                             <WarehouseCard />

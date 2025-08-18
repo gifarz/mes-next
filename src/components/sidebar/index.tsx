@@ -3,9 +3,7 @@
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
-import {
-    Button
-} from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import {
     Sidebar,
     SidebarContent,
@@ -27,53 +25,42 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import Image from "next/image"
+import { useUserStore } from "../../../store/userStore"
+import { useEffect, useMemo, useState } from "react"
 
-// Menu items.
+// Menu items
 const items = [
-    {
-        title: "Dashboard",
-        url: "/app/dashboard",
-        icon: Home,
-    },
-    {
-        title: "Setup",
-        url: "/app/setup",
-        icon: Inbox,
-    },
-    {
-        title: "Plan",
-        url: "/app/plan",
-        icon: Calendar,
-    },
-    {
-        title: "Track",
-        url: "/app/track",
-        icon: Search,
-    },
-    {
-        title: "Settings",
-        url: "/app/settings",
-        icon: Settings,
-    },
+    { title: "Dashboard", url: "/app/dashboard", icon: Home },
+    { title: "Setup", url: "/app/setup", icon: Inbox },
+    { title: "Plan", url: "/app/plan", icon: Calendar },
+    { title: "Track", url: "/app/track", icon: Search },
+    { title: "Settings", url: "/app/settings", icon: Settings },
 ]
 
-export function AppSidebar() {
+export function AppSidebar({ role }: { role: string }) {
     const pathname = usePathname()
     const router = useRouter()
 
     const handleLogout = async () => {
         try {
-            await fetch("/api/auth/logout", {
-                method: "POST",
-            })
+            await fetch("/api/auth/logout", { method: "POST" })
             router.push("/auth")
         } catch (error) {
             console.error("Logout failed", error)
         }
     }
+
+    // Filter menu items based on role
+    const filteredItems = useMemo(() => {
+        if (role === "Operator") {
+            return items.filter(
+                (item) => item.title === "Track" || item.title === "Settings"
+            )
+        }
+        return items
+    }, [role])
+
     return (
         <Sidebar>
             <SidebarContent>
@@ -90,14 +77,18 @@ export function AppSidebar() {
                     </SidebarGroupLabel>
                     <SidebarGroupContent className="mt-28">
                         <SidebarMenu>
-                            {items.map((item) => {
+                            {filteredItems.map((item) => {
                                 const isActive = pathname === item.url
                                 return (
                                     <SidebarMenuItem
                                         key={item.title}
-                                        className={`h-12 ${isActive ? "bg-muted font-semibold" : ""}`}
+                                        className={`h-12 ${isActive ? "bg-muted font-semibold" : ""
+                                            }`}
                                     >
-                                        <SidebarMenuButton asChild className="h-full flex items-center gap-2 px-4">
+                                        <SidebarMenuButton
+                                            asChild
+                                            className="h-full flex items-center gap-2 px-4"
+                                        >
                                             <Link href={item.url}>
                                                 <item.icon className="w-5 h-5" />
                                                 <span>{item.title}</span>
@@ -113,18 +104,22 @@ export function AppSidebar() {
             <SidebarFooter>
                 <Dialog>
                     <DialogTrigger asChild>
-                        <Button variant="destructive" className="w-full cursor-pointer">LOGOUT</Button>
+                        <Button variant="destructive" className="w-full cursor-pointer">
+                            LOGOUT
+                        </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
                             <DialogTitle>Logout</DialogTitle>
                             <DialogDescription>
-                                Are you sure want to logout ?
+                                Are you sure you want to logout?
                             </DialogDescription>
                         </DialogHeader>
                         <DialogFooter>
                             <DialogClose asChild>
-                                <Button className="cursor-pointer" variant="outline">No</Button>
+                                <Button className="cursor-pointer" variant="outline">
+                                    No
+                                </Button>
                             </DialogClose>
                             <Button
                                 variant="destructive"

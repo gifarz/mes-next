@@ -34,27 +34,14 @@ const styles = StyleSheet.create({
 interface DetailPDF {
     orderNumber?: string;
     customerName?: string;
-    productionName?: string;
-    skuCode?: string;
+    productName?: string;
+    productCode?: string;
     productPart?: string;
     actualQuantity?: string;
-    assyGroup?: string;
-    partRequst?: string;
-    noMode?: string;
     totalLength?: string;
     strippingFront?: string;
     strippingRear?: string;
-    halfStripFront?: string;
-    halfStripEnd?: string;
-    insulationFront?: string;
-    insulationBack?: string;
-    coreDiameter?: string;
-    bladeMoveBack?: string;
-    depthOfBlade?: string;
-    lengthOfMb?: string;
-    orderDuration: string;
     deliveryDate: string;
-    cost: string;
 }
 
 type DetailPDFProps = {
@@ -66,27 +53,14 @@ const OrderDetailPDF = ({ order }: DetailPDFProps) => {
     const fields = [
         { label: "Order Number", value: order.orderNumber || "-" },
         { label: "Customer Name", value: order.customerName || "-" },
-        { label: "Production Name", value: order.productionName || "-" },
-        { label: "SKU Code", value: order.skuCode || "-" },
+        { label: "Product Name", value: order.productName || "-" },
+        { label: "Product Code", value: order.productCode || "-" },
         { label: "Product Part", value: order.productPart || "-" },
         { label: "Actual Quantity", value: order.actualQuantity || "-" },
-        { label: "Assy Group", value: order.assyGroup || "-" },
-        { label: "Part Request", value: order.partRequst || "-" },
-        { label: "No Mode", value: order.noMode || "-" },
         { label: "Total Length", value: order.totalLength || "-" },
         { label: "Stripping Front", value: order.strippingFront || "-" },
         { label: "Stripping Rear", value: order.strippingRear || "-" },
-        { label: "Half Strip Front", value: order.halfStripFront || "-" },
-        { label: "Half Strip End", value: order.halfStripEnd || "-" },
-        { label: "Insulation Front", value: order.insulationFront || "-" },
-        { label: "Insulation Back", value: order.insulationBack || "-" },
-        { label: "Core Diameter", value: order.coreDiameter || "-" },
-        { label: "Blade Move Back", value: order.bladeMoveBack || "-" },
-        { label: "Depth Of Blade", value: order.depthOfBlade || "-" },
-        { label: "Length Of MB", value: order.lengthOfMb || "-" },
-        { label: "Order Duration", value: order.orderDuration || "-" },
         { label: "Delivery Date", value: order.deliveryDate || "-" },
-        { label: "Cost", value: order.cost || "-" },
     ];
 
     return (

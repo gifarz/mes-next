@@ -3,12 +3,12 @@ import { db } from '@/lib/db';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
-        const { identifier, defect, done, completed, actual_end, duration, status } = req.body;
+        const { identifier, defect, done, completed, actual_end, duration, status, checked_by } = req.body;
 
         try {
             const result = await db.query(
-                `UPDATE mes.orders SET defect_item = $1, done_item = $2, completed = $3, actual_end = $4, duration = $5, status = $6 WHERE identifier = $7 RETURNING *`,
-                [defect, done, completed, actual_end, duration, status, identifier]
+                `UPDATE mes.orders SET defect_item = $1, done_item = $2, completed = $3, actual_end = $4, duration = $5, status = $6, checked_by = $7 WHERE identifier = $8 RETURNING *`,
+                [defect, done, completed, actual_end, duration, status, checked_by, identifier]
             );
 
             if (result.rowCount && result.rows.length > 0) {

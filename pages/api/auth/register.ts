@@ -5,37 +5,48 @@ import { generateUUID } from '@/lib/uuidGenerator';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
-        const { email, name, phone, password, company } = req.body;
+        const { user_id, name, role, password } = req.body;
 
-        const uuid = generateUUID()
+        console.log('req.body', req.body);
 
         try {
-            const hashedPassword = await hashPassword(password)
+            const uuid = generateUUID()
             const result = await db.query(
-                `INSERT INTO mes.accounts (identifier, email, name, type, phone, password, company)
-                VALUES ($1, $2, $3, $4, $5, $6, $7)
-                RETURNING *`,
-                [uuid, email, name, "USER", phone, hashedPassword, company]
+                `SELECT * FROM mes.accounts WHERE user_id = $1 `,
+                [user_id]
             );
 
             if (result.rowCount && result.rowCount > 0) {
-                await db.query(
-                    `INSERT INTO mes.customer_logs (email, company, service, result_code, result_desc)
-                    VALUES ($1, $2, $3, $4, $5)
-                    RETURNING *`,
-                    [email, company, "REGISTRATION", "00", "Success"]
-                );
+                res.status(404).json({ message: 'Account Already Exist', data: result.rows[0] });
 
-                res.status(200).json({ message: 'Successfully Created the Account', data: result.rows[0] });
             } else {
-                await db.query(
-                    `INSERT INTO mes.customer_logs (email, company, service, result_code, result_desc)
-                    VALUES ($1, $2, $3, $4, $5)
-                    RETURNING *`,
-                    [email, company, "REGISTRATION", "01", "Registration Failed"]
+                const hashedPassword = await hashPassword(password)
+                const result = await db.query(
+                    `INSERT INTO mes.accounts (identifier, user_id, name, role, password)
+                VALUES ($1, $2, $3, $4, $5)
+                RETURNING *`,
+                    [uuid, user_id, name, role, hashedPassword]
                 );
 
-                res.status(500).json({ message: 'Failed Created the Account' });
+                if (result.rowCount && result.rowCount > 0) {
+                    await db.query(
+                        `INSERT INTO mes.customer_logs (user_id, service, result_code, result_desc)
+                    VALUES ($1, $2, $3, $4)
+                    RETURNING *`,
+                        [user_id, "REGISTRATION", "00", "Success"]
+                    );
+
+                    res.status(200).json({ message: 'Successfully Created the Account', data: result.rows[0] });
+                } else {
+                    await db.query(
+                        `INSERT INTO mes.customer_logs (user_id, service, result_code, result_desc)
+                    VALUES ($1, $2, $3, $4)
+                    RETURNING *`,
+                        [user_id, "REGISTRATION", "01", "Registration Failed"]
+                    );
+
+                    res.status(500).json({ message: 'Failed Created the Account' });
+                }
             }
 
         } catch (error) {

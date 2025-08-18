@@ -13,7 +13,7 @@ import {
     Button
 } from "@/components/ui/button"
 
-interface DialogComponentProps {
+interface DeleteConfirmationProps {
     title: string
     description: string
     onClickYes: () => void
@@ -21,8 +21,7 @@ interface DialogComponentProps {
     onOpenChange: (open: boolean) => void
 }
 
-export default function DialogComponent({ title, description, open, onOpenChange, onClickYes }: DialogComponentProps) {
-    console.log('dialog called')
+export default function DeleteConfirmation({ title, description, open, onOpenChange, onClickYes }: DeleteConfirmationProps) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[425px]">

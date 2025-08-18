@@ -3,16 +3,16 @@ import { db } from '@/lib/db';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
-        const { name, phone, company, email } = req.body;
+        const { name, user_id } = req.body;
 
-        if (!email) {
+        if (!user_id) {
             return res.status(400).json({ error: 'Invalid Parameter' });
         }
 
         try {
             const result = await db.query(
-                `UPDATE mes.accounts SET name = $1, phone = $2, company = $3 WHERE email = $4 RETURNING *`,
-                [name, phone, company, email]
+                `UPDATE mes.accounts SET name = $1 WHERE user_id = $2 RETURNING *`,
+                [name, user_id]
             );
 
             if (result.rowCount && result.rows.length > 0) {

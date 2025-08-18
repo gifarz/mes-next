@@ -36,7 +36,8 @@ export default function StationCard() {
     const [stationId, setStationId] = useState("")
     const [stationNumber, setStationNumber] = useState("")
     const [stationName, setStationName] = useState("")
-    const [machine, setMachine] = useState("")
+    const [stationLine, setStationLine] = useState("")
+    const [stationAddress, setStationAddress] = useState("")
     const [listStations, setListStations] = useState<Station[]>([])
     const [listMachines, setListMachines] = useState<Machine[]>([])
 
@@ -46,7 +47,7 @@ export default function StationCard() {
     const [isEditStation, setIsEditStation] = useState(false)
     const [refreshKey, setRefreshKey] = useState(0)
 
-    const email = useUserStore((state) => state.email)
+    const user_id = useUserStore((state) => state.user_id)
     const [selectedMachines, setSelectedMachines] = useState<string[]>([]);
 
     const triggerRef = useRef<HTMLButtonElement | null>(null);
@@ -68,11 +69,11 @@ export default function StationCard() {
 
     useEffect(() => {
         const payload = {
-            email: email,
+            user_id: user_id,
         }
 
         const fetcher = async () => {
-            const stations = await fetch("/api/getter/getStationsByEmail", {
+            const stations = await fetch("/api/getter/getStationsByUserId", {
                 method: "POST",
                 body: JSON.stringify(payload),
                 headers: {
@@ -89,7 +90,7 @@ export default function StationCard() {
                 }))
                 : []
 
-            const machines = await fetch("/api/getter/getMachinesByEmail", {
+            const machines = await fetch("/api/getter/getMachinesByUserId", {
                 method: "POST",
                 body: JSON.stringify(payload),
                 headers: {
@@ -111,7 +112,7 @@ export default function StationCard() {
 
         fetcher()
 
-    }, [email, search, isAddStation, isEditStation, refreshKey])
+    }, [user_id, search, isAddStation, isEditStation, refreshKey])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -119,6 +120,8 @@ export default function StationCard() {
         const payload = {
             number: stationNumber,
             name: stationName,
+            line: stationLine,
+            address: stationAddress,
             machine_name: selectedMachines.join(",")
         }
 
@@ -138,6 +141,7 @@ export default function StationCard() {
             if (res.ok) {
                 toast.success("Successfully Update The Station!")
                 setIsSubmitted(false)
+                setIsAddStation(false)
                 setIsEditStation(false)
             } else {
                 toast.error("Failed to Add Station!")
@@ -158,6 +162,7 @@ export default function StationCard() {
                 toast.success("The Station Added Successfully!")
                 setIsSubmitted(false)
                 setIsAddStation(false)
+                setIsEditStation(false)
             } else {
                 toast.error("Failed to Add Station!")
                 setIsSubmitted(false)
@@ -181,12 +186,12 @@ export default function StationCard() {
         setIsAddStation(true) // To activate the red cancel button
         setIsEditStation(true)
 
-        console.log('station', station)
-
         // Mapping the parameters of each station to the state
         setStationId(station.identifier)
         setStationNumber(station.number)
         setStationName(station.name)
+        setStationLine(station.line)
+        setStationAddress(station.address)
         setSelectedMachines(
             Array.isArray(station.machine_name) ?
                 station.machine_name : station.machine_name.split(",")
@@ -261,6 +266,7 @@ export default function StationCard() {
                                     <Label htmlFor="stationNumber">Station Number</Label>
                                     <Input
                                         id="stationNumber"
+                                        placeholder="Enter Station Number"
                                         type="text"
                                         value={stationNumber}
                                         onChange={(e) => setStationNumber(e.target.value)}
@@ -272,9 +278,32 @@ export default function StationCard() {
                                     <Label htmlFor="stationName">Station Name</Label>
                                     <Input
                                         id="stationName"
+                                        placeholder="Enter Station Name"
                                         type="text"
                                         value={stationName}
                                         onChange={(e) => setStationName(e.target.value)}
+                                    />
+                                </div>
+
+                                <div>
+                                    <Label htmlFor="stationName">Station Line</Label>
+                                    <Input
+                                        id="stationLine"
+                                        placeholder="Enter Station Line"
+                                        type="text"
+                                        value={stationLine}
+                                        onChange={(e) => setStationLine(e.target.value)}
+                                    />
+                                </div>
+
+                                <div>
+                                    <Label htmlFor="stationName">Station Address</Label>
+                                    <Input
+                                        id="stationAddress"
+                                        placeholder="Enter Station Address"
+                                        type="text"
+                                        value={stationAddress}
+                                        onChange={(e) => setStationAddress(e.target.value)}
                                     />
                                 </div>
 

@@ -128,6 +128,7 @@ export default function OrderTable({ listOrders, listProducts, listCustomers, on
                         orderData={orderData}
                         listProducts={listProducts}
                         listCustomers={listCustomers}
+                        onOrderUpdated={onOrderUpdated}
                     />
                     :
                     ""

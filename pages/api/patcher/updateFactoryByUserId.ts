@@ -7,18 +7,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method === 'POST') {
         const {
             name,
-            type,
-            production_model,
+            description,
             operation_start,
             operation_end,
             overtime_start,
             overtime_end,
             operation_day,
-            productivity_optimization,
-            work_utilization,
-            standard_machine_efficiency,
-            acceptable_waste,
-            reschedule_interval,
         } = req.body;
 
         console.log('req.body', req.body)
@@ -27,25 +21,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const cookieHeader = req.headers.cookie || ""
             const token = getCookieFromServer(cookieHeader, "accessToken")
             const decodedJwt = decodeJWT(token as string)
-            const created_by = decodedJwt.email
+            const created_by = decodedJwt.user_id
 
             const result = await db.query(
                 `UPDATE mes.factories SET 
                 name = $1,
-                type = $2,
-                production_model = $3,
-                operation_start = $4,
-                operation_end = $5,
-                overtime_start = $6,
-                overtime_end = $7,
-                operation_day = $8,
-                productivity_optimization = $9,
-                work_utilization = $10,
-                standard_machine_efficiency = $11,
-                acceptable_waste = $12,
-                reschedule_interval = $13
-                WHERE created_by = $14 RETURNING *`,
-                [name, type, production_model, operation_start, operation_end, overtime_start, overtime_end, operation_day, productivity_optimization, work_utilization, standard_machine_efficiency, acceptable_waste, reschedule_interval, created_by]
+                description = $2,
+                operation_start = $3,
+                operation_end = $4,
+                overtime_start = $5,
+                overtime_end = $6,
+                operation_day = $7,
+                WHERE created_by = $8 RETURNING *`,
+                [name, description, operation_start, operation_end, overtime_start, overtime_end, operation_day, created_by]
             );
 
             console.log('result', result.rows)

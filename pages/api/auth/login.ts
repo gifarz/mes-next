@@ -6,12 +6,12 @@ import jwt from 'jsonwebtoken';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
-        const { email, password } = req.body;
+        const { user_id, password } = req.body;
 
         try {
             const result = await db.query(
-                `SELECT * FROM mes.accounts WHERE email = $1 `,
-                [email]
+                `SELECT * FROM mes.accounts WHERE user_id = $1 `,
+                [user_id]
             );
 
             if (result.rowCount && result.rowCount > 0) {
@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                     // Generate JWT access token
                     const accessToken = jwt.sign(
-                        { email: email, type: result.rows[0].type },
+                        { user_id: user_id, role: result.rows[0].role },
                         process.env.JWT_SECRET,
                         { expiresIn: '1h' }
                     );
@@ -38,15 +38,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     res.setHeader('Set-Cookie', cookie);
 
                     await db.query(
-                        `INSERT INTO mes.customer_logs (email, company, service, result_code, result_desc)
-                        VALUES ($1, $2, $3, $4, $5)
+                        `INSERT INTO mes.customer_logs (user_id, service, result_code, result_desc)
+                        VALUES ($1, $2, $3, $4)
                         RETURNING *`,
-                        [email, result.rows[0].company, "LOGIN", "00", "Success"]
+                        [user_id, "LOGIN", "00", "Success"]
                     );
 
                     const factory = await db.query(
                         `SELECT * FROM mes.factories WHERE created_by = $1 `,
-                        [email]
+                        [user_id]
                     );
 
                     res.status(200).json(
@@ -58,19 +58,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     );
                 } else {
                     await db.query(
-                        `INSERT INTO mes.customer_logs (email, company, service, result_code, result_desc)
-                        VALUES ($1, $2, $3, $4, $5)
+                        `INSERT INTO mes.customer_logs (user_id, service, result_code, result_desc)
+                        VALUES ($1, $2, $3, $4)
                         RETURNING *`,
-                        [email, result.rows[0].company, "LOGIN", "02", "Password Does Not Match"]
+                        [user_id, "LOGIN", "02", "Password Does Not Match"]
                     );
                     res.status(403).json({ message: 'Account Not Found', data: result.rows[0] });
                 }
             } else {
                 await db.query(
-                    `INSERT INTO mes.customer_logs (email, company, service, result_code, result_desc)
-                    VALUES ($1, $2, $3, $4, $5)
+                    `INSERT INTO mes.customer_logs (user_id, service, result_code, result_desc)
+                    VALUES ($1, $2, $3, $4)
                     RETURNING *`,
-                    [email, null, "LOGIN", "02", "Account does not exist"]
+                    [user_id, null, "LOGIN", "02", "Account does not exist"]
                 );
                 res.status(403).json({ message: 'Account Not Found', data: result.rows[0] });
             }

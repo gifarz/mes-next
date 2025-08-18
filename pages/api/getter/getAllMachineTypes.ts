@@ -2,24 +2,22 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { db } from '@/lib/db';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    if (req.method === 'POST') {
-        const { email } = req.body;
+    if (req.method === 'GET') {
 
         try {
             const result = await db.query(
-                `SELECT * FROM mes.products WHERE created_by = $1`,
-                [email]
+                `SELECT * FROM mes.machine_types`
             );
 
             if (result.rowCount && result.rowCount > 0) {
-                res.status(200).json({ message: 'Product Found', data: result.rows });
+                res.status(200).json({ message: 'Machine Type Found', data: result.rows });
             } else {
-                res.status(403).json({ message: 'Product Not found' });
+                res.status(403).json({ message: 'Machine Type Not found' });
             }
 
         } catch (error) {
             console.error('Fetching error:', error);
-            res.status(500).json({ error: 'Failed to Fetch Product' });
+            res.status(500).json({ error: 'Failed to Fetch Machine Type' });
         }
     } else {
         res.setHeader('Allow', ['POST']);

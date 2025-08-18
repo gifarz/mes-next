@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import { useState, useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -27,46 +27,37 @@ import {
     TabsList,
     TabsTrigger,
 } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
 import { Spinner } from "@/components/ui/spinner"
 import { useRouter } from 'next/navigation';
 import Image from "next/image"
 import { useUserStore } from "../../../store/userStore"
+import { Roles } from "../../../types/auth/auth"
+import { encrypt } from "@/lib/crypto"
 
 const formSchemaRegistration = z.object({
-    email: z
-        .string()
-        .regex(
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-            { message: "Invalid email address" }
-        ),
+    user_id: z.string().min(3, {
+        message: "User ID must be at least 3 characters.",
+    }),
     name: z.string().min(3, {
         message: "Name must be at least 3 characters.",
     }),
-    phone: z
-        .string()
-        .min(10, { message: "Phone must be at least 10 digits." })
-        .max(15, { message: "Phone must be at most 13 digits." })
-        .regex(/^\d+$/, { message: "Phone must contain only digits." }),
+    role: z
+        .string(),
     password: z.string().min(5, {
         message: "Password must be at least 5 characters.",
     }),
     passwordConfirmation: z.string().min(5, {
         message: "Password must be at least 5 characters.",
-    }),
-    company: z.string().min(5, {
-        message: "Company must be at least 5 characters.",
     })
 })
 
 const formSchemaLogin = z.object({
-    email: z
-        .string()
-        .regex(
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-            { message: "Invalid email address" }
-        ),
+    user_id: z.string().min(3, {
+        message: "User ID must be at least 3 characters.",
+    }),
     password: z.string().min(5, {
         message: "Password must be at least 5 characters.",
     })
@@ -74,28 +65,44 @@ const formSchemaLogin = z.object({
 
 export default function AuthPage() {
     const router = useRouter();
-    const [isLogin, setIsLogin] = React.useState(false)
-    const [isRegistration, setIsRegistration] = React.useState(false)
-    const [tabValue, setTabValue] = React.useState("login")
+    const [isLogin, setIsLogin] = useState<boolean>(false)
+    const [isRegistration, setIsRegistration] = useState<boolean>(false)
+    const [tabValue, setTabValue] = useState<string>("login")
+    const [listRoles, setlistRoles] = useState<Roles[]>([])
 
     const setUser = useUserStore((state) => state.setUser)
+
+    useEffect(() => {
+        const fetcher = async () => {
+            const resRole = await fetch("/api/getter/getAllRoles", {
+                method: "GET"
+            });
+
+            const dataRoles = await resRole.json()
+            const fixedRoles = Array.isArray(dataRoles?.data)
+                ? dataRoles.data : []
+
+            setlistRoles(fixedRoles)
+        }
+
+        fetcher()
+    }, [])
 
     const formRegistration = useForm<z.infer<typeof formSchemaRegistration>>({
         resolver: zodResolver(formSchemaRegistration),
         defaultValues: {
-            email: "",
+            user_id: "",
             name: "",
-            phone: "",
+            role: "",
             password: "",
             passwordConfirmation: "",
-            company: "",
         },
     })
 
     const formLogin = useForm<z.infer<typeof formSchemaLogin>>({
         resolver: zodResolver(formSchemaLogin),
         defaultValues: {
-            email: "",
+            user_id: "",
             password: ""
         },
     })
@@ -111,12 +118,14 @@ export default function AuthPage() {
                 },
             });
 
+            const response = await res.json()
+
             if (res.ok) {
                 toast.success("Account Has Been Created!")
                 setTabValue("login")
                 formRegistration.reset();
             } else {
-                toast.error("Error Creating Account")
+                toast.error(response.message)
             }
         } else {
             toast.error("The password and Confirmation Password Does Not Match!")
@@ -137,11 +146,17 @@ export default function AuthPage() {
         const json = await res.json()
 
         if (res.ok) {
+            console.log('json', json)
             setUser({
-                email: json.data.email,
-                role: json.data.type,
+                user_id: json.data.user_id,
+                name: json.data.name,
+                role: json.data.role,
                 factory: json.factory
             })
+
+            const encryptedRole = encrypt(json.data.role)
+
+            localStorage.setItem("role", JSON.stringify(encryptedRole))
             toast.success("Account Found")
             router.push('/app/dashboard');
             formRegistration.reset();
@@ -181,12 +196,12 @@ export default function AuthPage() {
                                     <form onSubmit={formLogin.handleSubmit(onSubmitLogin)} className="space-y-5">
                                         <FormField
                                             control={formLogin.control}
-                                            name="email"
+                                            name="user_id"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Email</FormLabel>
+                                                    <FormLabel>User ID</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="Type your email" {...field} />
+                                                        <Input placeholder="Type your User ID" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -248,12 +263,12 @@ export default function AuthPage() {
                                     >
                                         <FormField
                                             control={formRegistration.control}
-                                            name="email"
+                                            name="user_id"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Email</FormLabel>
+                                                    <FormLabel>User ID</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="Type your email" {...field} />
+                                                        <Input placeholder="Type Your User ID" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -266,7 +281,7 @@ export default function AuthPage() {
                                                 <FormItem>
                                                     <FormLabel>Name</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="Type your name" {...field} />
+                                                        <Input placeholder="Type Your Name" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -274,15 +289,35 @@ export default function AuthPage() {
                                         />
                                         <FormField
                                             control={formRegistration.control}
-                                            name="phone"
+                                            name="role"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Phone</FormLabel>
+                                                    <FormLabel>Role</FormLabel>
                                                     <FormControl>
-                                                        <Input
-                                                            placeholder="Type your phone"
-                                                            {...field}
-                                                        />
+                                                        <Select
+                                                            value={field.value}
+                                                            onValueChange={field.onChange}
+                                                        >
+                                                            <SelectTrigger className="w-full">
+                                                                <SelectValue placeholder="Select Your Role" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {listRoles.length === 0 ? (
+                                                                    <p className="p-2 text-sm text-gray-500">
+                                                                        No role available
+                                                                    </p>
+                                                                ) : (
+                                                                    listRoles.map((role) => (
+                                                                        <SelectItem
+                                                                            value={role.name}
+                                                                            key={role.ai}
+                                                                        >
+                                                                            {role.name}
+                                                                        </SelectItem>
+                                                                    ))
+                                                                )}
+                                                            </SelectContent>
+                                                        </Select>
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -296,7 +331,7 @@ export default function AuthPage() {
                                                     <FormLabel>Password</FormLabel>
                                                     <FormControl>
                                                         <Input
-                                                            placeholder="Type your password"
+                                                            placeholder="Type Your password"
                                                             type="password"
                                                             {...field}
                                                         />
@@ -313,23 +348,10 @@ export default function AuthPage() {
                                                     <FormLabel>Password Confirmation</FormLabel>
                                                     <FormControl>
                                                         <Input
-                                                            placeholder="Type your confirmation password"
+                                                            placeholder="Type Your confirmation password"
                                                             type="password"
                                                             {...field}
                                                         />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={formRegistration.control}
-                                            name="company"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Company</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="Type your company" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>

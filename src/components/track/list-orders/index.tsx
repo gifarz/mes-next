@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
     Dialog,
     DialogClose,
@@ -13,73 +12,81 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { useUserStore } from '../../../../store/userStore';
 import { InfoRow } from '@/components/ui/info-row';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
-import { Station } from '../../../../types/setup/station';
 import { Order } from '../../../../types/plan/order';
 import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
 import { Toaster } from '@/components/ui/sonner';
-import { compareBetweenDate, customizeDateString, formattedDate } from '@/lib/dateUtils';
-import DialogComponent from '@/components/dialog';
+import { compareBetweenDate, customizeDateString } from '@/lib/dateUtils';
+import DeleteConfirmation from '@/components/dialog/delete-confirmation';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { decrypt } from '@/lib/crypto';
+import { Station } from '../../../../types/setup/station';
 
-export default function ProductionCard() {
-    const [listStations, setListStations] = useState<Station[]>([])
+export default function ListOrdersCard() {
     const [listOrders, setListOrders] = useState<Order[]>([])
+    const [listLines, setListLines] = useState<Station[]>([])
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
-    const [selectedStation, setSelectedStation] = useState<string>("")
     const [identifier, setIdentifier] = useState<string>("")
     const [orderNumber, setOrderNumber] = useState<string>("")
     const [defect, setDefect] = useState<number>(0)
     const [done, setDone] = useState<number>(0)
 
+    const [role, setRole] = useState<string>("")
     const [openDialog, setOpenDialog] = useState<boolean>(false)
-    const [openDialogProgress, setOpenDialogProgress] = useState<boolean>(false)
+    const [openUpdate, setOpenUpdate] = useState<boolean>(false)
     const [refreshKey, setRefreshKey] = useState<number>(0)
     const [buttonId, setButtonId] = useState<Set<string>>(new Set());
+    const [selectedLine, setSelectedLine] = useState<string>("")
+    const [stationId, setStationId] = useState<string>("")
 
-    const email = useUserStore((state) => state.email)
+    const { name, shift, line, station_id, leader, foreman } = useUserStore()
+
     useEffect(() => {
-        const payload = { email }
+        const payload = {
+            station_id: station_id ? station_id : stationId
+        }
+        const storageRole = localStorage.getItem("role")
+
+        if (!storageRole) return
+        const decryptedRole = decrypt(JSON.parse(storageRole))
+
+        setRole(decryptedRole)
 
         const fetcher = async () => {
-            const res = await fetch("/api/getter/getOrderByEmailStatus", {
+            const responseOrder = await fetch("/api/getter/getOrderByStationIdStatus", {
                 method: "POST",
                 body: JSON.stringify({
                     ...payload,
                     not_status: "Waiting",
+                    not_status_2: "Done",
                 }),
                 headers: {
                     "Content-Type": "application/json",
                 },
             })
 
-            const json = await res.json()
-            const orders = Array.isArray(json.data) ? json.data : []
-            setListOrders(orders)
+            const dataOrder = await responseOrder.json()
+            const fixedOrder = Array.isArray(dataOrder.data) ? dataOrder.data : []
+            setListOrders(fixedOrder)
 
-            const stations = await fetch("/api/getter/getStationsByEmail", {
-                method: "POST",
-                body: JSON.stringify(payload),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-            const dataStations = await stations.json()
+            const responseLine = await fetch("/api/getter/getAllStations", {
+                method: "GET"
+            })
 
-            const fixedResponse = Array.isArray(dataStations?.data)
-                ? dataStations.data
-                : []
-
-            setListStations(fixedResponse)
+            const dataLine = await responseLine.json()
+            const fixedLine = Array.isArray(dataLine.data) ? dataLine.data : []
+            setListLines(fixedLine)
         }
 
         fetcher()
 
-    }, [email, isSubmitted, refreshKey])
+    }, [station_id, isSubmitted, refreshKey, foreman, leader, line, name, shift, stationId])
 
     const handleReceiveJob = async (id: string, order_number: string) => {
         setButtonId(prev => new Set(prev).add(id));
@@ -157,7 +164,8 @@ export default function ProductionCard() {
                 completed: `${completed}%`,
                 actual_end: completed === 100 ? actual_end : null,
                 duration: completed === 100 ? compareBetweenDate(actual_start, actual_end) : null,
-                status: completed === 100 ? "Done" : "Work In Progress"
+                status: completed === 100 ? "Done" : "Work In Progress",
+                checked_by: name
             }
 
             const res = await fetch("/api/patcher/updateProgressOrderByIdentifier", {
@@ -196,8 +204,6 @@ export default function ProductionCard() {
                 toast.error(json.message)
             }
 
-            setOpenDialogProgress(false)
-
         } else {
             toast.error("The total items is not match with quantity")
         }
@@ -208,36 +214,82 @@ export default function ProductionCard() {
     return (
         <div>
             <Toaster position="top-right" />
-            <DialogComponent
+            <DeleteConfirmation
                 title='Order Delete'
                 description={`Are you sure want to delete Order Number : ${orderNumber} ? this can be reverse`}
                 open={openDialog}
                 onOpenChange={setOpenDialog}
                 onClickYes={() => handleDelete(identifier)}
             />
+            {
+                role === "Operator" ?
+                    <div className="grid grid-cols-3 gap-4">
+                        {/* Name */}
+                        <div className="flex flex-col space-y-2">
+                            <Label htmlFor="name">Operator</Label>
+                            <Input id="name" disabled value={name ? name : "-"} />
+                        </div>
 
-            <h2 className="text-2xl font-semibold mb-6 text-center">
-                Work in Progress Job Tracking
-            </h2>
-            <Select value={selectedStation} onValueChange={setSelectedStation}>
-                <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select the station" />
-                </SelectTrigger>
-                <SelectContent>
-                    {listStations.length === 0 ?
-                        <p className="p-2 text-sm text-gray-500">No station available</p>
-                        :
-                        listStations.map((station) => (
-                            <SelectItem
-                                value={station.name}
-                                key={station.identifier}
-                            >
-                                {station.name}
-                            </SelectItem>
-                        ))
-                    }
-                </SelectContent>
-            </Select>
+                        {/* Line */}
+                        <div className="flex flex-col space-y-2">
+                            <Label htmlFor="line">Line</Label>
+                            <Input id="line" disabled value={line ? line : "-"} />
+                        </div>
+
+                        {/* Shift */}
+                        <div className="flex flex-col space-y-2">
+                            <Label htmlFor="shift">Shift</Label>
+                            <Input id="shift" disabled value={shift ? shift : "-"} />
+                        </div>
+
+                        {/* Leader + Foreman in same row, centered */}
+                        <div className="col-span-3 flex justify-center gap-6">
+                            {/* Leader */}
+                            <div className="flex flex-col space-y-2 w-1/3">
+                                <Label htmlFor="leader">Leader</Label>
+                                <Input id="leader" disabled value={leader ? leader : "-"} />
+                            </div>
+
+                            {/* Foreman */}
+                            <div className="flex flex-col space-y-2 w-1/3">
+                                <Label htmlFor="foreman">Foreman</Label>
+                                <Input id="foreman" disabled value={foreman ? foreman : "-"} />
+                            </div>
+                        </div>
+                    </div>
+                    :
+                    <div>
+                        <Select
+                            value={selectedLine}
+                            onValueChange={(line) => {
+                                const selectedLine = listLines.find(l => l.line === line);
+
+                                if (selectedLine) {
+                                    setStationId(selectedLine.identifier)
+                                    setSelectedLine(selectedLine.line)
+                                }
+                            }}
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select the line" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {listLines.length === 0 ?
+                                    <p className="p-2 text-sm text-gray-500">No line available</p>
+                                    :
+                                    listLines.map((station) => (
+                                        <SelectItem
+                                            value={station.line}
+                                            key={station.identifier}
+                                        >
+                                            {station.line}
+                                        </SelectItem>
+                                    ))
+                                }
+                            </SelectContent>
+                        </Select>
+                    </div>
+            }
 
             {
                 listOrders.length === 0 ?
@@ -251,7 +303,7 @@ export default function ProductionCard() {
                                 <Card className='relative max-h-[500px]' key={order.identifier}>
                                     <CardHeader className="absolute top-0 left-0 rounded-t-xl z-10 bg-card w-full flex items-center justify-between min-h-[70px] px-5">
                                         <h2 className="text-2xl font-semibold text-center">
-                                            Part : {order.product_part}
+                                            Part : {order.part_name}
                                         </h2>
                                         <Button
                                             variant="ghost"
@@ -270,9 +322,9 @@ export default function ProductionCard() {
                                         <div className="divide-y">
                                             <InfoRow label="Order Number" value={order.order_number} />
                                             <InfoRow label="Customer Name" value={order.customer_name} />
-                                            <InfoRow label="Production Name" value={order.product_name} />
-                                            <InfoRow label="SKU Code" value={order.product_sku} />
-                                            <InfoRow label="Product Part" value={order.product_part} />
+                                            <InfoRow label="Product Name" value={order.product_name} />
+                                            <InfoRow label="Product Code" value={order.product_code} />
+                                            <InfoRow label="Part Name" value={order.part_name} />
                                             <InfoRow label="Quantity" value={order.quantity} />
                                             <InfoRow label="Estimate Start" value={order.estimate_start} />
                                             <InfoRow label="Estimate End" value={order.estimate_end} />
@@ -315,27 +367,29 @@ export default function ProductionCard() {
                                         </div>
                                     </CardContent>
                                     <CardFooter className="absolute bottom-0 left-0 rounded-b-xl z-10 bg-card w-full flex items-center justify-between min-h-[70px] px-5">
-                                        <div className='w-full flex gap-4 pr-2'>
+                                        <div className="w-full flex gap-4 pr-2">
+                                            {/* RECEIVE JOB button */}
                                             <Button
                                                 disabled={
                                                     order.status == "Work In Progress" ||
                                                     order.status == "Done" ||
                                                     buttonId.has(order.identifier)
                                                 }
-                                                className='w-1/2 cursor-pointer'
+                                                className="w-1/2 cursor-pointer"
                                                 onClick={() => handleReceiveJob(order.identifier, order.order_number)}
                                             >
-                                                {
-                                                    buttonId.has(order.identifier) ?
-                                                        <>
-                                                            <Spinner />
-                                                            <span className="ml-0">Submitting</span>
-                                                        </>
-                                                        :
-                                                        "RECEIVE JOB"
-                                                }
+                                                {buttonId.has(order.identifier) ? (
+                                                    <>
+                                                        <Spinner />
+                                                        <span className="ml-0">Submitting</span>
+                                                    </>
+                                                ) : (
+                                                    "RECEIVE JOB"
+                                                )}
                                             </Button>
-                                            <Dialog open={openDialogProgress} onOpenChange={setOpenDialogProgress}>
+
+                                            {/* PROGRESS REPORT dialog, scoped to this card only */}
+                                            <Dialog open={openUpdate} onOpenChange={setOpenUpdate}>
                                                 <DialogTrigger asChild>
                                                     <Button
                                                         disabled={
@@ -350,17 +404,18 @@ export default function ProductionCard() {
                                                     </Button>
                                                 </DialogTrigger>
                                                 <DialogContent className="sm:max-w-[425px]">
-                                                    <DialogHeader className='mb-4'>
+                                                    <DialogHeader className="mb-4">
                                                         <DialogTitle>Progress Update</DialogTitle>
                                                         <DialogDescription>
                                                             The total item should be equal with quantity ({order.quantity})
                                                         </DialogDescription>
                                                     </DialogHeader>
-                                                    <div className='space-y-2'>
+
+                                                    <div className="space-y-2">
                                                         <div>
                                                             <label>Defected</label>
                                                             <Input
-                                                                type='number'
+                                                                type="number"
                                                                 min={0}
                                                                 max={order.quantity}
                                                                 defaultValue={order.defect_item}
@@ -371,7 +426,7 @@ export default function ProductionCard() {
                                                         <div>
                                                             <label>Done</label>
                                                             <Input
-                                                                type='number'
+                                                                type="number"
                                                                 min={0}
                                                                 max={order.quantity}
                                                                 defaultValue={order.done_item}
@@ -380,30 +435,42 @@ export default function ProductionCard() {
                                                             />
                                                         </div>
                                                     </div>
+
                                                     <DialogFooter>
                                                         <DialogClose asChild>
-                                                            <Button className="cursor-pointer" variant="outline">CANCEL</Button>
+                                                            <Button className="cursor-pointer" variant="outline">
+                                                                CANCEL
+                                                            </Button>
                                                         </DialogClose>
                                                         <Button
                                                             variant="destructive"
                                                             className="cursor-pointer"
-                                                            onClick={() => handleUpdateProgress(order.identifier, order.quantity, order.actual_start, order.product_name, order.created_by)}
+                                                            onClick={async () => {
+                                                                await handleUpdateProgress(
+                                                                    order.identifier,
+                                                                    order.quantity,
+                                                                    order.actual_start,
+                                                                    order.product_name,
+                                                                    order.created_by
+                                                                )
+                                                                setOpenUpdate(false)
+                                                            }}
                                                         >
-                                                            {
-                                                                isSubmitted ?
-                                                                    <>
-                                                                        <Spinner />
-                                                                        <span className="ml-0">Submitting</span>
-                                                                    </>
-                                                                    :
-                                                                    "UPDATE PROGRESS"
-                                                            }
+                                                            {isSubmitted ? (
+                                                                <>
+                                                                    <Spinner />
+                                                                    <span className="ml-0">Submitting</span>
+                                                                </>
+                                                            ) : (
+                                                                "UPDATE PROGRESS"
+                                                            )}
                                                         </Button>
                                                     </DialogFooter>
                                                 </DialogContent>
                                             </Dialog>
                                         </div>
                                     </CardFooter>
+
                                 </Card>
                             ))
                         }

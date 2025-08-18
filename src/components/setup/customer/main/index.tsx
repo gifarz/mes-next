@@ -28,13 +28,13 @@ export default function CustomerCard() {
 
     const [isFetched, setIsFetched] = useState<boolean>(false)
 
-    const email = useUserStore((state) => state.email)
+    const user_id = useUserStore((state) => state.user_id)
 
     useEffect(() => {
-        const payload = { email }
+        const payload = { user_id }
 
         const fetcher = async () => {
-            const res = await fetch("/api/getter/getCustomerByEmail", {
+            const res = await fetch("/api/getter/getCustomerByUserId", {
                 method: "POST",
                 body: JSON.stringify(payload),
                 headers: {
@@ -42,14 +42,14 @@ export default function CustomerCard() {
                 },
             });
 
-            const response = await res.json()
+            const dataCustomers = await res.json()
 
-            const fixedResponse = response.data.map((res: Customer) => {
-                return {
+            const fixedResponse = Array.isArray(dataCustomers?.data)
+                ? dataCustomers.data.map((res: Customer) => ({
                     ...res,
-                    created_on: formattedDate(res.created_on)
-                }
-            })
+                    created_on: formattedDate(res.created_on),
+                }))
+                : []
 
             setListCustomer(fixedResponse)
             setIsFetched(true)
@@ -57,7 +57,7 @@ export default function CustomerCard() {
 
         fetcher()
 
-    }, [email, openDialog, refreshKey])
+    }, [user_id, openDialog, refreshKey])
 
     return (
         <>

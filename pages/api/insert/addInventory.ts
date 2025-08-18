@@ -18,15 +18,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const cookieHeader = req.headers.cookie || ""
             const token = getCookieFromServer(cookieHeader, "accessToken")
             const decodedJwt = decodeJWT(token as string)
-            const created_by = decodedJwt.email
+            const created_by = decodedJwt.user_id
 
-            const getFactoryByEmail = await db.query(
-                `SELECT * FROM mes.factories WHERE created_by = $1`,
-                [created_by]
-            );
+            const getFactory = await db.query(`SELECT * FROM mes.factories`);
 
-            if (getFactoryByEmail.rowCount && getFactoryByEmail.rowCount > 0) {
-                const factory_id = getFactoryByEmail.rows[0].identifier
+            if (getFactory.rowCount && getFactory.rowCount > 0) {
+                const factory_id = getFactory.rows[0].identifier
                 const result = await db.query(
                     `INSERT INTO mes.inventories (
                         identifier,
@@ -49,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }
 
             } else {
-                res.status(500).json({ message: 'The Email Has Not Factory Yet' });
+                res.status(500).json({ message: 'The User Has Not Factory Yet' });
             }
 
 

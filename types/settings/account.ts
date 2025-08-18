@@ -1,8 +1,8 @@
 export interface Account {
+    identifier: string
+    user_id: string
     name: string
-    email: string
-    phone: string
-    company: string
+    role: string
 }
 
 export interface ChangePassword {

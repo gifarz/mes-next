@@ -4,8 +4,9 @@ export interface Order {
     order_number: string
     customer_name: string
     product_name: string
-    product_part: string
-    product_sku: string
+    product_code: string
+    part_name: string
+    part_code: string
     quantity: string
     delivery_date: string
     used_machine: string
@@ -15,20 +16,9 @@ export interface Order {
     actual_start: string
     actual_end: string
     duration: string
-    assy_group: string
-    part: string
-    no_mode: string
     total_length: string
     stripping_front: string
     stripping_rear: string
-    half_strip_front: string
-    half_strip_end: string
-    insulation_front: string
-    insulation_back: string
-    core_diameter: string
-    blade_move_back: string
-    depth_of_blade: string
-    length_of_mb: string
     defect_item: string
     done_item: string
     completed: string

@@ -16,17 +16,20 @@ import {
 } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useUserStore } from '../../../../store/userStore'
-import { Machine } from "../../../../types/setup/machine"
+import { Machine, MachineTypes } from "../../../../types/setup/machine"
 import { formattedDate } from "@/lib/dateUtils"
+import { Textarea } from "@/components/ui/textarea"
 
 export default function MachineCard() {
     const [search, setSearch] = useState<string>("")
     const [machineId, setMachineId] = useState<string>("")
     const [machineNumber, setMachineNumber] = useState<string>("")
     const [machineName, setMachineName] = useState<string>("")
+    const [machineDescription, setMachineDescription] = useState<string>("")
     const [maxCapacity, setMaxCapacity] = useState<string>("")
     const [machineType, setMachineType] = useState<string>("")
     const [listMachines, setListMachines] = useState<Machine[]>([])
+    const [listMachineTypes, setListMachineTypes] = useState<MachineTypes[]>([])
 
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
     const [isFetched, setIsFetched] = useState<boolean>(false)
@@ -34,15 +37,15 @@ export default function MachineCard() {
     const [isEditMachine, setIsEditMachine] = useState<boolean>(false)
     const [refreshKey, setRefreshKey] = useState(0)
 
-    const email = useUserStore((state) => state.email)
+    const user_id = useUserStore((state) => state.user_id)
 
     useEffect(() => {
         const payload = {
-            email: email,
+            user_id: user_id,
         }
 
-        const getMachinesByEmail = async () => {
-            const res = await fetch("/api/getter/getMachinesByEmail", {
+        const fetcher = async () => {
+            const res = await fetch("/api/getter/getMachinesByUserId", {
                 method: "POST",
                 body: JSON.stringify(payload),
                 headers: {
@@ -62,12 +65,23 @@ export default function MachineCard() {
                 : []
 
             setListMachines(fixedResponse)
+
+            const resMachinTypes = await fetch("/api/getter/getAllMachineTypes", {
+                method: "GET"
+            });
+
+            const dataMachineTypes = await resMachinTypes.json()
+            const fixedMachineTypes = Array.isArray(dataMachineTypes?.data)
+                ? dataMachineTypes.data : []
+
+            setListMachineTypes(fixedMachineTypes)
+
             setIsFetched(true)
         }
 
-        getMachinesByEmail()
+        fetcher()
 
-    }, [email, search, isAddMachine, isEditMachine, refreshKey])
+    }, [user_id, search, isAddMachine, isEditMachine, refreshKey])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -75,6 +89,7 @@ export default function MachineCard() {
         const payload = {
             number: machineNumber,
             name: machineName,
+            description: machineDescription,
             capacity: maxCapacity,
             type: machineType
         }
@@ -143,6 +158,7 @@ export default function MachineCard() {
         setMachineId(machine.identifier)
         setMachineNumber(machine.number)
         setMachineName(machine.name)
+        setMachineDescription(machine.description)
         setMaxCapacity(machine.capacity)
         setMachineType(machine.type)
     }
@@ -213,6 +229,7 @@ export default function MachineCard() {
                                     <Label htmlFor="machineNumber">Machine Number</Label>
                                     <Input
                                         id="machineNumber"
+                                        placeholder="Enter Machine Number"
                                         type="text"
                                         value={machineNumber}
                                         onChange={(e) => setMachineNumber(e.target.value)}
@@ -224,6 +241,7 @@ export default function MachineCard() {
                                     <Label htmlFor="machineName">Machine Name</Label>
                                     <Input
                                         id="machineName"
+                                        placeholder="Enter Machine Name"
                                         type="text"
                                         value={machineName}
                                         onChange={(e) => setMachineName(e.target.value)}
@@ -231,9 +249,20 @@ export default function MachineCard() {
                                 </div>
 
                                 <div>
+                                    <Label htmlFor="machineDescription">Machine Description</Label>
+                                    <Textarea
+                                        id="machineDescription"
+                                        placeholder="Enter Machine Description"
+                                        value={machineDescription}
+                                        onChange={(e) => setMachineDescription(e.target.value)}
+                                    />
+                                </div>
+
+                                <div>
                                     <Label htmlFor="maxCapacity">Max Capacity (items/hour)</Label>
                                     <Input
                                         id="maxCapacity"
+                                        placeholder="Enter Machine Capacity"
                                         type="number"
                                         min={0}
                                         value={maxCapacity}
@@ -248,9 +277,19 @@ export default function MachineCard() {
                                             <SelectValue placeholder="Select or type a machine type" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="Type A">Type A</SelectItem>
-                                            <SelectItem value="Type B">Type B</SelectItem>
-                                            <SelectItem value="Type C">Type C</SelectItem>
+                                            {
+                                                listMachineTypes.length === 0 ?
+                                                    <p className="p-2 text-sm text-gray-500">No machine type available</p>
+                                                    :
+                                                    listMachineTypes.map((machine) => (
+                                                        <SelectItem
+                                                            value={machine.name}
+                                                            key={machine.ai}
+                                                        >
+                                                            {machine.name}
+                                                        </SelectItem>
+                                                    ))
+                                            }
                                         </SelectContent>
                                     </Select>
                                     <p className="text-sm text-muted-foreground mt-1">

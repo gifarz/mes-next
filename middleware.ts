@@ -11,7 +11,20 @@ export async function middleware(req: NextRequest) {
 
     try {
         const secret = new TextEncoder().encode(process.env.JWT_SECRET)
-        await jwtVerify(token, secret)
+        const { payload } = await jwtVerify(token, secret)
+
+        const role = payload.role as string | undefined
+        const path = req.nextUrl.pathname
+
+        // If Operator, restrict access
+        if (role === 'Operator') {
+            const allowedPaths = ['/app/track', '/app/settings']
+            const isAllowed = allowedPaths.some((allowed) => path.startsWith(allowed))
+
+            if (!isAllowed) {
+                return NextResponse.redirect(new URL('/app/track', req.url))
+            }
+        }
         return NextResponse.next()
     } catch (err) {
         console.error('JWT verification failed', err)

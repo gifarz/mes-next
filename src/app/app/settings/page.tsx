@@ -26,13 +26,13 @@ export default function Settings() {
         newPasswordConfirmation: "",
     })
 
-    const email = useUserStore((state) => state.email)
+    const user_id = useUserStore((state) => state.user_id)
 
     React.useEffect(() => {
-        const getAccountByEmail = async () => {
-            const result = await fetch("/api/getter/getAccountByEmail", {
+        const fetcher = async () => {
+            const result = await fetch("/api/getter/getAccountByUserId", {
                 method: "POST",
-                body: JSON.stringify(email),
+                body: JSON.stringify(user_id),
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -42,8 +42,8 @@ export default function Settings() {
             setAccount(res.data)
         }
 
-        if (email) getAccountByEmail()
-    }, [email])
+        if (user_id) fetcher()
+    }, [user_id])
 
     const handleChangeAccount = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
@@ -93,7 +93,7 @@ export default function Settings() {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        email: account?.email,
+                        user_id: account?.user_id,
                         newPassword: updatePassword.newPasswordConfirmation
                     }),
                 });
@@ -158,11 +158,11 @@ export default function Settings() {
 
                         {/* EMAIL */}
                         <div>
-                            <label className="text-sm">Email</label>
+                            <label className="text-sm">User ID</label>
                             {account ? (
                                 <Input
-                                    name="email"
-                                    value={account.email}
+                                    name="user_id"
+                                    value={account.user_id}
                                     disabled
                                 />
                             ) : (
@@ -170,35 +170,6 @@ export default function Settings() {
                             )}
                         </div>
 
-                        {/* PHONE */}
-                        <div>
-                            <label className="text-sm">Phone</label>
-                            {account ? (
-                                <Input
-                                    name="phone"
-                                    value={account.phone}
-                                    onChange={handleChangeAccount}
-                                    disabled={!isEditing}
-                                />
-                            ) : (
-                                <Skeleton className="h-10 w-full rounded-md" />
-                            )}
-                        </div>
-
-                        {/* COMPANY */}
-                        <div>
-                            <label className="text-sm">Company</label>
-                            {account ? (
-                                <Input
-                                    name="company"
-                                    value={account.company}
-                                    onChange={handleChangeAccount}
-                                    disabled={!isEditing}
-                                />
-                            ) : (
-                                <Skeleton className="h-10 w-full rounded-md" />
-                            )}
-                        </div>
                         {
                             isChanging &&
                             <>
