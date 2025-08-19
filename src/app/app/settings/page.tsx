@@ -58,8 +58,8 @@ export default function Settings() {
     const handleUpdateAccount = async () => {
         if (!account) return;
 
+        setIsUpdated(true)
         try {
-            setIsUpdated(true)
             const result = await fetch("/api/patcher/updateAccountByEmail", {
                 method: "POST",
                 headers: {
@@ -79,14 +79,15 @@ export default function Settings() {
             console.error("An Error Occurred", err)
             toast.error("An Error Occurred While Updating Profile.")
         }
+        setIsUpdated(false)
     };
 
     const handleUpdatePassword = async () => {
         if (!updatePassword) return;
 
         if (updatePassword.newPassword === updatePassword.newPasswordConfirmation) {
+            setIsUpdated(true)
             try {
-                setIsUpdated(true)
                 const result = await fetch("/api/patcher/updatePasswordByEmail", {
                     method: "POST",
                     headers: {
@@ -109,6 +110,8 @@ export default function Settings() {
                 console.error("An Error Occurred", err)
                 toast.error("An Error Occurred While Updating Password.")
             }
+
+            setIsUpdated(false)
         } else {
             toast.error("Password Confirmation Does Not Match!")
         }

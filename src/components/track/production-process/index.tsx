@@ -164,7 +164,7 @@ export default function WarehouseCard() {
                         loading ?
                             "Downloading..."
                             :
-                            "Export to CSV"
+                            "Export to Excel"
                     }
                 </Button>
             </div>
