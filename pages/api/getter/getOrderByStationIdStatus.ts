@@ -7,7 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         try {
             let query = `SELECT * FROM mes.orders`;
-            const params: any[] = [];
+            const params = [];
             let paramIndex = 1;
 
             // only add station filter if not "all"

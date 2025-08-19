@@ -198,7 +198,7 @@ export default function ProductDataTable({ data, onProductUpdated }: DataProduct
                                                         </DropdownMenu>
                                                     </div>
                                                 ) : (
-                                                    product[key]
+                                                    product[key] || "-"
                                                 )}
                                             </TableCell>
 

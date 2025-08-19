@@ -8,8 +8,9 @@ export default defineConfig({
     outDir: "dist-electron",
     sourcemap: true,
     clean: true,
-    format: ["cjs"], // Electron main/preload need CJS
+    format: ["cjs"],
     target: "node18",
     minify: false,
     dts: false,
+    external: ["electron"], // ⬅️ ADD THIS
 });

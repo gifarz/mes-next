@@ -5,23 +5,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method === 'POST') {
         const {
             identifier,
-            status,
-            actual_start,
-            receiver,
-            shift
+            qc,
+            checker
         } = req.body;
 
         console.log('req.body', req.body)
 
         try {
-            if (!Array.isArray(identifier) || identifier.length === 0) {
-                return res.status(400).json({ message: "No Row(s) Selected" });
-            }
-
             const result = await db.query(
-                `UPDATE mes.orders SET status = $1, actual_start = $2, receiver = $3, shift = $4 WHERE identifier = ANY($5) RETURNING *`,
-                [status, actual_start, receiver, shift, identifier]
+                `UPDATE mes.orders SET qc = $1, checker = $2 WHERE identifier = $3 RETURNING *`,
+                [qc, checker, identifier]
             );
+
+            console.log(result.rows)
 
             if (result.rowCount && result.rows.length > 0) {
                 res.status(200).json({ message: 'Order Updated', data: result.rows[0] });

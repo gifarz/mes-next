@@ -45,7 +45,7 @@ export default function ListOrdersCard() {
     const [selectedLine, setSelectedLine] = useState<string>("")
     const [stationId, setStationId] = useState<string>("")
 
-    const { name, shift, line, station_id, leader, foreman } = useUserStore()
+    const { user_id, name, shift, line, station_id, leader, foreman } = useUserStore()
 
     useEffect(() => {
         const payload = {
@@ -98,7 +98,9 @@ export default function ListOrdersCard() {
                 body: JSON.stringify({
                     identifier: [id],
                     status: "Work In Progress",
-                    actual_start: actualStart
+                    actual_start: actualStart,
+                    receiver: user_id,
+                    shift: shift || "not_operator"
                 }),
                 headers: {
                     "Content-Type": "application/json",
@@ -154,6 +156,8 @@ export default function ListOrdersCard() {
         setIsSubmitted(true)
         const total_items = Number(defect) + Number(done)
         const completed = (Number(done) / Number(quantity)) * 100
+        console.log('total_items', total_items)
+        console.log('quantity', quantity)
 
         if (total_items <= Number(quantity)) {
             const actual_end = customizeDateString("yyyy-MM-dd HH:mm:ss")
@@ -165,7 +169,6 @@ export default function ListOrdersCard() {
                 actual_end: completed === 100 ? actual_end : null,
                 duration: completed === 100 ? compareBetweenDate(actual_start, actual_end) : null,
                 status: completed === 100 ? "Done" : "Work In Progress",
-                checked_by: name
             }
 
             const res = await fetch("/api/patcher/updateProgressOrderByIdentifier", {
@@ -204,8 +207,13 @@ export default function ListOrdersCard() {
                 toast.error(json.message)
             }
 
+            setDefect(0)
+            setDone(0)
+
         } else {
             toast.error("The total items is not match with quantity")
+            setDefect(0)
+            setDone(0)
         }
 
         setIsSubmitted(false)

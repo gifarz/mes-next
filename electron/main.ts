@@ -1,13 +1,12 @@
 import { app, BrowserWindow, ipcMain, shell } from "electron";
 import * as path from "path";
-import * as url from "url";
 import http from "http";
 import getPort from "get-port";
 import { spawn } from "child_process";
 
 const isDev = !app.isPackaged;
-
 let mainWindow: BrowserWindow | null = null;
+let externalProcess: ReturnType<typeof spawn> | null = null;
 
 async function waitForUrl(targetUrl: string, timeoutMs = 30000) {
     const start = Date.now();
@@ -18,48 +17,43 @@ async function waitForUrl(targetUrl: string, timeoutMs = 30000) {
                 if (res.statusCode && res.statusCode >= 200 && res.statusCode < 400) {
                     resolve();
                 } else {
-                    setTimeout(() => {
-                        if (Date.now() - start > timeoutMs) reject(new Error("Timeout"));
-                        else check().then(resolve).catch(reject);
-                    }, 300);
+                    retry();
                 }
             });
-            req.on("error", () => {
+            req.on("error", retry);
+            req.end();
+
+            function retry() {
                 setTimeout(() => {
                     if (Date.now() - start > timeoutMs) reject(new Error("Timeout"));
                     else check().then(resolve).catch(reject);
                 }, 300);
-            });
-            req.end();
+            }
         });
     return check();
 }
 
-async function createWindow(startUrl: string | { file: string }) {
+async function createWindow(startUrl: string) {
     mainWindow = new BrowserWindow({
         width: 1200,
         height: 800,
-        title: "My Next + Electron App",
+        title: "IMES Platform",
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
             contextIsolation: true,
             nodeIntegration: false,
-            sandbox: true,
+            sandbox: false, // allow IPC
         },
     });
 
-    // Open external links in the user's default browser
+    // Open external links in system browser
     mainWindow.webContents.setWindowOpenHandler(({ url }) => {
         shell.openExternal(url);
         return { action: "deny" };
     });
 
-    if (typeof startUrl === "string") {
-        await waitForUrl(startUrl).catch(() => { }); // dev/prod server might take a moment
-        await mainWindow.loadURL(startUrl);
-    } else {
-        await mainWindow.loadFile(startUrl.file);
-    }
+    await waitForUrl(startUrl).catch(() => { });
+    await mainWindow.loadURL(startUrl);
 
     if (isDev) {
         mainWindow.webContents.openDevTools({ mode: "detach" });
@@ -69,24 +63,24 @@ async function createWindow(startUrl: string | { file: string }) {
 }
 
 async function startNextProd(): Promise<string> {
-    const port = await getPort({ port: 3000 }); // pick free port, prefer 3000
-    const appPath = app.getAppPath(); // in prod, this resolves inside asar
-    const cwd = app.isPackaged
-        ? appPath // packaged app root (contains .next if included in "files")
-        : process.cwd();
+    const port = await getPort({ port: 3000 });
+    const appPath = app.getAppPath();
 
-    // Start Next with the production build
-    const child = spawn(
-        process.execPath, // use the packaged Node runtime
-        [path.join(cwd, "node_modules", "next", "dist", "bin", "next"), "start", "-p", String(port)],
-        {
-            cwd,
-            env: { ...process.env, NODE_ENV: "production" },
-            stdio: "inherit",
-        }
+    const nextBinary = path.join(
+        appPath,
+        "node_modules",
+        "next",
+        "dist",
+        "bin",
+        "next"
     );
 
-    // Optionally: handle child exit
+    const child = spawn(process.execPath, [nextBinary, "start", "-p", String(port)], {
+        cwd: appPath,
+        env: { ...process.env, NODE_ENV: "production" },
+        stdio: "inherit",
+    });
+
     child.on("exit", (code) => {
         if (code !== 0) console.error("next start exited with code", code);
     });
@@ -94,7 +88,27 @@ async function startNextProd(): Promise<string> {
     return `http://localhost:${port}`;
 }
 
+// 🚀 Launch external exe
+function startExternalExe() {
+    const exePath = isDev
+        ? path.join(__dirname, "../resources/IMES-Platform.exe") // dev path
+        : path.join(process.resourcesPath, "IMES-Platform.exe"); // prod path
+
+    try {
+        externalProcess = spawn(exePath, [], {
+            detached: true,
+            stdio: "ignore",
+        });
+        externalProcess.unref();
+        console.log("IMES-Platform started:", exePath);
+    } catch (err) {
+        console.error("Failed to start IMES-Platform.exe:", err);
+    }
+}
+
 app.on("ready", async () => {
+    startExternalExe();
+
     if (isDev) {
         await createWindow("http://localhost:3000");
     } else {
@@ -103,8 +117,13 @@ app.on("ready", async () => {
     }
 });
 
-app.on("ready", async () => {
-    // The URL or file to load will be decided by Track A or Track B (below).
+// Clean up external exe when quitting
+app.on("before-quit", () => {
+    if (externalProcess) {
+        try {
+            externalProcess.kill();
+        } catch { }
+    }
 });
 
 app.on("window-all-closed", () => {
@@ -113,7 +132,7 @@ app.on("window-all-closed", () => {
 
 app.on("activate", () => {
     if (mainWindow === null) {
-        // Recreate on mac dock click
+        // recreate window on macOS dock click
     }
 });
 

@@ -1,14 +1,19 @@
 {
   "name": "mes-next",
+  "description": "Manufacturing Execution System Platform",
+  "author": "imes-platform",
   "version": "0.1.0",
   "private": true,
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:debug": "cross-env DEBUG=* next build",
     "build:next": "next build",
     "start:next": "next start -p 3000",
     "build:electron": "tsup",
+    "builder:win": "electron-builder -w",
+    "postinstall": "electron-builder install-app-deps",
     "dist:win": "npm run build:next && npm run build:electron && electron-builder -w",
     "dist:mac": "npm run build:next && npm run build:electron && electron-builder -m",
     "dist:linux": "npm run build:next && npm run build:electron && electron-builder -l",
@@ -16,8 +21,8 @@
     "lint": "next lint"
   },
   "build": {
-    "appId": "com.example.my-nextron",
-    "productName": "MyNextElectronApp",
+    "appId": "com.imes.platform",
+    "productName": "IMES-Platform",
     "files": [
       "dist-electron/**",
       ".next/**",
@@ -104,6 +109,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/snapsvg": "^0.5.8",
+    "cross-env": "^10.0.0",
     "electron": "^37.3.0",
     "electron-builder": "^26.0.12",
     "eslint": "^9",

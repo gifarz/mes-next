@@ -24,4 +24,8 @@ export interface Order {
     completed: string
     status: string
     created_by: string
+    receiver: string
+    shift: string
+    checker: string
+    qc: string
 }

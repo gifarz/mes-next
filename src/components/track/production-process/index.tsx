@@ -3,11 +3,31 @@
 import { useEffect, useState } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
+import {
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem,
+} from "@/components/ui/dropdown-menu"
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
 import { ArrowUpIcon, ArrowDownIcon } from "@radix-ui/react-icons"
 import { Order } from '../../../../types/plan/order'
 import { useSidebarStore } from '../../../../store/sidebarStore'
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
+import { Input } from '@/components/ui/input'
+import { Spinner } from '@/components/ui/spinner'
+import { toast } from 'sonner'
+import { Toaster } from '@/components/ui/sonner'
 
 type SortKey = keyof Order
 type SortRule = {
@@ -27,11 +47,18 @@ const columns = [
     { key: 'actual_start', label: 'ACTUAL_START' },
     { key: 'actual_end', label: 'ACTUAL_END' },
     { key: 'status', label: 'STATUS' },
-    // { key: 'action', label: 'ACTION' }
+    { key: 'qc', label: 'QC' },
+    { key: 'checker', label: 'CHECKER' },
+    { key: 'action', label: 'ACTION' }
 ] as const
 
 export default function WarehouseCard() {
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [openEdit, setOpenEdit] = useState<boolean>(false);
+    const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+    const [qc, setQc] = useState<string>("");
+    const [checker, setChecker] = useState<string>("");
+    const [dataOrder, setDataOrder] = useState<Order>();
     const [listOrders, setListOrders] = useState<Order[]>([]);
     const [sortRules, setSortRules] = useState<SortRule[]>([
         { key: 'order_number', order: 'asc' },
@@ -58,7 +85,7 @@ export default function WarehouseCard() {
 
         fetcher()
 
-    }, [])
+    }, [isSubmitted])
 
 
     const sortedData = [...listOrders].sort((a, b) => {
@@ -109,6 +136,46 @@ export default function WarehouseCard() {
         )
     }
 
+    const handleEditOrder = async (data: Order) => {
+        setIsSubmitted(true)
+        const payload = {
+            qc, checker, identifier: data.identifier
+        }
+        const res = await fetch("/api/patcher/updateQcCheckerByIdentifier", {
+            method: "POST",
+            body: JSON.stringify(payload),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+
+        if (res.ok) {
+            toast.success(`Order ${data.order_number} Has Been Updated!`)
+            setOpenEdit(false)
+        } else {
+            toast.error(`Failed to Update Order ${data.order_number}`)
+        }
+        setIsSubmitted(false)
+    }
+
+    const handleDeleteOrder = async (data: Order) => {
+        setIsSubmitted(true)
+        const res = await fetch("/api/remover/deleteOrderByIdentifier", {
+            method: "POST",
+            body: JSON.stringify({ identifier: data.identifier }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+
+        if (res.ok) {
+            toast.success(`Order ${data.order_number} Has Been Deleted!`)
+        } else {
+            toast.error(`Failed to Delete Order ${data.order_number}`)
+        }
+        setIsSubmitted(false)
+    }
+
     const handleExport = async () => {
         setLoading(true);
 
@@ -126,8 +193,8 @@ export default function WarehouseCard() {
         // 4. Data to append (under the header row)
         const plainArray = listOrders.map(order => [
             order.station_name,
-            "1",
-            "Operator",
+            order.shift,
+            order.receiver,
             order.actual_start,
             order.actual_end,
             order.order_number,
@@ -138,8 +205,8 @@ export default function WarehouseCard() {
             order.stripping_rear,
             order.quantity,
             order.completed,
-            "QC",
-            "CHECKER"
+            order.qc,
+            order.checker
         ]);
 
         // 5. Append data starting from row 3
@@ -147,14 +214,64 @@ export default function WarehouseCard() {
 
         // 6. Export the updated workbook
         const buffer = await workbook.xlsx.writeBuffer();
-        saveAs(new Blob([buffer]), "Order Completed.xlsx");
+        saveAs(new Blob([buffer]), "List Order.xlsx");
 
         setLoading(false);
     };
 
     return (
         <div>
-            <div className="flex justify-end mt-10">
+            <Toaster position="top-right" />
+
+            <Dialog open={openEdit} onOpenChange={setOpenEdit}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader className="mb-4">
+                        <DialogTitle>Edit Order</DialogTitle>
+                    </DialogHeader>
+
+                    <div className="space-y-2">
+                        <div>
+                            <label>QC</label>
+                            <Input
+                                value={qc}
+                                onChange={(e) => setQc(e.target.value)}
+                                placeholder="Enter Defected Items"
+                            />
+                        </div>
+                        <div>
+                            <label>CHECKER</label>
+                            <Input
+                                value={checker}
+                                onChange={(e) => setChecker(e.target.value)}
+                                placeholder="Enter Done Items"
+                            />
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button variant="outline">CANCEL</Button>
+                        </DialogClose>
+                        <Button
+                            className='cursor-pointer'
+                            disabled={!qc || !checker || isSubmitted}
+                            variant="destructive"
+                            onClick={() => dataOrder && handleEditOrder(dataOrder)}
+                        >
+                            {isSubmitted ? (
+                                <>
+                                    <Spinner />
+                                    <span className="ml-0">Submitting</span>
+                                </>
+                            ) : (
+                                "UPDATE ORDER"
+                            )}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <div className="flex justify-end mt-5">
                 <Button
                     variant="secondary"
                     className="cursor-pointer"
@@ -179,14 +296,18 @@ export default function WarehouseCard() {
                         <TableRow>
                             {columns.map(({ key, label }) => (
                                 <TableHead key={key} className="text-center">
-                                    <Button
-                                        variant="ghost"
-                                        onClick={() => handleSort(key as SortKey)}
-                                        className="font-semibold"
-                                    >
-                                        {label}
-                                        <SortIcon column={key as SortKey} />
-                                    </Button>
+                                    {key === 'action' ? (
+                                        <span className="font-semibold">{label}</span>
+                                    ) : (
+                                        <Button
+                                            variant="ghost"
+                                            onClick={() => handleSort(key as SortKey)}
+                                            className="font-semibold"
+                                        >
+                                            {label}
+                                            <SortIcon column={key as SortKey} />
+                                        </Button>
+                                    )}
                                 </TableHead>
                             ))}
                         </TableRow>
@@ -204,7 +325,51 @@ export default function WarehouseCard() {
                                     <TableRow key={data.identifier} className="text-center">
                                         {columns.map(({ key }) => (
                                             <TableCell key={key}>
-                                                {data[key] || "-"}
+                                                {key === 'action' ? (
+                                                    <div className="flex justify-center">
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="ghost" size="icon" className="h-6 w-6">
+                                                                    <span className="sr-only">Open menu</span>
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        className="h-4 w-4"
+                                                                        fill="none"
+                                                                        viewBox="0 0 24 24"
+                                                                        stroke="currentColor"
+                                                                    >
+                                                                        <path
+                                                                            strokeLinecap="round"
+                                                                            strokeLinejoin="round"
+                                                                            strokeWidth={2}
+                                                                            d="M6 12h.01M12 12h.01M18 12h.01"
+                                                                        />
+                                                                    </svg>
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end">
+                                                                <DropdownMenuItem
+                                                                    onClick={() => {
+                                                                        setDataOrder(data)
+                                                                        setOpenEdit(true)
+                                                                    }}
+                                                                    className="cursor-pointer"
+                                                                >
+                                                                    EDIT
+                                                                </DropdownMenuItem>
+
+                                                                <DropdownMenuItem
+                                                                    onClick={() => handleDeleteOrder(data)}
+                                                                    className="cursor-pointer text-red-600 focus:text-red-700"
+                                                                >
+                                                                    DELETE
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </div>
+                                                ) : (
+                                                    data[key] || "-"
+                                                )}
                                             </TableCell>
 
                                         ))}
