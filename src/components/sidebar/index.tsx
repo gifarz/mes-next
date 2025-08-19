@@ -26,8 +26,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import Image from "next/image"
-import { useUserStore } from "../../../store/userStore"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo } from "react"
 
 // Menu items
 const items = [

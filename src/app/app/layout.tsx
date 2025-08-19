@@ -2,8 +2,6 @@
 
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import { useUserStore } from '../../../store/userStore'
-import { decodeJWT } from '@/lib/decodeJWT'
-import { getCookie } from '@/lib/cookie'
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/sidebar";
 import { Moon, Sun } from 'lucide-react'
@@ -11,12 +9,12 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { useSidebarStore } from '../../../store/sidebarStore'
 import OperatorInitiation from '@/components/dialog/operator-initiation'
-import { Account } from '../../../types/settings/account'
 import { decrypt } from '@/lib/crypto'
+import { Label } from '@/components/ui/label';
 
 export default function AppLayout({ children }: { children: ReactNode }) {
     const { toggle } = useSidebarStore();
-    const user_id = useUserStore((state) => state.user_id)
+    const { name, user_id } = useUserStore()
     const isInitialized = useRef<boolean>(false)
     const { setTheme, resolvedTheme } = useTheme()
     const [mounted, setMounted] = useState<boolean>(false)
@@ -55,6 +53,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                             <main className="flex-1 p-4">
                                 <div className="flex justify-between">
                                     <SidebarTrigger onClick={toggle} />
+                                    <Label>User Login : {name}</Label>
                                     <Button
                                         variant="outline"
                                         size="icon"

@@ -14,7 +14,7 @@ type SortRule = {
 }
 
 const columns = [
-    { key: 'station_name', label: 'STATION' },
+    // { key: 'station_name', label: 'STATION' },
     { key: 'order_number', label: 'ORDER_NUMBER' },
     { key: 'customer_name', label: 'CUSTOMER' },
     { key: 'product_name', label: 'PRODUCT' },

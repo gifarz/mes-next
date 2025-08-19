@@ -201,7 +201,7 @@ export default function AuthPage() {
                                                 <FormItem>
                                                     <FormLabel>User ID</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="Type your User ID" {...field} />
+                                                        <Input placeholder="Type Your User ID" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -215,7 +215,7 @@ export default function AuthPage() {
                                                     <FormLabel>Password</FormLabel>
                                                     <FormControl>
                                                         <Input
-                                                            placeholder="Type your password"
+                                                            placeholder="Type Your Password"
                                                             {...field}
                                                             type="password"
                                                         />
@@ -331,7 +331,7 @@ export default function AuthPage() {
                                                     <FormLabel>Password</FormLabel>
                                                     <FormControl>
                                                         <Input
-                                                            placeholder="Type Your password"
+                                                            placeholder="Type Your Password"
                                                             type="password"
                                                             {...field}
                                                         />
@@ -348,7 +348,7 @@ export default function AuthPage() {
                                                     <FormLabel>Password Confirmation</FormLabel>
                                                     <FormControl>
                                                         <Input
-                                                            placeholder="Type Your confirmation password"
+                                                            placeholder="Type Your Confirmation Password"
                                                             type="password"
                                                             {...field}
                                                         />

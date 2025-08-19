@@ -3,12 +3,6 @@
 import { useEffect, useState } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-    DropdownMenuContent,
-    DropdownMenuItem,
-} from "@/components/ui/dropdown-menu"
 import { ArrowUpIcon, ArrowDownIcon } from "@radix-ui/react-icons"
 import { Order } from '../../../../types/plan/order'
 import { useSidebarStore } from '../../../../store/sidebarStore'
@@ -46,7 +40,7 @@ export default function WarehouseCard() {
     const { open } = useSidebarStore();
 
     useEffect(() => {
-        const payload = { status: "Done" }
+        const payload = { not_status: "Waiting" }
 
         const fetcher = async () => {
             const resCustomer = await fetch("/api/getter/getOrderByStatus", {
@@ -210,7 +204,7 @@ export default function WarehouseCard() {
                                     <TableRow key={data.identifier} className="text-center">
                                         {columns.map(({ key }) => (
                                             <TableCell key={key}>
-                                                {data[key]}
+                                                {data[key] || "-"}
                                             </TableCell>
 
                                         ))}

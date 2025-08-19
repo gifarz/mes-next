@@ -2,7 +2,6 @@
 
 import NotificationCard from "@/components/dashboard/notification"
 import OverviewCard from "@/components/dashboard/overview"
-import StatisticCard from "@/components/dashboard/statistic"
 import {
     Card,
     CardContent,

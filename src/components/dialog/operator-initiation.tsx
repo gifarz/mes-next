@@ -11,7 +11,7 @@ import { Account } from "../../../types/settings/account"
 import { useUserStore } from "../../../store/userStore"
 
 export default function OperatorInitiation() {
-    const [open, setOpen] = useState<boolean>(true) // start open
+    const [open, setOpen] = useState<boolean>(true)
     const [operator, setOperator] = useState<string>("")
     const [listStations, setListStations] = useState<Station[]>([])
     const [listAccounts, setListAccounts] = useState<Account[]>([])
@@ -88,7 +88,7 @@ export default function OperatorInitiation() {
                 onEscapeKeyDown={(e) => e.preventDefault()} // block Esc key
             >
                 <DialogHeader>
-                    <DialogTitle className="text-center">Fill in your information</DialogTitle>
+                    <DialogTitle className="text-center">Please Fill The Form</DialogTitle>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -97,7 +97,6 @@ export default function OperatorInitiation() {
                         <Input
                             disabled
                             id="operator"
-                            placeholder="Enter your operator"
                             value={operator}
                         />
                     </div>
@@ -109,7 +108,7 @@ export default function OperatorInitiation() {
                             onValueChange={setSelectedShift}
                         >
                             <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select the shift" />
+                                <SelectValue placeholder="Select the Shift" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value='1'>1</SelectItem>
@@ -121,28 +120,28 @@ export default function OperatorInitiation() {
                     </div>
 
                     <div>
-                        <Label htmlFor="line">Choose Line</Label>
+                        <Label htmlFor="line">Choose the Station</Label>
                         <Select
                             value={selectedStationId}
                             onValueChange={(id) => {
                                 const dataStation = listStations.find((station) => station.identifier === id)
                                 if (dataStation) {
-                                    setSelectedLine(dataStation.line)
+                                    setSelectedLine(dataStation.name)
                                     setSelectedStationId(dataStation.identifier)
                                 }
                             }}
                         >
                             <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select the Line" />
+                                <SelectValue placeholder="Select the Station" />
                             </SelectTrigger>
 
                             <SelectContent>
                                 {listStations.length === 0 ? (
-                                    <p className="p-2 text-sm text-gray-500">No line available</p>
+                                    <p className="p-2 text-sm text-gray-500">No station available</p>
                                 ) : (
                                     listStations.map((station) => (
                                         <SelectItem value={station.identifier} key={station.identifier}>
-                                            {station.line}
+                                            {station.name}
                                         </SelectItem>
                                     ))
                                 )}
@@ -152,36 +151,19 @@ export default function OperatorInitiation() {
 
                     <div>
                         <Label htmlFor="line">Choose Leader</Label>
-                        <Select
+                        <Input
+                            id="leader"
+                            placeholder="Enter Your Leader"
                             value={selectedLeader}
-                            onValueChange={setSelectedLeader}
-                        >
-                            <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select the Leader or Supervisor" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {
-                                    listAccounts.length === 0 ?
-                                        <p className="p-2 text-sm text-gray-500">No leader available</p>
-                                        :
-                                        listAccounts.map((account) => (
-                                            <SelectItem
-                                                value={account.name}
-                                                key={account.identifier}
-                                            >
-                                                {account.name}
-                                            </SelectItem>
-                                        ))
-                                }
-                            </SelectContent>
-                        </Select>
+                            onChange={(e) => setSelectedLeader(e.target.value)}
+                        />
                     </div>
 
                     <div>
                         <Label htmlFor="foreman">Foreman</Label>
                         <Input
                             id="foreman"
-                            placeholder="Enter your foreman"
+                            placeholder="Enter Your Foreman"
                             value={foreman}
                             onChange={(e) => setForeman(e.target.value)}
                         />
@@ -190,7 +172,7 @@ export default function OperatorInitiation() {
                     <Button
                         disabled={!selectedShift || !selectedLine || !selectedLeader || !foreman}
                         type="submit"
-                        className="w-full"
+                        className="w-full cursor-pointer"
                     >
                         SUBMIT
                     </Button>

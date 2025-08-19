@@ -261,30 +261,40 @@ export default function ListOrdersCard() {
                     <div>
                         <Select
                             value={selectedLine}
-                            onValueChange={(line) => {
-                                const selectedLine = listLines.find(l => l.line === line);
+                            onValueChange={(name) => {
+                                if (name === "all") {
+                                    setStationId("all")
+                                    setSelectedLine("all")
+                                } else {
+                                    const selectedLine = listLines.find(l => l.name === name);
 
-                                if (selectedLine) {
-                                    setStationId(selectedLine.identifier)
-                                    setSelectedLine(selectedLine.line)
+                                    if (selectedLine) {
+                                        setStationId(selectedLine.identifier)
+                                        setSelectedLine(selectedLine.name)
+                                    }
                                 }
                             }}
                         >
                             <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select the line" />
+                                <SelectValue placeholder="Select the station" />
                             </SelectTrigger>
                             <SelectContent>
                                 {listLines.length === 0 ?
-                                    <p className="p-2 text-sm text-gray-500">No line available</p>
+                                    <p className="p-2 text-sm text-gray-500">No station available</p>
                                     :
-                                    listLines.map((station) => (
-                                        <SelectItem
-                                            value={station.line}
-                                            key={station.identifier}
-                                        >
-                                            {station.line}
-                                        </SelectItem>
-                                    ))
+                                    <>
+                                        <SelectItem value="all">All Stations</SelectItem>
+                                        {
+                                            listLines.map((station) => (
+                                                <SelectItem
+                                                    value={station.name}
+                                                    key={station.identifier}
+                                                >
+                                                    {station.name}
+                                                </SelectItem>
+                                            ))
+                                        }
+                                    </>
                                 }
                             </SelectContent>
                         </Select>
@@ -294,7 +304,7 @@ export default function ListOrdersCard() {
             {
                 listOrders.length === 0 ?
                     <div className="col-span-full text-center mt-10 text-muted-foreground">
-                        No Station Active of Production Found.
+                        List Order Not Found
                     </div>
                     :
                     <div className='grid md:grid-cols-2 gap-4 mt-5'>
@@ -303,7 +313,7 @@ export default function ListOrdersCard() {
                                 <Card className='relative max-h-[500px]' key={order.identifier}>
                                     <CardHeader className="absolute top-0 left-0 rounded-t-xl z-10 bg-card w-full flex items-center justify-between min-h-[70px] px-5">
                                         <h2 className="text-2xl font-semibold text-center">
-                                            Part : {order.part_name}
+                                            Product Code : {order.product_code}
                                         </h2>
                                         <Button
                                             variant="ghost"
@@ -326,8 +336,8 @@ export default function ListOrdersCard() {
                                             <InfoRow label="Product Code" value={order.product_code} />
                                             <InfoRow label="Part Name" value={order.part_name} />
                                             <InfoRow label="Quantity" value={order.quantity} />
-                                            <InfoRow label="Estimate Start" value={order.estimate_start} />
-                                            <InfoRow label="Estimate End" value={order.estimate_end} />
+                                            {/* <InfoRow label="Estimate Start" value={order.estimate_start} />
+                                            <InfoRow label="Estimate End" value={order.estimate_end} /> */}
                                             <InfoRow
                                                 label="Actual Start"
                                                 value={order.actual_start ? order.actual_start : "N/A"}

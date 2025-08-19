@@ -2,8 +2,8 @@
 import { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { TimeInput } from "@/components/ui/time-input";
+// import { Checkbox } from '@/components/ui/checkbox';
+// import { TimeInput } from "@/components/ui/time-input";
 import { InfoRow } from "@/components/ui/info-row";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner"
@@ -34,30 +34,30 @@ export default function FactoryCard() {
 
         setFactoryName(data.name || '');
         setFactoryDescription(data.description || '');
-        setOperationStart(data.operation_start || '');
-        setOperationEnd(data.operation_end || '');
-        setOvertimeStart(data.overtime_start || '');
-        setOvertimeEnd(data.overtime_end || '');
-        setOperationDays(data.operation_day?.split(",") || []);
+        // setOperationStart(data.operation_start || '');
+        // setOperationEnd(data.operation_end || '');
+        // setOvertimeStart(data.overtime_start || '');
+        // setOvertimeEnd(data.overtime_end || '');
+        // setOperationDays(data.operation_day?.split(",") || []);
 
     }, [factory, isSubmitted]);
 
-    const toggleDay = (day: string) => {
-        setOperationDays((prev) =>
-            prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
-        );
-    };
+    // const toggleDay = (day: string) => {
+    //     setOperationDays((prev) =>
+    //         prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
+    //     );
+    // };
 
     const handleAddFactory = async () => {
         setIsSubmitted(true)
         const payload = {
             name: factoryName,
             description: factoryDescription,
-            operation_start: operationStart,
-            operation_end: operationEnd,
-            overtime_start: overtimeStart,
-            overtime_end: overtimeEnd,
-            operation_day: operationDays.join(","),
+            // operation_start: operationStart,
+            // operation_end: operationEnd,
+            // overtime_start: overtimeStart,
+            // overtime_end: overtimeEnd,
+            // operation_day: operationDays.join(","),
         };
 
         const res = await fetch("/api/insert/addFactory", {
@@ -75,14 +75,14 @@ export default function FactoryCard() {
             setFactory({
                 factory: [
                     {
-                        identifier: responseFactory.data[0].identifier,
+                        identifier: responseFactory.data.identifier,
                         name: factoryName,
                         description: factoryDescription,
-                        operation_start: operationStart,
-                        operation_end: operationEnd,
-                        overtime_start: overtimeStart,
-                        overtime_end: overtimeEnd,
-                        operation_day: operationDays.join(','),
+                        // operation_start: operationStart,
+                        // operation_end: operationEnd,
+                        // overtime_start: overtimeStart,
+                        // overtime_end: overtimeEnd,
+                        // operation_day: operationDays.join(','),
                     }
                 ]
             })
@@ -100,11 +100,11 @@ export default function FactoryCard() {
         const payload = {
             name: factoryName,
             description: factoryDescription,
-            operation_start: operationStart,
-            operation_end: operationEnd,
-            overtime_start: overtimeStart,
-            overtime_end: overtimeEnd,
-            operation_day: operationDays.join(",")
+            // operation_start: operationStart,
+            // operation_end: operationEnd,
+            // overtime_start: overtimeStart,
+            // overtime_end: overtimeEnd,
+            // operation_day: operationDays.join(",")
         };
 
         const res = await fetch("/api/patcher/updateFactoryByEmail", {
@@ -124,7 +124,7 @@ export default function FactoryCard() {
         setIsSubmitted(false)
     }
 
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    // const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
     return (
         <>
@@ -160,13 +160,13 @@ export default function FactoryCard() {
                         </div>
 
                         {/* Time Pickers */}
-                        <TimeInput label="Operation Start" value={operationStart} onChange={setOperationStart} />
+                        {/* <TimeInput label="Operation Start" value={operationStart} onChange={setOperationStart} />
                         <TimeInput label="Operation End" value={operationEnd} onChange={setOperationEnd} />
                         <TimeInput label="Overtime Start" value={overtimeStart} onChange={setOvertimeStart} />
-                        <TimeInput label="Overtime End" value={overtimeEnd} onChange={setOvertimeEnd} />
+                        <TimeInput label="Overtime End" value={overtimeEnd} onChange={setOvertimeEnd} /> */}
 
                         {/* Operation Days */}
-                        <div className="mt-4">
+                        {/* <div className="mt-4">
                             <Label className="block mb-2">Operation Day</Label>
                             <div className="flex flex-wrap gap-3">
                                 {days.map((day) => (
@@ -179,14 +179,14 @@ export default function FactoryCard() {
                                     </label>
                                 ))}
                             </div>
-                        </div>
+                        </div> */}
                     </div>
 
                     <Button
                         variant="secondary"
                         className="w-full cursor-pointer mt-6"
                         onClick={factory.length > 0 ? handleUpdateFactory : handleAddFactory}
-                        disabled={!factoryName || !factoryDescription || !operationStart || !operationEnd || !overtimeStart || !overtimeEnd || !operationDays || isSubmitted}
+                        disabled={!factoryName || !factoryDescription || isSubmitted}
                     >
                         {isSubmitted ? (
                             <>
@@ -210,11 +210,11 @@ export default function FactoryCard() {
                         <div className="divide-y space-y-4">
                             <InfoRow label="Factory Name" value={factoryName} />
                             <InfoRow label="Factory Description" value={factoryDescription} />
-                            <InfoRow label="Operation Start" value={operationStart} />
+                            {/* <InfoRow label="Operation Start" value={operationStart} />
                             <InfoRow label="Operation End" value={operationEnd} />
                             <InfoRow label="Overtime Start" value={overtimeStart} />
                             <InfoRow label="Overtime End" value={overtimeEnd} />
-                            <InfoRow label="Operation Day" value={operationDays.toString()} />
+                            <InfoRow label="Operation Day" value={operationDays.toString()} /> */}
                         </div>
                     </div>
                 </div>

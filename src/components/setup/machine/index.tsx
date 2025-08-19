@@ -26,8 +26,8 @@ export default function MachineCard() {
     const [machineNumber, setMachineNumber] = useState<string>("")
     const [machineName, setMachineName] = useState<string>("")
     const [machineDescription, setMachineDescription] = useState<string>("")
-    const [maxCapacity, setMaxCapacity] = useState<string>("")
     const [machineType, setMachineType] = useState<string>("")
+    const [machineTypeCustom, setMachineTypeCustom] = useState<string>("")
     const [listMachines, setListMachines] = useState<Machine[]>([])
     const [listMachineTypes, setListMachineTypes] = useState<MachineTypes[]>([])
 
@@ -90,8 +90,7 @@ export default function MachineCard() {
             number: machineNumber,
             name: machineName,
             description: machineDescription,
-            capacity: maxCapacity,
-            type: machineType
+            type: machineTypeCustom
         }
 
         if (isEditMachine) {
@@ -159,7 +158,6 @@ export default function MachineCard() {
         setMachineNumber(machine.number)
         setMachineName(machine.name)
         setMachineDescription(machine.description)
-        setMaxCapacity(machine.capacity)
         setMachineType(machine.type)
     }
 
@@ -196,7 +194,6 @@ export default function MachineCard() {
                                     setSearch(e.target.value)
                                     setIsAddMachine(false)
                                 }}
-                            // className="w-[200px]"
                             />
                             <Button
                                 className="cursor-pointer"
@@ -206,8 +203,9 @@ export default function MachineCard() {
                                     setIsAddMachine(!isAddMachine)
                                     setMachineNumber("")
                                     setMachineName("")
-                                    setMaxCapacity("")
+                                    setMachineDescription("")
                                     setMachineType("")
+                                    setMachineTypeCustom("")
                                 }}>
                                 {
                                     isAddMachine ? "Cancel" : "Add Machine"
@@ -258,7 +256,7 @@ export default function MachineCard() {
                                     />
                                 </div>
 
-                                <div>
+                                {/* <div>
                                     <Label htmlFor="maxCapacity">Max Capacity (items/hour)</Label>
                                     <Input
                                         id="maxCapacity"
@@ -268,11 +266,21 @@ export default function MachineCard() {
                                         value={maxCapacity}
                                         onChange={(e) => setMaxCapacity(e.target.value)}
                                     />
-                                </div>
+                                </div> */}
 
                                 <div>
                                     <Label htmlFor="machineType">Machine Type *</Label>
-                                    <Select value={machineType} onValueChange={setMachineType}>
+                                    <Select
+                                        value={machineType}
+                                        onValueChange={(name) => {
+                                            const selectedMachineType = listMachineTypes.find(m => m.name === name)
+
+                                            if (selectedMachineType) {
+                                                setMachineType(selectedMachineType.name)
+                                                setMachineTypeCustom(selectedMachineType.name)
+                                            }
+                                        }}
+                                    >
                                         <SelectTrigger className="w-full">
                                             <SelectValue placeholder="Select or type a machine type" />
                                         </SelectTrigger>
@@ -298,8 +306,8 @@ export default function MachineCard() {
                                     <Input
                                         className="mt-2"
                                         placeholder="Custom machine type..."
-                                        value={machineType}
-                                        onChange={(e) => setMachineType(e.target.value)}
+                                        value={machineTypeCustom}
+                                        onChange={(e) => setMachineTypeCustom(e.target.value)}
                                     />
                                 </div>
 
@@ -339,7 +347,7 @@ export default function MachineCard() {
                                         <CardContent className="space-y-1 text-sm">
                                             <div><strong>Machine Number:</strong> {machine.number}</div>
                                             <div><strong>Machine Type:</strong> {machine.type}</div>
-                                            <div><strong>Max Capacity:</strong> {machine.capacity} Items/ Hour</div>
+                                            {/* <div><strong>Max Capacity:</strong> {machine.capacity} Items/ Hour</div> */}
                                             <div><strong>Installation Date:</strong> {machine.created_on}</div>
                                             <div className="flex flex-col gap-2 mt-4">
                                                 <Button
@@ -373,7 +381,7 @@ export default function MachineCard() {
                                         <div className="flex flex-col gap-1">
                                             <div><strong>Machine Number:</strong> <Skeleton className="inline-block h-4 w-20 ml-2" /></div>
                                             <div><strong>Machine Type:</strong> <Skeleton className="inline-block h-4 w-24 ml-2" /></div>
-                                            <div><strong>Max Capacity:</strong> <Skeleton className="inline-block h-4 w-28 ml-2" /></div>
+                                            {/* <div><strong>Max Capacity:</strong> <Skeleton className="inline-block h-4 w-28 ml-2" /></div> */}
                                             <div><strong>Installation Date:</strong> <Skeleton className="inline-block h-4 w-32 ml-2" /></div>
                                         </div>
                                         <div className="flex flex-col gap-2 mt-4">

@@ -2,11 +2,54 @@
   "name": "mes-next",
   "version": "0.1.0",
   "private": true,
+  "main": "dist-electron/main.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "build:next": "next build",
+    "start:next": "next start -p 3000",
+    "build:electron": "tsup",
+    "dist:win": "npm run build:next && npm run build:electron && electron-builder -w",
+    "dist:mac": "npm run build:next && npm run build:electron && electron-builder -m",
+    "dist:linux": "npm run build:next && npm run build:electron && electron-builder -l",
+    "start": "next start -p 3000",
     "lint": "next lint"
+  },
+  "build": {
+    "appId": "com.example.my-nextron",
+    "productName": "MyNextElectronApp",
+    "files": [
+      "dist-electron/**",
+      ".next/**",
+      "public/**",
+      "package.json",
+      "next.config.*"
+    ],
+    "extraMetadata": {
+      "main": "dist-electron/main.js"
+    },
+    "asar": true,
+    "directories": {
+      "buildResources": "build"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.ico"
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "icon": "build/icon.icns"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "icon": "build"
+    }
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
@@ -32,7 +75,7 @@
     "dayjs": "^1.11.13",
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
-    "gantt-task-react": "^0.3.9",
+    "get-port": "^7.1.0",
     "jose": "^6.0.12",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.525.0",
@@ -44,10 +87,9 @@
     "react-dom": "19.1.0",
     "react-hook-form": "^7.60.0",
     "react-pdf": "^10.0.1",
-    "recharts": "^2.15.4",
     "sonner": "^2.0.6",
     "tailwind-merge": "^3.3.1",
-    "xlsx": "^0.18.5",
+    "tsup": "^8.5.0",
     "zod": "^4.0.5",
     "zustand": "^5.0.6"
   },
@@ -62,6 +104,8 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/snapsvg": "^0.5.8",
+    "electron": "^37.3.0",
+    "electron-builder": "^26.0.12",
     "eslint": "^9",
     "eslint-config-next": "15.4.2",
     "tailwindcss": "^4",

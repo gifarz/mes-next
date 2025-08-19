@@ -26,7 +26,6 @@ export default function SchedulingCard() {
     const [refreshKey, setRefreshKey] = useState<number>(0)
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
 
-    // const email = useUserStore((state) => state.email)
     const { open } = useSidebarStore();
 
     useEffect(() => {
@@ -46,16 +45,16 @@ export default function SchedulingCard() {
                 const orders = Array.isArray(json.data) ? json.data : []
                 setListOrders(orders)
 
-                const stations = await fetch("/api/getter/getAllStations", {
-                    method: "GET"
-                });
-                const dataStations = await stations.json()
+                // const stations = await fetch("/api/getter/getAllStations", {
+                //     method: "GET"
+                // });
+                // const dataStations = await stations.json()
 
-                const fixedResponse = Array.isArray(dataStations?.data)
-                    ? dataStations.data
-                    : []
+                // const fixedResponse = Array.isArray(dataStations?.data)
+                //     ? dataStations.data
+                //     : []
 
-                setListStations(fixedResponse)
+                // setListStations(fixedResponse)
 
                 const resCustomer = await fetch("/api/getter/getAllCustomers", {
                     method: "GET"
@@ -129,8 +128,8 @@ export default function SchedulingCard() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className='flex justify-between gap-4'>
-                        <Select value={selectedStation} onValueChange={setSelectedStation}>
+                    <div className='flex justify-end gap-4'>
+                        {/* <Select value={selectedStation} onValueChange={setSelectedStation}>
                             <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Select the station" />
                             </SelectTrigger>
@@ -148,8 +147,9 @@ export default function SchedulingCard() {
                                     ))
                                 }
                             </SelectContent>
-                        </Select>
+                        </Select> */}
                         <Button
+                            className='cursor-pointer'
                             variant="destructive"
                             onClick={handleApplySchedule}
                         >
@@ -160,7 +160,7 @@ export default function SchedulingCard() {
                                         <span className="ml-0">Submitting</span>
                                     </>
                                     :
-                                    "Apply Schedule"
+                                    "APPLY SCHEDULE"
                             }
                         </Button>
                     </div>
@@ -172,17 +172,6 @@ export default function SchedulingCard() {
                     />
                 </CardContent>
             </Card>
-
-            {/* <Card className="mt-5">
-                <CardHeader>
-                    <CardTitle>
-                        <h2 className="text-2xl font-semibold mb-4 text-center">Scheduling Chart</h2>
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <GanttChart isSidebarOpen={open} />
-                </CardContent>
-            </Card> */}
         </div>
     )
 }

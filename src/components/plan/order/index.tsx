@@ -88,35 +88,37 @@ export default function OrderCard() {
             status: "Waiting",
         }
 
-        const response = await fetch("/api/getter/getInventoryByName", {
+        // DISABLED FOR CHECKING QUANTITY TO INVENTORY
+        // const response = await fetch("/api/getter/getInventoryByName", {
+        //     method: "POST",
+        //     body: JSON.stringify({ name: partMaterial }),
+        //     headers: {
+        //         "Content-Type": "application/json",
+        //     },
+        // });
+
+        // const inventoryData = await response.json()
+
+        // if (Number(inventoryData.data[0].quantity) >= Number(quantity)) {
+        // } else {
+        //     toast.error("The Request Quantity More Than Quantity Available in Inventory")
+        //     setIsSubmitted(false)
+        // }
+
+        const res = await fetch("/api/insert/addOrder", {
             method: "POST",
-            body: JSON.stringify({ name: partMaterial }),
+            body: JSON.stringify(payload),
             headers: {
                 "Content-Type": "application/json",
             },
         });
 
-        const inventoryData = await response.json()
-
-        if (Number(inventoryData.data[0].quantity) >= Number(quantity)) {
-            const res = await fetch("/api/insert/addOrder", {
-                method: "POST",
-                body: JSON.stringify(payload),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-
-            if (res.ok) {
-                toast.success("The Order Added Successfully!")
-            } else {
-                toast.error("Failed to Add Order!")
-            }
-            setIsSubmitted(false)
+        if (res.ok) {
+            toast.success("The Order Added Successfully!")
         } else {
-            toast.error("The Request Quantity More Than Quantity Available in Inventory")
-            setIsSubmitted(false)
+            toast.error("Failed to Add Order!")
         }
+        setIsSubmitted(false)
 
         setRefreshKey((prev) => prev + 1) // Trigger to generate a new orderNumber 
     }

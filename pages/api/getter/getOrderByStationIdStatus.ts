@@ -6,9 +6,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { station_id, status, not_status, not_status_2 } = req.body;
 
         try {
-            let query = `SELECT * FROM mes.orders WHERE station_id = $1`;
-            const params = [station_id];
-            let paramIndex = 2;
+            let query = `SELECT * FROM mes.orders`;
+            const params: any[] = [];
+            let paramIndex = 1;
+
+            // only add station filter if not "all"
+            if (station_id !== "all") {
+                query += ` WHERE station_id = $${paramIndex}`;
+                params.push(station_id);
+                paramIndex++;
+            } else {
+                // if all, we may need a WHERE if next filters exist
+                query += ` WHERE 1=1`;
+            }
 
             if (status) {
                 query += ` AND status = $${paramIndex}`;

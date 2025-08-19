@@ -50,19 +50,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     const station_name = dataStation.rows[randStation].name
                     const machine_name = dataStation.rows[randStation].machine_name.split(',')
                     const used_machine = machine_name.length
-                    const total_item_in_hour = await Promise.all(
-                        machine_name.map(async (machine: string) => {
-                            const machines = await db.query(
-                                `SELECT capacity FROM mes.machines WHERE name = $1`,
-                                [machine.trim()]
-                            );
-                            return Number(machines.rows[0]?.capacity || 0);
-                        })
-                    ).then(capacities => capacities.reduce((sum, cap) => sum + cap, 0));
-                    const workloads = workloadsTime(Number(total_item_in_hour), Number(quantity))
-                    const operation_start = getFactory.rows[0].operation_start
-                    const estimate_start = adjustDayWithTime(new Date(), 1, operation_start + ":00")
-                    const estimate_end = adjustDayWithTime(new Date(), 1, operation_start + ":00", workloads)
+                    // const total_item_in_hour = await Promise.all(
+                    //     machine_name.map(async (machine: string) => {
+                    //         const machines = await db.query(
+                    //             `SELECT capacity FROM mes.machines WHERE name = $1`,
+                    //             [machine.trim()]
+                    //         );
+                    //         return Number(machines.rows[0]?.capacity || 0);
+                    //     })
+                    // ).then(capacities => capacities.reduce((sum, cap) => sum + cap, 0));
+                    // const workloads = workloadsTime(Number(total_item_in_hour), Number(quantity))
+                    // const operation_start = getFactory.rows[0].operation_start
+                    // const estimate_start = adjustDayWithTime(new Date(), 1, operation_start + ":00")
+                    // const estimate_end = adjustDayWithTime(new Date(), 1, operation_start + ":00", workloads)
 
                     // console.log("randStation", randStation);
                     // console.log("factory_id", factory_id);
@@ -92,18 +92,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                             quantity,
                             delivery_date,
                             used_machine,
-                            workloads,
-                            estimate_start,
-                            estimate_end,
                             total_length,
                             stripping_front,
                             stripping_rear,
                             status,
                             created_by
                         )
-                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
+                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
                         RETURNING *`,
-                        [uuid, factory_id, station_id, station_name, order_number, customer_name, product_name, product_code, part_name, part_code, quantity, formattedDateOnly(delivery_date), used_machine, workloads, estimate_start, estimate_end, total_length, stripping_front, stripping_rear, status, created_by]
+                        [uuid, factory_id, station_id, station_name, order_number, customer_name, product_name, product_code, part_name, part_code, quantity, formattedDateOnly(delivery_date), used_machine, total_length, stripping_front, stripping_rear, status, created_by]
                     );
 
                     if (result.rowCount && result.rowCount > 0) {
