@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowUpIcon, ArrowDownIcon } from "@radix-ui/react-icons"
 import { Scheduling } from '../../../../types/plan/scheduling'
 import { Checkbox } from '@/components/ui/checkbox'
+import { useI18n } from '@/components/i18n/provider'
 
 type SortKey = keyof Scheduling
 type SortRule = {
@@ -38,6 +39,7 @@ type ProductionSchedulingProps = {
 export default function ProductionScheduling({ listData, selectedStation, isSidebarOpen, onSelectedRows }: ProductionSchedulingProps) {
     const [filteredData, setFilteredData] = useState<Scheduling[]>([])
     const [selectedRows, setSelectedRows] = useState<string[]>([])
+    const { t } = useI18n();
 
     useEffect(() => {
         onSelectedRows(selectedRows)
@@ -129,14 +131,14 @@ export default function ProductionScheduling({ listData, selectedStation, isSide
                                 onCheckedChange={(checked) => toggleSelectAll(!!checked)}
                             />
                         </TableHead>
-                        {columns.map(({ key, label }) => (
+                        {columns.map(({ key }) => (
                             <TableHead key={key} className="text-center">
                                 <Button
                                     variant="ghost"
                                     onClick={() => handleSort(key as SortKey)}
                                     className="font-semibold"
                                 >
-                                    {label}
+                                    {t(key)}
                                     <SortIcon column={key as SortKey} />
                                 </Button>
                             </TableHead>
@@ -147,7 +149,7 @@ export default function ProductionScheduling({ listData, selectedStation, isSide
                     {sortedData.length === 0 ? (
                         <TableRow>
                             <TableCell colSpan={columns.length + 1} className="text-center py-10 text-muted-foreground">
-                                No data available for now
+                                {t("noData")}
                             </TableCell>
                         </TableRow>
                     ) : (

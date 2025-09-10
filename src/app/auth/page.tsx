@@ -36,6 +36,8 @@ import Image from "next/image"
 import { useUserStore } from "../../../store/userStore"
 import { Roles } from "../../../types/auth/auth"
 import { encrypt } from "@/lib/crypto"
+import { useI18n } from "@/components/i18n/provider"
+import { Navbar } from "@/components/navbar"
 
 const formSchemaRegistration = z.object({
     user_id: z.string().min(3, {
@@ -69,6 +71,7 @@ export default function AuthPage() {
     const [isRegistration, setIsRegistration] = useState<boolean>(false)
     const [tabValue, setTabValue] = useState<string>("login")
     const [listRoles, setlistRoles] = useState<Roles[]>([])
+    const { t } = useI18n();
 
     const setUser = useUserStore((state) => state.setUser)
 
@@ -118,17 +121,15 @@ export default function AuthPage() {
                 },
             });
 
-            const response = await res.json()
-
             if (res.ok) {
-                toast.success("Account Has Been Created!")
+                toast.success(t("successReg"))
                 setTabValue("login")
                 formRegistration.reset();
             } else {
-                toast.error(response.message)
+                toast.error(t("failReg"))
             }
         } else {
-            toast.error("The password and Confirmation Password Does Not Match!")
+            toast.error(t("notMatchReg"))
         }
         setIsRegistration(false)
     }
@@ -146,7 +147,6 @@ export default function AuthPage() {
         const json = await res.json()
 
         if (res.ok) {
-            console.log('json', json)
             setUser({
                 user_id: json.data.user_id,
                 name: json.data.name,
@@ -157,30 +157,31 @@ export default function AuthPage() {
             const encryptedRole = encrypt(json.data.role)
 
             localStorage.setItem("role", JSON.stringify(encryptedRole))
-            toast.success("Account Found")
+            toast.success(t("successLogin"))
             router.push('/app/dashboard');
             formRegistration.reset();
         } else {
-            toast.error("Account Not Found")
+            toast.error(t("failLogin"))
         }
         setIsLogin(false)
     }
 
     return (
-        <div className="p-4 md:p-0 overflow-auto px-5 md:px-10 lg:px-20">
+        <div className="p-4 md:p-0 overflow-auto">
             <Toaster position="top-right" />
+            <Navbar isAuthPage={true} />
             <div className="fixed left-1/2 -translate-x-1/2 w-full mt-1 max-w-lg">
                 <Tabs value={tabValue} onValueChange={setTabValue}>
                     <TabsList className="w-full flex">
-                        <TabsTrigger value="login" className="flex-1">Login</TabsTrigger>
-                        <TabsTrigger value="register" className="flex-1">Register</TabsTrigger>
+                        <TabsTrigger value="login" className="flex-1">{t("login")}</TabsTrigger>
+                        <TabsTrigger value="register" className="flex-1">{t("register")}</TabsTrigger>
                     </TabsList>
                     <TabsContent value="login">
-                        <Card className="h-[87vh] overflow-y-auto">
+                        <Card className="h-[77vh] overflow-y-auto">
                             <CardHeader>
-                                <CardTitle>Login to your account</CardTitle>
+                                <CardTitle>{t("titleLogin")}</CardTitle>
                                 <CardDescription>
-                                    Enter your credential below to login to your account
+                                    {t("descriptionLogin")}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -199,9 +200,9 @@ export default function AuthPage() {
                                             name="user_id"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>User ID</FormLabel>
+                                                    <FormLabel>{t("userId")}</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="Type Your User ID" {...field} />
+                                                        <Input placeholder={t("userIdPlaceholder")} {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -212,10 +213,10 @@ export default function AuthPage() {
                                             name="password"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Password</FormLabel>
+                                                    <FormLabel>{t("password")}</FormLabel>
                                                     <FormControl>
                                                         <Input
-                                                            placeholder="Type Your Password"
+                                                            placeholder={t("passwordPlaceholder")}
                                                             {...field}
                                                             type="password"
                                                         />
@@ -228,10 +229,10 @@ export default function AuthPage() {
                                             {isLogin ? (
                                                 <>
                                                     <Spinner />
-                                                    <span className="ml-0">Submitting</span>
+                                                    <span className="ml-0">{t("submitting")}</span>
                                                 </>
                                             ) : (
-                                                "Login"
+                                                t("login").toUpperCase()
                                             )}
                                         </Button>
                                     </form>
@@ -240,11 +241,11 @@ export default function AuthPage() {
                         </Card>
                     </TabsContent>
                     <TabsContent value="register">
-                        <Card className="max-h-[87vh] overflow-y-auto">
+                        <Card className="h-[77vh] overflow-y-auto">
                             <CardHeader>
-                                <CardTitle>Register Your Account</CardTitle>
+                                <CardTitle>{t("titleRegister")}</CardTitle>
                                 <CardDescription>
-                                    Please fill all of the field in the form below
+                                    {t("descriptionRegister")}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -266,9 +267,9 @@ export default function AuthPage() {
                                             name="user_id"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>User ID</FormLabel>
+                                                    <FormLabel>{t("userId")}</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="Type Your User ID" {...field} />
+                                                        <Input placeholder={t("userIdPlaceholder")} {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -279,9 +280,9 @@ export default function AuthPage() {
                                             name="name"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Name</FormLabel>
+                                                    <FormLabel>{t("name")}</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="Type Your Name" {...field} />
+                                                        <Input placeholder={t("namePlaceholder")} {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -292,14 +293,14 @@ export default function AuthPage() {
                                             name="role"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Role</FormLabel>
+                                                    <FormLabel>{t("role")}</FormLabel>
                                                     <FormControl>
                                                         <Select
                                                             value={field.value}
                                                             onValueChange={field.onChange}
                                                         >
                                                             <SelectTrigger className="w-full">
-                                                                <SelectValue placeholder="Select Your Role" />
+                                                                <SelectValue placeholder={t("rolePlaceholder")} />
                                                             </SelectTrigger>
                                                             <SelectContent>
                                                                 {listRoles.length === 0 ? (
@@ -328,10 +329,10 @@ export default function AuthPage() {
                                             name="password"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Password</FormLabel>
+                                                    <FormLabel>{t("password")}</FormLabel>
                                                     <FormControl>
                                                         <Input
-                                                            placeholder="Type Your Password"
+                                                            placeholder={t("passwordPlaceholder")}
                                                             type="password"
                                                             {...field}
                                                         />
@@ -345,10 +346,10 @@ export default function AuthPage() {
                                             name="passwordConfirmation"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Password Confirmation</FormLabel>
+                                                    <FormLabel>{t("confirmPassword")}</FormLabel>
                                                     <FormControl>
                                                         <Input
-                                                            placeholder="Type Your Confirmation Password"
+                                                            placeholder={t("confirmPasswordPlaceholder")}
                                                             type="password"
                                                             {...field}
                                                         />
@@ -365,10 +366,10 @@ export default function AuthPage() {
                                             {isRegistration ? (
                                                 <>
                                                     <Spinner />
-                                                    <span className="ml-0">Submitting</span>
+                                                    <span className="ml-0">{t("submitting")}</span>
                                                 </>
                                             ) : (
-                                                "Registration"
+                                                t("register").toUpperCase()
                                             )}
                                         </Button>
                                     </form>

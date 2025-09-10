@@ -28,6 +28,7 @@ import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 import { toast } from 'sonner'
 import { Toaster } from '@/components/ui/sonner'
+import { useI18n } from '@/components/i18n/provider'
 
 type SortKey = keyof Order
 type SortRule = {
@@ -65,6 +66,7 @@ export default function WarehouseCard() {
     ])
 
     const { open } = useSidebarStore();
+    const { t } = useI18n();
 
     useEffect(() => {
         const payload = { not_status: "Waiting" }
@@ -279,9 +281,9 @@ export default function WarehouseCard() {
                 >
                     {
                         loading ?
-                            "Downloading..."
+                            t("downloading")
                             :
-                            "Export to Excel"
+                            t("exportToExcel")
                     }
                 </Button>
             </div>
@@ -294,17 +296,17 @@ export default function WarehouseCard() {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            {columns.map(({ key, label }) => (
+                            {columns.map(({ key }) => (
                                 <TableHead key={key} className="text-center">
                                     {key === 'action' ? (
-                                        <span className="font-semibold">{label}</span>
+                                        <span className="font-semibold">{t(key)}</span>
                                     ) : (
                                         <Button
                                             variant="ghost"
                                             onClick={() => handleSort(key as SortKey)}
                                             className="font-semibold"
                                         >
-                                            {label}
+                                            {t(key)}
                                             <SortIcon column={key as SortKey} />
                                         </Button>
                                     )}
@@ -317,7 +319,7 @@ export default function WarehouseCard() {
                             sortedData.length === 0 ?
                                 <TableRow>
                                     <TableCell colSpan={columns.length} className="text-center py-10 text-muted-foreground">
-                                        No data of order available for now
+                                        {t("noData")}
                                     </TableCell>
                                 </TableRow>
                                 :
@@ -355,14 +357,14 @@ export default function WarehouseCard() {
                                                                     }}
                                                                     className="cursor-pointer"
                                                                 >
-                                                                    EDIT
+                                                                    {t("edit").toUpperCase()}
                                                                 </DropdownMenuItem>
 
                                                                 <DropdownMenuItem
                                                                     onClick={() => handleDeleteOrder(data)}
                                                                     className="cursor-pointer text-red-600 focus:text-red-700"
                                                                 >
-                                                                    DELETE
+                                                                    {t("delete").toUpperCase()}
                                                                 </DropdownMenuItem>
                                                             </DropdownMenuContent>
                                                         </DropdownMenu>

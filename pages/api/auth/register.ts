@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { db } from '@/lib/db';
 import { hashPassword } from '@/lib/hashPassword';
 import { generateUUID } from '@/lib/uuidGenerator';
+import { insertUserLog } from '@/lib/userLogsHelper';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
@@ -29,27 +30,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 );
 
                 if (result.rowCount && result.rowCount > 0) {
-                    await db.query(
-                        `INSERT INTO mes.customer_logs (user_id, service, result_code, result_desc)
-                    VALUES ($1, $2, $3, $4)
-                    RETURNING *`,
-                        [user_id, "REGISTRATION", "00", "Success"]
-                    );
+                    const payload = {
+                        api: "REGISTRATION",
+                        resultCode: "00",
+                        resultDesc: "Success",
+                        user_id
+                    }
+                    insertUserLog(payload)
 
                     res.status(200).json({ message: 'Successfully Created the Account', data: result.rows[0] });
                 } else {
-                    await db.query(
-                        `INSERT INTO mes.customer_logs (user_id, service, result_code, result_desc)
-                    VALUES ($1, $2, $3, $4)
-                    RETURNING *`,
-                        [user_id, "REGISTRATION", "01", "Registration Failed"]
-                    );
+                    const payload = {
+                        api: "REGISTRATION",
+                        resultCode: "01",
+                        resultDesc: "Registration Failed",
+                        user_id
+                    }
+                    insertUserLog(payload)
 
-                    res.status(500).json({ message: 'Failed Created the Account' });
+                    res.status(500).json({ message: 'Fail to Create the Account' });
                 }
             }
 
         } catch (error) {
+            const payload = {
+                api: "REGISTRATION",
+                resultCode: "99",
+                resultDesc: "Error Catch Registration : " + error,
+                user_id
+            }
+            insertUserLog(payload)
             console.error('Insert Error:', error);
             res.status(500).json({ error: 'Failed to Insert Account' });
         }

@@ -20,6 +20,7 @@ import AddEditCustomer from "../add-edit"
 import CustomerDataTable from "../table"
 import { formattedDate } from "@/lib/dateUtils"
 import { Customer } from "../../../../../types/setup/customer"
+import { useI18n } from "@/components/i18n/provider"
 
 export default function CustomerCard() {
     const [listCustomer, setListCustomer] = useState<Customer[]>([])
@@ -29,6 +30,7 @@ export default function CustomerCard() {
     const [isFetched, setIsFetched] = useState<boolean>(false)
 
     const user_id = useUserStore((state) => state.user_id)
+    const { t } = useI18n();
 
     useEffect(() => {
         const payload = { user_id }
@@ -72,18 +74,18 @@ export default function CustomerCard() {
                 <div className="w-full max-h-full rounded">
                     <div className="flex flex-row items-center justify-between">
                         <h2 className="text-2xl font-semibold">
-                            Customer Management
+                            {t("customerManagement")}
                         </h2>
                         <div className="flex gap-2 ml-auto">
                             <Input
                                 type="text"
-                                placeholder="Search customer..."
+                                placeholder={t("searchCustomer")}
                             />
                             <Button
                                 className="cursor-pointer"
                                 onClick={() => setOpenDialog(true)}
                             >
-                                Add Customer
+                                {t("addCustomer")}
                             </Button>
                         </div>
                     </div>

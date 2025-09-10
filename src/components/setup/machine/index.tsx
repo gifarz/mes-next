@@ -19,6 +19,7 @@ import { useUserStore } from '../../../../store/userStore'
 import { Machine, MachineTypes } from "../../../../types/setup/machine"
 import { formattedDate } from "@/lib/dateUtils"
 import { Textarea } from "@/components/ui/textarea"
+import { useI18n } from "@/components/i18n/provider"
 
 export default function MachineCard() {
     const [search, setSearch] = useState<string>("")
@@ -38,6 +39,7 @@ export default function MachineCard() {
     const [refreshKey, setRefreshKey] = useState(0)
 
     const user_id = useUserStore((state) => state.user_id)
+    const { t } = useI18n();
 
     useEffect(() => {
         const payload = {
@@ -107,12 +109,12 @@ export default function MachineCard() {
             });
 
             if (res.ok) {
-                toast.success("The Machine Updated Successfully!")
+                toast.success(t("successUpdateMachine"))
                 setIsSubmitted(false)
                 setIsEditMachine(false)
                 setIsAddMachine(false)
             } else {
-                toast.error("Failed to Update Machine!")
+                toast.error(t("failUpdateMachine"))
                 setIsSubmitted(false)
 
             }
@@ -127,12 +129,12 @@ export default function MachineCard() {
             });
 
             if (res.ok) {
-                toast.success("The Machine Added Successfully!")
+                toast.success(t("successMachine"))
                 setIsSubmitted(false)
                 setIsAddMachine(false)
                 setIsEditMachine(false)
             } else {
-                toast.error("Failed to Add Machine!")
+                toast.error(t("failMachine"))
                 setIsSubmitted(false)
             }
         }
@@ -183,12 +185,12 @@ export default function MachineCard() {
                 <div className="w-full max-h-full rounded">
                     <div className="flex flex-row items-center justify-between">
                         <h2 className="text-2xl font-semibold">
-                            Machine Management
+                            {t("machineManagement")}
                         </h2>
                         <div className="flex gap-2 ml-auto">
                             <Input
                                 type="text"
-                                placeholder="Search machines..."
+                                placeholder={t("searchMachines")}
                                 value={search}
                                 onChange={(e) => {
                                     setSearch(e.target.value)
@@ -208,7 +210,7 @@ export default function MachineCard() {
                                     setMachineTypeCustom("")
                                 }}>
                                 {
-                                    isAddMachine ? "Cancel" : "Add Machine"
+                                    isAddMachine ? t("cancel") : t("addMachine")
                                 }
                             </Button>
                         </div>
@@ -219,15 +221,15 @@ export default function MachineCard() {
                         <>
                             <h2 className="text-2xl font-semibold text-center my-8">
                                 {
-                                    isEditMachine ? "Edit Machine" : "Add Machine"
+                                    isEditMachine ? t("editMachine") : t("addMachine")
                                 }
                             </h2>
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div>
-                                    <Label htmlFor="machineNumber">Machine Number</Label>
+                                    <Label htmlFor="machineNumber">{t("machineNumber")}</Label>
                                     <Input
                                         id="machineNumber"
-                                        placeholder="Enter Machine Number"
+                                        placeholder={t("machineNumberPlaceholder")}
                                         type="text"
                                         value={machineNumber}
                                         onChange={(e) => setMachineNumber(e.target.value)}
@@ -236,10 +238,10 @@ export default function MachineCard() {
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="machineName">Machine Name</Label>
+                                    <Label htmlFor="machineName">{t("machineName")}</Label>
                                     <Input
                                         id="machineName"
-                                        placeholder="Enter Machine Name"
+                                        placeholder={t("machineNamePlaceholder")}
                                         type="text"
                                         value={machineName}
                                         onChange={(e) => setMachineName(e.target.value)}
@@ -247,10 +249,10 @@ export default function MachineCard() {
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="machineDescription">Machine Description</Label>
+                                    <Label htmlFor="machineDescription">{t("machineDescription")}</Label>
                                     <Textarea
                                         id="machineDescription"
-                                        placeholder="Enter Machine Description"
+                                        placeholder={t("machineDescriptionPlaceholder")}
                                         value={machineDescription}
                                         onChange={(e) => setMachineDescription(e.target.value)}
                                     />
@@ -269,7 +271,7 @@ export default function MachineCard() {
                                 </div> */}
 
                                 <div>
-                                    <Label htmlFor="machineType">Machine Type *</Label>
+                                    <Label htmlFor="machineType">{t("machineType")} *</Label>
                                     <Select
                                         value={machineType}
                                         onValueChange={(name) => {
@@ -282,12 +284,12 @@ export default function MachineCard() {
                                         }}
                                     >
                                         <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select or type a machine type" />
+                                            <SelectValue placeholder={t("machineTypePlaceholder")} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {
                                                 listMachineTypes.length === 0 ?
-                                                    <p className="p-2 text-sm text-gray-500">No machine type available</p>
+                                                    <p className="p-2 text-sm text-gray-500">{t("noMachineType")}</p>
                                                     :
                                                     listMachineTypes.map((machine) => (
                                                         <SelectItem
@@ -301,11 +303,11 @@ export default function MachineCard() {
                                         </SelectContent>
                                     </Select>
                                     <p className="text-sm text-muted-foreground mt-1">
-                                        *For custom machine type just type custom name in this input field.
+                                        *{t("customMachineNote")}
                                     </p>
                                     <Input
                                         className="mt-2"
-                                        placeholder="Custom machine type..."
+                                        placeholder={t("customMachineType")}
                                         value={machineTypeCustom}
                                         onChange={(e) => setMachineTypeCustom(e.target.value)}
                                     />
@@ -320,10 +322,11 @@ export default function MachineCard() {
                                         {isSubmitted ? (
                                             <>
                                                 <Spinner />
-                                                <span className="ml-0">Submitting</span>
+                                                <span className="ml-0">{t("submitting")}</span>
                                             </>
                                         ) :
-                                            isEditMachine ? "UPDATE MACHINE" : "ADD MACHINE"
+                                            isEditMachine ?
+                                                t("machineType").toUpperCase() : t("addMachine").toUpperCase()
                                         }
                                     </Button>
                                 </div>
@@ -336,7 +339,7 @@ export default function MachineCard() {
                         isFetched ? (
                             filteredMachines.length === 0 ? (
                                 <div className="col-span-full text-center mt-10 text-muted-foreground">
-                                    No Machines Found.
+                                    {t("noMachine")}
                                 </div>
                             ) : (
                                 filteredMachines.map((machine) => (
@@ -345,24 +348,24 @@ export default function MachineCard() {
                                             <CardTitle className="text-center text-lg">{machine.name}</CardTitle>
                                         </CardHeader>
                                         <CardContent className="space-y-1 text-sm">
-                                            <div><strong>Machine Number:</strong> {machine.number}</div>
-                                            <div><strong>Machine Type:</strong> {machine.type}</div>
+                                            <div><strong>{t("machineNumber")}:</strong> {machine.number}</div>
+                                            <div><strong>{t("machineType")}:</strong> {machine.type}</div>
                                             {/* <div><strong>Max Capacity:</strong> {machine.capacity} Items/ Hour</div> */}
-                                            <div><strong>Installation Date:</strong> {machine.created_on}</div>
+                                            <div><strong>{t("installation")}:</strong> {machine.created_on}</div>
                                             <div className="flex flex-col gap-2 mt-4">
                                                 <Button
                                                     className="cursor-pointer"
                                                     variant="secondary"
                                                     onClick={() => handleEdit(machine)}
                                                 >
-                                                    EDIT
+                                                    {t("edit").toUpperCase()}
                                                 </Button>
                                                 <Button
                                                     className="cursor-pointer"
                                                     variant="destructive"
                                                     onClick={() => handleDelete(machine)}
                                                 >
-                                                    DELETE
+                                                    {t("delete").toUpperCase()}
                                                 </Button>
                                             </div>
                                         </CardContent>
@@ -379,10 +382,10 @@ export default function MachineCard() {
                                     </CardHeader>
                                     <CardContent className="space-y-2 text-sm">
                                         <div className="flex flex-col gap-1">
-                                            <div><strong>Machine Number:</strong> <Skeleton className="inline-block h-4 w-20 ml-2" /></div>
-                                            <div><strong>Machine Type:</strong> <Skeleton className="inline-block h-4 w-24 ml-2" /></div>
+                                            <div><strong>{t("machineNumber")}:</strong> <Skeleton className="inline-block h-4 w-20 ml-2" /></div>
+                                            <div><strong>{t("machineType")}:</strong> <Skeleton className="inline-block h-4 w-24 ml-2" /></div>
                                             {/* <div><strong>Max Capacity:</strong> <Skeleton className="inline-block h-4 w-28 ml-2" /></div> */}
-                                            <div><strong>Installation Date:</strong> <Skeleton className="inline-block h-4 w-32 ml-2" /></div>
+                                            <div><strong>{t("installation")}:</strong> <Skeleton className="inline-block h-4 w-32 ml-2" /></div>
                                         </div>
                                         <div className="flex flex-col gap-2 mt-4">
                                             <Skeleton className="h-9 w-full rounded" />

@@ -27,6 +27,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { decrypt } from '@/lib/crypto';
 import { Station } from '../../../../types/setup/station';
+import { useI18n } from '@/components/i18n/provider';
 
 export default function ListOrdersCard() {
     const [listOrders, setListOrders] = useState<Order[]>([])
@@ -44,6 +45,7 @@ export default function ListOrdersCard() {
     const [buttonId, setButtonId] = useState<Set<string>>(new Set());
     const [selectedLine, setSelectedLine] = useState<string>("")
     const [stationId, setStationId] = useState<string>("")
+    const { t } = useI18n();
 
     const { user_id, name, shift, line, station_id, leader, foreman } = useUserStore()
 
@@ -284,14 +286,14 @@ export default function ListOrdersCard() {
                             }}
                         >
                             <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select the station" />
+                                <SelectValue placeholder={t("selectStation")} />
                             </SelectTrigger>
                             <SelectContent>
                                 {listLines.length === 0 ?
-                                    <p className="p-2 text-sm text-gray-500">No station available</p>
+                                    <p className="p-2 text-sm text-gray-500">{t("noData")}</p>
                                     :
                                     <>
-                                        <SelectItem value="all">All Stations</SelectItem>
+                                        <SelectItem value="all">{t("allStation")}</SelectItem>
                                         {
                                             listLines.map((station) => (
                                                 <SelectItem
@@ -312,7 +314,7 @@ export default function ListOrdersCard() {
             {
                 listOrders.length === 0 ?
                     <div className="col-span-full text-center mt-10 text-muted-foreground">
-                        List Order Not Found
+                        {t("noData")}
                     </div>
                     :
                     <div className='grid md:grid-cols-2 gap-4 mt-5'>
@@ -321,7 +323,7 @@ export default function ListOrdersCard() {
                                 <Card className='relative max-h-[500px]' key={order.identifier}>
                                     <CardHeader className="absolute top-0 left-0 rounded-t-xl z-10 bg-card w-full flex items-center justify-between min-h-[70px] px-5">
                                         <h2 className="text-2xl font-semibold text-center">
-                                            Product Code : {order.product_code}
+                                            {t("product_code")} : {order.product_code}
                                         </h2>
                                         <Button
                                             variant="ghost"
@@ -338,28 +340,28 @@ export default function ListOrdersCard() {
                                     </CardHeader>
                                     <CardContent className="space-y-4 pt-[50px] pb-[50px] overflow-y-auto">
                                         <div className="divide-y">
-                                            <InfoRow label="Order Number" value={order.order_number} />
-                                            <InfoRow label="Customer Name" value={order.customer_name} />
-                                            <InfoRow label="Product Name" value={order.product_name} />
-                                            <InfoRow label="Product Code" value={order.product_code} />
-                                            <InfoRow label="Part Name" value={order.part_name} />
-                                            <InfoRow label="Quantity" value={order.quantity} />
+                                            <InfoRow label={t("orderNumber")} value={order.order_number} />
+                                            <InfoRow label={t("customerName")} value={order.customer_name} />
+                                            <InfoRow label={t("productName")} value={order.product_name} />
+                                            <InfoRow label={t("productCode")} value={order.product_code} />
+                                            <InfoRow label={t("part_name")} value={order.part_name} />
+                                            <InfoRow label={t("quantity")} value={order.quantity} />
                                             {/* <InfoRow label="Estimate Start" value={order.estimate_start} />
                                             <InfoRow label="Estimate End" value={order.estimate_end} /> */}
                                             <InfoRow
-                                                label="Actual Start"
+                                                label={t("actual_start")}
                                                 value={order.actual_start ? order.actual_start : "N/A"}
                                             />
                                             <InfoRow
-                                                label="Actual End"
+                                                label={t("actual_end")}
                                                 value={order.actual_end ? order.actual_end : "N/A"}
                                             />
                                             <InfoRow
-                                                label="Duration"
+                                                label={t("duration")}
                                                 value={order.duration ? order.duration : "N/A"}
                                             />
                                             <InfoRow
-                                                label="Defect"
+                                                label={t("defect")}
                                                 value={
                                                     order.defect_item ?
                                                         `${order.defect_item}/${order.quantity}`
@@ -367,7 +369,7 @@ export default function ListOrdersCard() {
                                                 }
                                             />
                                             <InfoRow
-                                                label="Done"
+                                                label={t("done")}
                                                 value={
                                                     order.done_item ?
                                                         `${order.done_item}/${order.quantity}`
@@ -375,11 +377,11 @@ export default function ListOrdersCard() {
                                                 }
                                             />
                                             <InfoRow
-                                                label="Completed"
+                                                label={t("completed")}
                                                 value={order.completed ? order.completed : "N/A"}
                                             />
                                             <InfoRow
-                                                label="Status"
+                                                label={t("status")}
                                                 value={order.status}
                                             />
                                         </div>
@@ -399,10 +401,10 @@ export default function ListOrdersCard() {
                                                 {buttonId.has(order.identifier) ? (
                                                     <>
                                                         <Spinner />
-                                                        <span className="ml-0">Submitting</span>
+                                                        <span className="ml-0">{t("submitting")}</span>
                                                     </>
                                                 ) : (
-                                                    "RECEIVE JOB"
+                                                    t("receiveJob").toUpperCase()
                                                 )}
                                             </Button>
 
@@ -418,38 +420,38 @@ export default function ListOrdersCard() {
                                                         variant="destructive"
                                                         className="w-1/2 cursor-pointer"
                                                     >
-                                                        PROGRESS REPORT
+                                                        {t("progressReport").toUpperCase()}
                                                     </Button>
                                                 </DialogTrigger>
                                                 <DialogContent className="sm:max-w-[425px]">
                                                     <DialogHeader className="mb-4">
-                                                        <DialogTitle>Progress Update</DialogTitle>
+                                                        <DialogTitle>{t("progressUpdate")}</DialogTitle>
                                                         <DialogDescription>
-                                                            The total item should be equal with quantity ({order.quantity})
+                                                            {t("totalItemEqualQuantity")} ({order.quantity})
                                                         </DialogDescription>
                                                     </DialogHeader>
 
                                                     <div className="space-y-2">
                                                         <div>
-                                                            <label>Defected</label>
+                                                            <label>{t("defected")}</label>
                                                             <Input
                                                                 type="number"
                                                                 min={0}
                                                                 max={order.quantity}
                                                                 defaultValue={order.defect_item}
                                                                 onChange={(e) => setDefect(Number(e.target.value))}
-                                                                placeholder="Enter Defected Items"
+                                                                placeholder={t("defectedPlaceholder")}
                                                             />
                                                         </div>
                                                         <div>
-                                                            <label>Done</label>
+                                                            <label>{t("done")}</label>
                                                             <Input
                                                                 type="number"
                                                                 min={0}
                                                                 max={order.quantity}
                                                                 defaultValue={order.done_item}
                                                                 onChange={(e) => setDone(Number(e.target.value))}
-                                                                placeholder="Enter Done Items"
+                                                                placeholder={t("donePlaceholder")}
                                                             />
                                                         </div>
                                                     </div>
@@ -457,7 +459,7 @@ export default function ListOrdersCard() {
                                                     <DialogFooter>
                                                         <DialogClose asChild>
                                                             <Button className="cursor-pointer" variant="outline">
-                                                                CANCEL
+                                                                {t("cancel").toUpperCase()}
                                                             </Button>
                                                         </DialogClose>
                                                         <Button
@@ -477,10 +479,10 @@ export default function ListOrdersCard() {
                                                             {isSubmitted ? (
                                                                 <>
                                                                     <Spinner />
-                                                                    <span className="ml-0">Submitting</span>
+                                                                    <span className="ml-0">{t("submitting")}</span>
                                                                 </>
                                                             ) : (
-                                                                "UPDATE PROGRESS"
+                                                                t("updateProgress").toUpperCase()
                                                             )}
                                                         </Button>
                                                     </DialogFooter>

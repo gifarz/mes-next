@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import AddEditInventory from '../add-edit'
 import { DataInventoryProps, Inventory } from '../../../../../types/setup/inventory'
+import { useI18n } from '@/components/i18n/provider'
 
 type SortKey = keyof Inventory
 type SortRule = {
@@ -31,6 +32,8 @@ const columns = [
 export default function InventoryDataTable({ data, onInventoryUpdated }: DataInventoryProps) {
     const [openDialog, setOpenDialog] = useState<boolean>(false);
     const [inventoryData, setInventoryData] = useState<Inventory>();
+    const { t } = useI18n();
+
     const [sortRules, setSortRules] = useState<SortRule[]>([
         { key: 'created_on', order: 'asc' },
         { key: 'name', order: 'asc' },
@@ -114,17 +117,17 @@ export default function InventoryDataTable({ data, onInventoryUpdated }: DataInv
             <Table className='mt-10'>
                 <TableHeader>
                     <TableRow>
-                        {columns.map(({ key, label }) => (
+                        {columns.map(({ key }) => (
                             <TableHead key={key} className="text-center">
                                 {key === 'action' ? (
-                                    <span className="font-semibold">{label}</span>
+                                    <span className="font-semibold">{t(key)}</span>
                                 ) : (
                                     <Button
                                         variant="ghost"
                                         onClick={() => handleSort(key as SortKey)}
                                         className="font-semibold"
                                     >
-                                        {label}
+                                        {t(key).toUpperCase()}
                                         <SortIcon column={key as SortKey} />
                                     </Button>
                                 )}
@@ -137,7 +140,7 @@ export default function InventoryDataTable({ data, onInventoryUpdated }: DataInv
                         sortedData.length === 0 ?
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="text-center py-10 text-muted-foreground">
-                                    No data of inventory available for now
+                                    {t("noData")}
                                 </TableCell>
                             </TableRow>
                             :
@@ -175,13 +178,13 @@ export default function InventoryDataTable({ data, onInventoryUpdated }: DataInv
                                                                     setInventoryData(inventory)
                                                                 }}
                                                             >
-                                                                EDIT
+                                                                {t("edit").toUpperCase()}
                                                             </DropdownMenuItem>
                                                             <DropdownMenuItem
                                                                 onClick={() => handleDelete(inventory)}
                                                                 className="cursor-pointer text-red-500 focus:text-red-600"
                                                             >
-                                                                DELETE
+                                                                {t("delete").toUpperCase()}
                                                             </DropdownMenuItem>
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>

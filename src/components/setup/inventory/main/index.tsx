@@ -8,6 +8,7 @@ import { useUserStore } from '../../../../../store/userStore'
 import InventoryDataTable from "../table"
 import { formattedDate } from "@/lib/dateUtils"
 import AddEditInventory from "../add-edit"
+import { useI18n } from "@/components/i18n/provider"
 
 interface Inventory {
     identifier: string
@@ -27,6 +28,7 @@ export default function InventoryCard() {
     const [isFetched, setIsFetched] = useState<boolean>(false)
 
     const user_id = useUserStore((state) => state.user_id)
+    const { t } = useI18n();
 
     useEffect(() => {
         const payload = {
@@ -72,18 +74,18 @@ export default function InventoryCard() {
                 <div className="w-full max-h-full rounded">
                     <div className="flex flex-row items-center justify-between">
                         <h2 className="text-2xl font-semibold">
-                            Inventory Management
+                            {t("inventoryManagement")}
                         </h2>
                         <div className="flex gap-2 ml-auto">
                             <Input
                                 type="text"
-                                placeholder="Search inventory..."
+                                placeholder={t("searchInventory")}
                             />
                             <Button
                                 className="cursor-pointer"
                                 onClick={() => setOpenDialog(true)}
                             >
-                                Add Inventory
+                                {t("addInventory")}
                             </Button>
                         </div>
                     </div>

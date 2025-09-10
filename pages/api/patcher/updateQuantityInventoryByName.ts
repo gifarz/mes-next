@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { db } from '@/lib/db';
+import { insertUserLog } from '@/lib/userLogsHelper';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
@@ -9,7 +10,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             created_by
         } = req.body;
 
-        console.log('updaetQuantityInventory', req.body)
 
         try {
             // Subtraction flow for quantity in inventory table
@@ -51,16 +51,38 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     );
                 }
 
+                const payload = {
+                    api: "UPDATE_QUANTITY_INVENTORY",
+                    resultCode: "00",
+                    resultDesc: "Success",
+                    user_id: created_by
+                }
+                insertUserLog(payload)
+
                 res.status(200).json({
                     message: 'Successfully Update Quantity',
                     data: updateQuantityInventory.rows[0]
                 });
 
             } else {
+                const payload = {
+                    api: "UPDATE_QUANTITY_INVENTORY",
+                    resultCode: "21",
+                    resultDesc: "Failed to Update Inventory",
+                    user_id: created_by
+                }
+                insertUserLog(payload)
                 res.status(500).json({ message: 'Failed to Update Inventory' });
             }
 
         } catch (error) {
+            const payload = {
+                api: "UPDATE_QUANTITY_INVENTORY",
+                resultCode: "99",
+                resultDesc: "Error Catch Update Quantity : " + error,
+                user_id: created_by
+            }
+            insertUserLog(payload)
             console.error('Update Error:', error);
             res.status(500).json({ error: 'Failed to Update Inventory' });
         }

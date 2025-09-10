@@ -21,11 +21,13 @@ import { DialogProductProps } from "../../../../../types/setup/product"
 import { Inventory } from "../../../../../types/setup/inventory"
 import { Station } from "../../../../../types/setup/station"
 import { useUserStore } from "../../../../../store/userStore"
+import { useI18n } from "@/components/i18n/provider"
+import { snakeCaseFormat } from "@/lib/formatCase"
 
 const steps = [
-    { title: "Product Information" },
-    { title: "Parts & Process" },
-    { title: "Summary" },
+    { title: "productInformation" },
+    { title: "partAndProcess" },
+    { title: "productSummary" },
 ]
 
 export default function AddEditProduct({ isEdit, productData, open, onOpenChange }: DialogProductProps) {
@@ -44,6 +46,7 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
 
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
     const user_id = useUserStore((state) => state.user_id)
+    const { t } = useI18n();
 
     useEffect(() => {
         const payload = {
@@ -138,11 +141,11 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
             });
 
             if (res.ok) {
-                toast.success("The Product Updated Successfully!")
+                toast.success(t("successUpdateProduct"))
                 onOpenChange(false)
                 setIsSubmitted(false)
             } else {
-                toast.error("Failed to Update Product!")
+                toast.error(t("failUpdateProduct"))
                 setIsSubmitted(false)
             }
 
@@ -156,11 +159,11 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
             });
 
             if (res.ok) {
-                toast.success("The Product Added Successfully!")
+                toast.success(t("successProduct"))
                 onOpenChange(false)
                 setIsSubmitted(false)
             } else {
-                toast.error("Failed to Add Product!")
+                toast.error(t("failProduct"))
                 setIsSubmitted(false)
             }
         }
@@ -173,12 +176,12 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
                     <DialogHeader>
                         <DialogTitle>
                             {
-                                isEdit ? "Edit Product" : "Add Product"
+                                isEdit ? t("editProduct") : t("addProduct")
                             }
                         </DialogTitle>
                         <DialogDescription>
                             {
-                                isEdit ? "Please complete this form to edit the product" : "Please complete this form to add the product"
+                                isEdit ? t("editProductDesc") : t("addProductDesc")
                             }
                         </DialogDescription>
                     </DialogHeader>
@@ -191,7 +194,7 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
                                         className={`font-normal ${index === step ? "text-orange-500" : "text-gray-400"
                                             }`}
                                     >
-                                        {index + 1} {s.title}
+                                        {index + 1} {t(s.title)}
                                     </div>
                                 </div>
                             ))}
@@ -200,32 +203,38 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
                         {/* Step content */}
                         {step === 0 && (
                             <div>
-                                <h2 className="text-2xl font-semibold mb-4">Product Information</h2>
+                                <h2 className="text-2xl font-semibold mb-4">{t("productInformation")}</h2>
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium">Product Name*</label>
+                                        <label className="block text-sm font-medium">
+                                            {snakeCaseFormat(t("product_name"))}
+                                        </label>
                                         <Input
                                             value={productName}
                                             onChange={(e) => setProductName(e.target.value)}
-                                            placeholder="Enter Product Name"
+                                            placeholder={t("productNamePlaceholder")}
                                             required
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium">Product Code *</label>
+                                        <label className="block text-sm font-medium">
+                                            {snakeCaseFormat(t("product_code"))}
+                                        </label>
                                         <Input
                                             value={productCode}
                                             onChange={(e) => setProductCode(e.target.value)}
-                                            placeholder="Enter Product Code"
+                                            placeholder={t("productCodePlaceholder")}
                                             required
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium">Description</label>
+                                        <label className="block text-sm font-medium">
+                                            {snakeCaseFormat(t("product_desc"))}
+                                        </label>
                                         <Textarea
                                             value={productDescription}
                                             onChange={(e) => setProductDescription(e.target.value)}
-                                            placeholder="Enter Description"
+                                            placeholder={t("productDescriptionPlaceholder")}
                                         />
                                     </div>
                                 </div>
@@ -234,39 +243,45 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
 
                         {step === 1 && (
                             <div>
-                                <h2 className="text-2xl font-semibold mb-4">Part Information</h2>
+                                <h2 className="text-2xl font-semibold mb-4">{t("partAndProcess")}</h2>
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium">Part Name</label>
+                                        <label className="block text-sm font-medium">
+                                            {snakeCaseFormat(t("part_name"))}
+                                        </label>
                                         <Input
                                             value={partName}
                                             onChange={(e) => setPartName(e.target.value)}
-                                            placeholder="Enter Part Name"
+                                            placeholder={t("partNamePlaceholder")}
                                             required
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium">Part Code</label>
+                                        <label className="block text-sm font-medium">
+                                            {snakeCaseFormat(t("part_code"))}
+                                        </label>
                                         <Input
                                             value={partCode}
                                             onChange={(e) => setPartCode(e.target.value)}
-                                            placeholder="Enter Part Code"
+                                            placeholder={t("partCodePlaceholder")}
                                             required
                                         />
                                     </div>
                                     <div>
-                                        <Label htmlFor="machineType">Raw Material</Label>
+                                        <Label>
+                                            {snakeCaseFormat(t("raw_material"))}
+                                        </Label>
                                         <Select
                                             value={partRawMaterial}
                                             onValueChange={setPartRawMaterial}
                                         >
                                             <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select Raw Material" />
+                                                <SelectValue placeholder={t("rawMaterialPlaceholder")} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {
                                                     listInventory.length === 0 ?
-                                                        <p className="p-2 text-sm text-gray-500">No inventory available</p>
+                                                        <p className="p-2 text-sm text-gray-500">t{("noData")}</p>
                                                         :
                                                         listInventory.map((inventory) => (
                                                             <SelectItem
@@ -281,13 +296,15 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
                                         </Select>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium">Raw Material Quantity</label>
+                                        <label className="block text-sm font-medium">
+                                            {snakeCaseFormat(t("raw_material_quantity"))}
+                                        </label>
                                         <Input
                                             value={partRawMaterialQuantity}
                                             onChange={(e) => setPartRawMaterialQuantity(e.target.value)}
                                             type="number"
                                             min={0}
-                                            placeholder="Enter Quantity"
+                                            placeholder={t("rawQuantityPlaceholder")}
                                         />
                                     </div>
                                 </div>
@@ -296,25 +313,31 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
 
                         {step === 2 && (
                             <div>
-                                <h2 className="text-2xl font-semibold text-center mb-4">Product Summary</h2>
-                                <h2 className="text-lg font-semibold mb-4">1. Product Information</h2>
+                                <h2 className="text-2xl font-semibold text-center mb-4">{t("productSummary")}</h2>
+                                <h2 className="text-lg font-semibold mb-4">1. {t("productInformation")}</h2>
                                 <div className="grid md:grid-cols-2 gap-4 mb-4">
                                     <div>
-                                        <label className="block text-sm font-medium">Name</label>
+                                        <label className="block text-sm font-medium">
+                                            {snakeCaseFormat(t("product_name"))}
+                                        </label>
                                         <Input
                                             disabled
                                             value={productName ? productName : "-"}
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium">Product Code</label>
+                                        <label className="block text-sm font-medium">
+                                            {snakeCaseFormat(t("product_code"))}
+                                        </label>
                                         <Input
                                             disabled
                                             value={productCode ? productCode : "-"}
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium">Description</label>
+                                        <label className="block text-sm font-medium">
+                                            {snakeCaseFormat(t("product_desc"))}
+                                        </label>
                                         <Textarea
                                             disabled
                                             value={productDescription ? productDescription : "-"}
@@ -322,31 +345,39 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
                                     </div>
                                 </div>
 
-                                <h2 className="text-lg font-semibold mb-4">2. Part and Process</h2>
+                                <h2 className="text-lg font-semibold mb-4">2. {t("partAndProcess")}</h2>
                                 <div className="grid md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium">Name</label>
+                                        <label className="block text-sm font-medium">
+                                            {snakeCaseFormat(t("part_name"))}
+                                        </label>
                                         <Input
                                             disabled
                                             value={partName ? partName : "-"}
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium">Part Code</label>
+                                        <label className="block text-sm font-medium">
+                                            {snakeCaseFormat(t("part_code"))}
+                                        </label>
                                         <Input
                                             disabled
                                             value={partCode ? partCode : "-"}
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium">Raw Material</label>
+                                        <label className="block text-sm font-medium">
+                                            {snakeCaseFormat(t("raw_material"))}
+                                        </label>
                                         <Input
                                             disabled
                                             value={partRawMaterial ? partRawMaterial : "-"}
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium">Raw Material Quantity</label>
+                                        <label className="block text-sm font-medium">
+                                            {snakeCaseFormat(t("raw_material_quantity"))}
+                                        </label>
                                         <Input
                                             disabled
                                             value={partRawMaterialQuantity ? partRawMaterialQuantity : "-"}
@@ -364,20 +395,22 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
                                 disabled={step === 0}
                                 variant="outline"
                             >
-                                Back
+                                {t("back")}
                             </Button>
                             <Button
                                 className="cursor-pointer"
                                 onClick={nextStep}
                                 disabled={step === steps.length - 1}
                             >
-                                Next
+                                {t("next")}
                             </Button>
                         </div>
                     </div>
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button className="cursor-pointer" variant="outline">Cancel</Button>
+                            <Button className="cursor-pointer" variant="outline">
+                                {t("cancel").toUpperCase()}
+                            </Button>
                         </DialogClose>
                         <Button
                             disabled={!productName || !productCode || !partName || !partCode || !partRawMaterial || !partRawMaterialQuantity}
@@ -388,10 +421,10 @@ export default function AddEditProduct({ isEdit, productData, open, onOpenChange
                             {isSubmitted ? (
                                 <>
                                     <Spinner />
-                                    <span className="ml-0">Submitting</span>
+                                    <span className="ml-0">{t("submitting")}</span>
                                 </>
                             ) :
-                                "Submit"
+                                t("submit").toUpperCase()
                             }
                         </Button>
                     </DialogFooter>

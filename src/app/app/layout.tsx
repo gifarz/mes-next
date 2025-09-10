@@ -11,6 +11,7 @@ import { useSidebarStore } from '../../../store/sidebarStore'
 import OperatorInitiation from '@/components/dialog/operator-initiation'
 import { decrypt } from '@/lib/crypto'
 import { Label } from '@/components/ui/label';
+import { useI18n } from '@/components/i18n/provider';
 
 export default function AppLayout({ children }: { children: ReactNode }) {
     const { toggle } = useSidebarStore();
@@ -19,7 +20,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     const { setTheme, resolvedTheme } = useTheme()
     const [mounted, setMounted] = useState<boolean>(false)
     const [role, setRole] = useState<string>("")
-
+    const { t } = useI18n();
 
     useEffect(() => {
         const storageRole = localStorage.getItem("role")
@@ -53,7 +54,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                             <main className="flex-1 p-4">
                                 <div className="flex justify-between">
                                     <SidebarTrigger onClick={toggle} />
-                                    <Label>User Login : {name}</Label>
+                                    <Label>{t("userLogin")} : {name}</Label>
                                     <Button
                                         variant="outline"
                                         size="icon"

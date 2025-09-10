@@ -1,0 +1,13 @@
+appId: com.mes.next
+productName: "MES Next"
+directories:
+  buildResources: assets
+files:
+  - "electron/**/*"
+  - ".next/**/*"
+  - "package.json"
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true

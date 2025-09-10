@@ -19,6 +19,7 @@ import { ChevronDownIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { pdf } from "@react-pdf/renderer";
 import OrderDetailPDF from "../pdf/PDFDoc";
+import { useI18n } from "@/components/i18n/provider";
 
 export default function OrderCard() {
     const [orderNumber, setOrderNumber] = useState<string>("");
@@ -28,12 +29,20 @@ export default function OrderCard() {
     const [quantity, setQuantity] = useState<string>("");
     const [deliveryDate, setDeliveryDate] = useState<Date | undefined>(undefined);
     const [part, setPart] = useState<string>("");
-    const [partMaterial, setPartMaterial] = useState<string>("");
     const [productCode, setProductCode] = useState<string>("");
     const [cost, setCost] = useState<string>("");
     const [totalLength, setTotalLength] = useState<string>("");
     const [strippingFront, setStrippingFront] = useState<string>("");
     const [strippingRear, setStrippingRear] = useState<string>("");
+    const [strippingHalfFront, setStrippingHalfFront] = useState<string>("");
+    const [strippingHalfRear, setStrippingHalfRear] = useState<string>("");
+    const [cable, setCable] = useState<string>("");
+    const [color, setColor] = useState<string>("");
+    const [pinA, setPinA] = useState<string>("");
+    const [pinB, setPinB] = useState<string>("");
+    const [diameterCore, setDiameterCore] = useState<string>("");
+    const [settingPieces, setSettingPieces] = useState<string>("");
+    const [currentPieces, setCurrentPieces] = useState<string>("");
 
     const [listCustomers, setListCustomers] = useState<Customer[]>([]);
     const [listProducts, setListProducts] = useState<Product[]>([]);
@@ -43,6 +52,7 @@ export default function OrderCard() {
     const [open, setOpen] = useState(false)
 
     const user_id = useUserStore((state) => state.user_id)
+    const { t } = useI18n();
 
     useEffect(() => {
         setOrderNumber(customizeDateString("yyyyMMddHHmmsss"))
@@ -84,6 +94,11 @@ export default function OrderCard() {
             total_length: totalLength,
             stripping_front: strippingFront,
             stripping_rear: strippingRear,
+            stripping_half_front: strippingHalfFront,
+            stripping_half_rear: strippingHalfRear,
+            diameter_core: diameterCore,
+            setting_pieces: settingPieces,
+            current_pieces: currentPieces,
             delivery_date: deliveryDate,
             status: "Waiting",
         }
@@ -114,9 +129,9 @@ export default function OrderCard() {
         });
 
         if (res.ok) {
-            toast.success("The Order Added Successfully!")
+            toast.success(t("successOrder"))
         } else {
-            toast.error("Failed to Add Order!")
+            toast.error(t("failOrder"))
         }
         setIsSubmitted(false)
 
@@ -134,7 +149,11 @@ export default function OrderCard() {
             totalLength: totalLength,
             strippingFront: strippingFront,
             strippingRear: strippingRear,
-            orderDuration: '-',
+            strippingHalfFront: strippingHalfFront,
+            strippingHalfRear: strippingHalfRear,
+            diameterCore: diameterCore,
+            settingPieces: settingPieces,
+            currentPieces: currentPieces,
             deliveryDate: deliveryDate ? formattedDateOnly(deliveryDate.toISOString()) : "N/A",
             cost: (Number(cost) * Number(quantity)).toString(),
         }
@@ -151,19 +170,19 @@ export default function OrderCard() {
                 <Card className="w-full">
                     <CardHeader>
                         <CardTitle>
-                            <h2 className="text-2xl font-semibold mb-6 text-center">Create Order</h2>
+                            <h2 className="text-2xl font-semibold mb-6 text-center">{t("createOrder")}</h2>
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div>
-                            <Label htmlFor="customer_name">Customer Name</Label>
+                            <Label htmlFor="customer_name">{t("customerName")}</Label>
                             <Select value={customerName} onValueChange={setCustomerName}>
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select customer" />
+                                    <SelectValue placeholder={t("customerNamePlaceholder")} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {listCustomers.length === 0 ?
-                                        <p className="p-2 text-sm text-gray-500">No customer available</p>
+                                        <p className="p-2 text-sm text-gray-500">{t("noData")}</p>
                                         :
                                         listCustomers.map((customer) => (
                                             <SelectItem
@@ -178,7 +197,7 @@ export default function OrderCard() {
                             </Select>
                         </div>
                         <div>
-                            <Label>Product</Label>
+                            <Label>{t("productName")}</Label>
                             <Select
                                 value={product}
                                 onValueChange={(name) => {
@@ -189,18 +208,17 @@ export default function OrderCard() {
                                         setProduct(selectedProduct.name);
                                         setProductCode(selectedProduct.code);
                                         setPart(selectedProduct.part_name);
-                                        setPartMaterial(selectedProduct.part_material)
                                         setCost(selectedProduct.cost);
                                     }
                                 }}
                             >
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select product" />
+                                    <SelectValue placeholder={t("productNamePlaceholder")} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {
                                         listProducts.length === 0 ?
-                                            <p className="p-2 text-sm text-gray-500">No product available</p>
+                                            <p className="p-2 text-sm text-gray-500">{t("noData")}</p>
                                             :
                                             listProducts.map((product) => (
                                                 <SelectItem
@@ -215,9 +233,9 @@ export default function OrderCard() {
                             </Select>
                         </div>
                         <div>
-                            <Label>Quantity</Label>
+                            <Label>{t("quantity")}</Label>
                             <Input
-                                placeholder="Input the Quantity"
+                                placeholder={t("quantityPlaceholder")}
                                 type="number"
                                 min={1}
                                 value={quantity}
@@ -225,37 +243,127 @@ export default function OrderCard() {
                             />
                         </div>
                         <div>
-                            <Label>Total Length</Label>
+                            <Label>{t("totalLength")}</Label>
                             <Input
                                 type="number"
                                 min={0}
-                                placeholder="Input the Total Length"
+                                placeholder={t("totalLengthPlaceholder")}
                                 value={totalLength}
                                 onChange={(e) => setTotalLength((e.target.value))}
                             />
                         </div>
                         <div>
-                            <Label>Stripping Front</Label>
+                            <Label>{t("strippingFront")}</Label>
                             <Input
                                 type="number"
                                 min={0}
-                                placeholder="Input the Stripping Front"
+                                placeholder={t("strippingFrontPlaceholder")}
                                 value={strippingFront}
                                 onChange={(e) => setStrippingFront((e.target.value))}
                             />
                         </div>
                         <div>
-                            <Label>Stripping Rear</Label>
+                            <Label>{t("strippingRear")}</Label>
                             <Input
                                 type="number"
                                 min={0}
-                                placeholder="Input the Stripping Rear"
+                                placeholder={t("strippingRearPlaceholder")}
                                 value={strippingRear}
                                 onChange={(e) => setStrippingRear((e.target.value))}
                             />
                         </div>
                         <div>
-                            <Label>Delivery Date</Label>
+                            <Label>{t("strippingHalfFront")}</Label>
+                            <Input
+                                type="number"
+                                min={0}
+                                placeholder={t("strippingHalfFrontPlaceholder")}
+                                value={strippingHalfFront}
+                                onChange={(e) => setStrippingHalfFront((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>{t("strippingHalfRear")}</Label>
+                            <Input
+                                type="number"
+                                min={0}
+                                placeholder={t("strippingHalfRearPlaceholder")}
+                                value={strippingHalfRear}
+                                onChange={(e) => setStrippingHalfRear((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>{t("cable")}</Label>
+                            <Input
+                                type="number"
+                                min={0}
+                                placeholder={t("cablePlaceholder")}
+                                value={cable}
+                                onChange={(e) => setCable((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>{t("color")}</Label>
+                            <Input
+                                type="number"
+                                min={0}
+                                placeholder={t("colorPlaceholder")}
+                                value={color}
+                                onChange={(e) => setColor((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>{t("pinA")}</Label>
+                            <Input
+                                type="number"
+                                min={0}
+                                placeholder={t("pinAPlaceholder")}
+                                value={pinA}
+                                onChange={(e) => setPinA((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>{t("pinB")}</Label>
+                            <Input
+                                type="number"
+                                min={0}
+                                placeholder={t("pinBPlaceholder")}
+                                value={pinB}
+                                onChange={(e) => setPinB((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>{t("diameterCore")}</Label>
+                            <Input
+                                type="number"
+                                min={0}
+                                placeholder={t("diameterCorePlaceholder")}
+                                value={diameterCore}
+                                onChange={(e) => setDiameterCore((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>{t("settingPieces")}</Label>
+                            <Input
+                                type="number"
+                                min={0}
+                                placeholder={t("settingPiecesPlaceholder")}
+                                value={settingPieces}
+                                onChange={(e) => setSettingPieces((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>{t("currentPieces")}</Label>
+                            <Input
+                                type="number"
+                                min={0}
+                                placeholder={t("currentPiecesPlaceholder")}
+                                value={currentPieces}
+                                onChange={(e) => setCurrentPieces((e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <Label>{t("deliveryDate")}</Label>
                             <Popover open={open} onOpenChange={setOpen}>
                                 <PopoverTrigger asChild>
                                     <Button
@@ -263,7 +371,7 @@ export default function OrderCard() {
                                         id="date"
                                         className="w-full justify-between font-normal"
                                     >
-                                        {deliveryDate ? deliveryDate.toLocaleDateString() : "Select Delivery Date"}
+                                        {deliveryDate ? deliveryDate.toLocaleDateString() : t("deliveryDatePlaceholder")}
                                         <ChevronDownIcon />
                                     </Button>
                                 </PopoverTrigger>
@@ -291,9 +399,9 @@ export default function OrderCard() {
                                 isSubmitted ? (
                                     <>
                                         <Spinner />
-                                        <span className="ml-0">Submitting</span>
+                                        <span className="ml-0">{t("submitting")}</span>
                                     </>
-                                ) : "ADD TO SCHEDULE"
+                                ) : t("addToSchedule")
                             }
                         </Button>
                         <Button
@@ -301,29 +409,38 @@ export default function OrderCard() {
                             className="w-full cursor-pointer"
                             onClick={handlePDF}
                         >
-                            PRINT ORDER REPORT
+                            {t("printOrderReport")}
                         </Button>
                     </CardContent>
                 </Card>
                 <Card className="w-full">
                     <CardHeader>
                         <CardTitle>
-                            <h2 className="text-2xl font-semibold mb-6 text-center">Detail Order</h2>
+                            <h2 className="text-2xl font-semibold mb-6 text-center">{t("detailOrder")}</h2>
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-3 divide-y">
-                            <InfoRow label="Order Number" value={orderNumber} />
-                            <InfoRow label="Customer Name" value={customerName ? customerName : "N/A"} />
-                            <InfoRow label="Production Name" value={product ? product : "N/A"} />
-                            <InfoRow label="Product Code" value={productCode ? productCode : "N/A"} />
-                            <InfoRow label="Product Part" value={part ? part : "N/A"} />
-                            <InfoRow label="Actual Quantity" value={quantity ? quantity : "N/A"} />
-                            <InfoRow label="Total Length" value={totalLength ? totalLength : "N/A"} />
-                            <InfoRow label="Stripping Front" value={strippingFront ? strippingFront : "N/A"} />
-                            <InfoRow label="Stripping Rear" value={strippingRear ? strippingRear : "N/A"} />
+                            <InfoRow label={t("orderNumber")} value={orderNumber} />
+                            <InfoRow label={t("customerName")} value={customerName ? customerName : "N/A"} />
+                            <InfoRow label={t("productName")} value={product ? product : "N/A"} />
+                            <InfoRow label={t("productCode")} value={productCode ? productCode : "N/A"} />
+                            <InfoRow label={t("productPart")} value={part ? part : "N/A"} />
+                            <InfoRow label={t("actualQuantity")} value={quantity ? quantity : "N/A"} />
+                            <InfoRow label={t("totalLength")} value={totalLength ? totalLength : "N/A"} />
+                            <InfoRow label={t("strippingFront")} value={strippingFront ? strippingFront : "N/A"} />
+                            <InfoRow label={t("strippingRear")} value={strippingRear ? strippingRear : "N/A"} />
+                            <InfoRow label={t("strippingHalfFront")} value={strippingHalfFront ? strippingHalfFront : "N/A"} />
+                            <InfoRow label={t("strippingHalfRear")} value={strippingHalfRear ? strippingHalfRear : "N/A"} />
+                            <InfoRow label={t("cable")} value={cable ? cable : "N/A"} />
+                            <InfoRow label={t("color")} value={color ? color : "N/A"} />
+                            <InfoRow label={t("pinA")} value={pinA ? pinA : "N/A"} />
+                            <InfoRow label={t("pinB")} value={pinB ? pinB : "N/A"} />
+                            <InfoRow label={t("diameterCore")} value={diameterCore ? diameterCore : "N/A"} />
+                            <InfoRow label={t("settingPieces")} value={settingPieces ? settingPieces : "N/A"} />
+                            <InfoRow label={t("currentPieces")} value={currentPieces ? currentPieces : "N/A"} />
                             <InfoRow
-                                label="Delivery Date"
+                                label={t("deliveryDate")}
                                 value={deliveryDate ? formattedDateOnly(deliveryDate.toISOString()) : "N/A"}
                             />
                         </div>

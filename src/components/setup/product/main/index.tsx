@@ -4,13 +4,12 @@ import { useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/sonner"
-import { Spinner } from "@/components/ui/spinner"
-import { Skeleton } from "@/components/ui/skeleton"
 import { useUserStore } from '../../../../../store/userStore'
 import ProductDataTable from "../table"
 import { formattedDate } from "@/lib/dateUtils"
 import AddEditProduct from "../add-edit"
 import { Product } from "../../../../../types/setup/product"
+import { useI18n } from "@/components/i18n/provider"
 
 export default function ProductCard() {
     const [listProduct, setListProduct] = useState<Product[]>([])
@@ -20,6 +19,7 @@ export default function ProductCard() {
     const [isFetched, setIsFetched] = useState<boolean>(false)
 
     const user_id = useUserStore((state) => state.user_id)
+    const { t } = useI18n();
 
     useEffect(() => {
         const payload = {
@@ -66,18 +66,18 @@ export default function ProductCard() {
                 <div className="w-full max-h-full rounded">
                     <div className="flex flex-row items-center justify-between">
                         <h2 className="text-2xl font-semibold">
-                            Product Management
+                            {t("productManagement")}
                         </h2>
                         <div className="flex gap-2 ml-auto">
                             <Input
                                 type="text"
-                                placeholder="Search product..."
+                                placeholder={t("searchProduct")}
                             />
                             <Button
                                 className="cursor-pointer"
                                 onClick={() => setOpenDialog(true)}
                             >
-                                Add Product
+                                {t("addProduct")}
                             </Button>
                         </div>
                     </div>

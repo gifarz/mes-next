@@ -11,17 +11,19 @@ import { Toaster } from "@/components/ui/sonner"
 import { Spinner } from "@/components/ui/spinner"
 import { useUserStore } from '../../../../store/userStore';
 import { Textarea } from '@/components/ui/textarea';
+import { useI18n } from '@/components/i18n/provider';
 
 export default function FactoryCard() {
     const [factoryName, setFactoryName] = useState<string>('');
     const [factoryDescription, setFactoryDescription] = useState<string>('');
-    const [operationStart, setOperationStart] = useState<string>('');
-    const [operationEnd, setOperationEnd] = useState<string>('');
-    const [overtimeStart, setOvertimeStart] = useState<string>('');
-    const [overtimeEnd, setOvertimeEnd] = useState<string>('');
-    const [operationDays, setOperationDays] = useState<string[]>([]);
+    // const [operationStart, setOperationStart] = useState<string>('');
+    // const [operationEnd, setOperationEnd] = useState<string>('');
+    // const [overtimeStart, setOvertimeStart] = useState<string>('');
+    // const [overtimeEnd, setOvertimeEnd] = useState<string>('');
+    // const [operationDays, setOperationDays] = useState<string[]>([]);
 
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const { t } = useI18n();
 
     // For checking is the user has the factory or not
     const factory = useUserStore((state) => state.factory)
@@ -71,7 +73,7 @@ export default function FactoryCard() {
         const responseFactory = await res.json()
 
         if (res.ok) {
-            toast.success("The Factory Added Successfully!")
+            toast.success(t("successFactory"))
             setFactory({
                 factory: [
                     {
@@ -88,7 +90,7 @@ export default function FactoryCard() {
             })
 
         } else {
-            toast.success("Failed to Add The Factory!")
+            toast.success(t("failFactory"))
         }
 
         setIsSubmitted(false)
@@ -116,9 +118,9 @@ export default function FactoryCard() {
         });
 
         if (res.ok) {
-            toast.success("The Factory Updated Successfully!")
+            toast.success(t("successUpdateFactory"))
         } else {
-            toast.success("Failed to Update The Factory!")
+            toast.success(t("failUpdateFactory"))
         }
 
         setIsSubmitted(false)
@@ -133,16 +135,16 @@ export default function FactoryCard() {
                 {/* Left card with form */}
                 <div className="w-full md:w-1/2 border-1 h-auto rounded p-4 overflow-auto">
                     <h2 className="text-2xl font-semibold mb-6 text-center">
-                        Factory Initialize
+                        {t("factoryInitialize")}
                     </h2>
 
                     <div className="space-y-4">
                         {/* Factory Name */}
                         <div className="space-y-1">
-                            <Label htmlFor="factoryName">Factory Name</Label>
+                            <Label htmlFor="factoryName">{t("factoryName")}</Label>
                             <Input
                                 id="factoryName"
-                                placeholder="Enter factory name"
+                                placeholder={t("factoryNamePlaceholder")}
                                 onChange={(e) => setFactoryName(e.target.value)}
                                 value={factoryName}
                             />
@@ -150,10 +152,10 @@ export default function FactoryCard() {
 
                         {/* Factory Description */}
                         <div className="space-y-1">
-                            <Label htmlFor="factoryDescription">Factory Description</Label>
+                            <Label htmlFor="factoryDescription">{t("factoryDescription")}</Label>
                             <Textarea
                                 id="factoryDescription"
-                                placeholder="Enter factory name"
+                                placeholder={t("factoryDescriptionPlaceholder")}
                                 onChange={(e) => setFactoryDescription(e.target.value)}
                                 value={factoryDescription}
                             />
@@ -191,11 +193,11 @@ export default function FactoryCard() {
                         {isSubmitted ? (
                             <>
                                 <Spinner />
-                                <span className="ml-0">Submitting</span>
+                                <span className="ml-0">{t("submitting")}</span>
                             </>
                         ) : (
                             factory.length > 0 ?
-                                "UPDATE FACTORY" : "SAVE SETTINGS"
+                                t("updateFactory").toUpperCase() : t("saveSetting").toUpperCase()
                         )}
                     </Button>
                 </div>
@@ -204,12 +206,12 @@ export default function FactoryCard() {
                 <div className="w-full md:w-1/2 flex flex-col gap-4">
                     <div className="border-1 w-full max-h-full rounded p-4">
                         <h2 className="text-2xl font-semibold mb-6 text-center">
-                            Factory Information
+                            {t("factoryInformation")}
                         </h2>
 
                         <div className="divide-y space-y-4">
-                            <InfoRow label="Factory Name" value={factoryName} />
-                            <InfoRow label="Factory Description" value={factoryDescription} />
+                            <InfoRow label={t("factoryName")} value={factoryName} />
+                            <InfoRow label={t("factoryDescription")} value={factoryDescription} />
                             {/* <InfoRow label="Operation Start" value={operationStart} />
                             <InfoRow label="Operation End" value={operationEnd} />
                             <InfoRow label="Overtime Start" value={overtimeStart} />

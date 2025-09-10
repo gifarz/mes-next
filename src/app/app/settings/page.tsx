@@ -15,8 +15,9 @@ import { Toaster } from "@/components/ui/sonner"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from '@/components/ui/spinner'
 import { Account, ChangePassword } from '../../../../types/settings/account'
+import { useI18n } from '@/components/i18n/provider'
 
-export default function Settings() {
+export default function SettingsPage() {
     const [account, setAccount] = React.useState<Account | null>(null)
     const [isUpdated, setIsUpdated] = React.useState(false)
     const [isEditing, setIsEditing] = React.useState(false)
@@ -27,6 +28,7 @@ export default function Settings() {
     })
 
     const user_id = useUserStore((state) => state.user_id)
+    const { t } = useI18n();
 
     React.useEffect(() => {
         const fetcher = async () => {
@@ -70,14 +72,14 @@ export default function Settings() {
 
             const res = await result.json();
             if (result.ok) {
-                toast.success("Profile Updated Successfully!")
+                toast.success(t("profileUpdated"))
                 setIsEditing(false);
             } else {
-                toast.error(res.message || "Failed to Update Profile")
+                toast.error(res.message || t("passwordUpdateError"))
             }
         } catch (err) {
             console.error("An Error Occurred", err)
-            toast.error("An Error Occurred While Updating Profile.")
+            toast.error(t("passwordUpdateError"))
         }
         setIsUpdated(false)
     };
@@ -101,19 +103,19 @@ export default function Settings() {
 
                 const res = await result.json();
                 if (result.ok) {
-                    toast.success("Password Updated Successfully!")
+                    toast.success(t("passwordUpdated"))
                     setIsChanging(false);
                 } else {
-                    toast.error(res.message || "Failed to Update Password")
+                    toast.error(res.message || t("passwordUpdateError"))
                 }
             } catch (err) {
                 console.error("An Error Occurred", err)
-                toast.error("An Error Occurred While Updating Password.")
+                toast.error(t("passwordUpdateError"))
             }
 
             setIsUpdated(false)
         } else {
-            toast.error("Password Confirmation Does Not Match!")
+            toast.error(t("passwordNotMatch"))
         }
 
     };
@@ -123,7 +125,7 @@ export default function Settings() {
             <Toaster position="bottom-right" />
             <Card className="min-w-full min-h-[calc(100vh-90px)]">
                 <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle>ACCOUNT SETTING</CardTitle>
+                    <CardTitle>{t("accountSetting")}</CardTitle>
 
                     <div className="flex gap-2 ml-auto">
                         <Button
@@ -131,14 +133,14 @@ export default function Settings() {
                             onClick={() => setIsEditing(!isEditing)}
                             disabled={isChanging}
                         >
-                            {isEditing ? "Cancel Update" : "Update Profile"}
+                            {isEditing ? t("cancelUpdate") : t("updateProfile")}
                         </Button>
                         <Button
                             variant={`${isChanging ? 'destructive' : 'default'}`}
                             onClick={() => setIsChanging(!isChanging)}
                             disabled={isEditing}
                         >
-                            {isChanging ? "Cancel Update" : "Change Password"}
+                            {isChanging ? t("cancelUpdate") : t("changePassword")}
                         </Button>
                     </div>
                 </CardHeader>
@@ -146,7 +148,7 @@ export default function Settings() {
                     <div className="grid grid-cols-2 gap-4">
                         {/* NAME */}
                         <div>
-                            <label className="text-sm">Name</label>
+                            <label className="text-sm">{t("name")}</label>
                             {account ? (
                                 <Input
                                     name="name"
@@ -161,7 +163,7 @@ export default function Settings() {
 
                         {/* EMAIL */}
                         <div>
-                            <label className="text-sm">User ID</label>
+                            <label className="text-sm">{t("userId")}</label>
                             {account ? (
                                 <Input
                                     name="user_id"
@@ -177,7 +179,7 @@ export default function Settings() {
                             isChanging &&
                             <>
                                 <div>
-                                    <label className="text-sm">New Password</label>
+                                    <label className="text-sm">{t("newPassword")}</label>
                                     <Input
                                         name="newPassword"
                                         value={updatePassword.newPassword}
@@ -185,7 +187,7 @@ export default function Settings() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-sm">New Confirmation Password</label>
+                                    <label className="text-sm">{t("newConfirmationPassword")}</label>
                                     <Input
                                         name="newPasswordConfirmation"
                                         value={updatePassword.newPasswordConfirmation}
@@ -200,10 +202,10 @@ export default function Settings() {
                             {isUpdated ? (
                                 <>
                                     <Spinner />
-                                    <span className="ml-0">Submitting</span>
+                                    <span className="ml-0">{t("submitting")}</span>
                                 </>
                             ) : (
-                                "Update Profile"
+                                t("updateProfile")
                             )}
                         </Button>
                     )}
@@ -212,10 +214,10 @@ export default function Settings() {
                             {isUpdated ? (
                                 <>
                                     <Spinner />
-                                    <span className="ml-0">Submitting</span>
+                                    <span className="ml-0">{t("submitting")}</span>
                                 </>
                             ) : (
-                                "Update Password"
+                                t("updatePassword")
                             )}
                         </Button>
                     )}

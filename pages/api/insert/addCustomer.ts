@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { generateUUID } from '@/lib/uuidGenerator';
 import { getCookieFromServer } from '@/lib/cookie';
 import { decodeJWT } from '@/lib/decodeJWT';
-import { resumePluginState } from 'next/dist/build/build-context';
+import { insertUserLog } from '@/lib/userLogsHelper';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
@@ -15,13 +15,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             address,
         } = req.body;
 
-        try {
-            const uuid = generateUUID()
-            const cookieHeader = req.headers.cookie || ""
-            const token = getCookieFromServer(cookieHeader, "accessToken")
-            const decodedJwt = decodeJWT(token as string)
-            const created_by = decodedJwt.user_id
+        const uuid = generateUUID()
+        const cookieHeader = req.headers.cookie || ""
+        const token = getCookieFromServer(cookieHeader, "accessToken")
+        const decodedJwt = decodeJWT(token as string)
+        const created_by = decodedJwt.user_id
 
+        try {
             const getFactory = await db.query(`SELECT * FROM mes.factories`);
 
             if (getFactory.rowCount && getFactory.rowCount > 0) {
@@ -42,8 +42,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     [uuid, factory_id, firstName, lastName, email, phoneNumber, address, created_by]
                 );
 
-                console.log('result', result.rows)
-
                 if (result.rowCount && result.rowCount > 0) {
                     res.status(200).json({ message: 'Successfully Insert Customer', data: result.rows[0] });
                 } else {
@@ -56,6 +54,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 
         } catch (error) {
+            const payload = {
+                api: "ADD_CUSTOMER",
+                resultCode: "99",
+                resultDesc: "Error Catch Add Customer : " + error,
+                user_id: created_by
+            }
+            insertUserLog(payload)
             console.error('Insert Error:', error);
             res.status(500).json({ error: 'Failed to Insert Customer' });
         }

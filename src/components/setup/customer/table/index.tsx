@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import AddEditCustomer from '../add-edit'
 import { Customer, DataCustomerProps } from '../../../../../types/setup/customer'
+import { useI18n } from '@/components/i18n/provider'
 
 type SortKey = keyof Customer
 type SortRule = {
@@ -32,6 +33,8 @@ const columns = [
 export default function CustomerDataTable({ data, onCustomerUpdated }: DataCustomerProps) {
     const [openDialog, setOpenDialog] = useState<boolean>(false);
     const [customerData, setCustomerData] = useState<Customer>();
+    const { t } = useI18n();
+
     const [sortRules, setSortRules] = useState<SortRule[]>([
         { key: 'created_on', order: 'asc' },
     ])
@@ -114,17 +117,17 @@ export default function CustomerDataTable({ data, onCustomerUpdated }: DataCusto
             <Table className='mt-10'>
                 <TableHeader>
                     <TableRow>
-                        {columns.map(({ key, label }) => (
+                        {columns.map(({ key }) => (
                             <TableHead key={key} className="text-center">
                                 {key === 'action' ? (
-                                    <span className="font-semibold">{label}</span>
+                                    <span className="font-semibold">{t(key)}</span>
                                 ) : (
                                     <Button
                                         variant="ghost"
                                         onClick={() => handleSort(key as SortKey)}
                                         className="font-semibold"
                                     >
-                                        {label}
+                                        {t(key)}
                                         <SortIcon column={key as SortKey} />
                                     </Button>
                                 )}
@@ -137,7 +140,7 @@ export default function CustomerDataTable({ data, onCustomerUpdated }: DataCusto
                         sortedData.length === 0 ?
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="text-center py-10 text-muted-foreground">
-                                    No data of customer available for now
+                                    {t("noData")}
                                 </TableCell>
                             </TableRow>
                             :
@@ -175,13 +178,13 @@ export default function CustomerDataTable({ data, onCustomerUpdated }: DataCusto
                                                                     setCustomerData(customer)
                                                                 }}
                                                             >
-                                                                EDIT
+                                                                {t("edit").toUpperCase()}
                                                             </DropdownMenuItem>
                                                             <DropdownMenuItem
                                                                 onClick={() => handleDelete(customer)}
                                                                 className="cursor-pointer text-red-500 focus:text-red-600"
                                                             >
-                                                                DELETE
+                                                                {t("delete").toUpperCase()}
                                                             </DropdownMenuItem>
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>

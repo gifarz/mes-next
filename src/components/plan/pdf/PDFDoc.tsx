@@ -41,6 +41,11 @@ interface DetailPDF {
     totalLength?: string;
     strippingFront?: string;
     strippingRear?: string;
+    strippingHalfFront?: string;
+    strippingHalfRear?: string;
+    diameterCore?: string;
+    settingPieces?: string;
+    currentPieces?: string;
     deliveryDate: string;
 }
 
@@ -60,6 +65,11 @@ const OrderDetailPDF = ({ order }: DetailPDFProps) => {
         { label: "Total Length", value: order.totalLength || "-" },
         { label: "Stripping Front", value: order.strippingFront || "-" },
         { label: "Stripping Rear", value: order.strippingRear || "-" },
+        { label: "Stripping Half Front", value: order.strippingHalfFront || "-" },
+        { label: "Stripping Half Rear", value: order.strippingHalfRear || "-" },
+        { label: "Diameter Core", value: order.diameterCore || "-" },
+        { label: "Setting Pieces", value: order.settingPieces || "-" },
+        { label: "Current Pieces", value: order.currentPieces || "-" },
         { label: "Delivery Date", value: order.deliveryDate || "-" },
     ];
 

@@ -14,6 +14,7 @@ import { Customer } from '../../../../types/setup/customer'
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
+import { useI18n } from '@/components/i18n/provider';
 
 
 export default function SchedulingCard() {
@@ -25,6 +26,7 @@ export default function SchedulingCard() {
     const [selectedRows, setSelectedRows] = useState<string[]>([]);
     const [refreshKey, setRefreshKey] = useState<number>(0)
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
+    const { t } = useI18n();
 
     const { open } = useSidebarStore();
 
@@ -76,8 +78,7 @@ export default function SchedulingCard() {
 
                 setListProducts(fixedProduct)
 
-            } catch (error) {
-                console.error("Failed to fetch orders:", error)
+            } catch {
                 setListOrders([])
             }
         }
@@ -100,10 +101,9 @@ export default function SchedulingCard() {
         });
 
         const json = await res.json()
-        console.log('json response', json)
 
         if (res.ok) {
-            toast.success("The Selected Rows Has Been Scheduled! Please Check On The Track Page")
+            toast.success(t("scheduled"))
         } else {
             toast.error(json.message)
         }
@@ -124,7 +124,7 @@ export default function SchedulingCard() {
             <Card className="mt-5">
                 <CardHeader>
                     <CardTitle>
-                        <h2 className="text-2xl font-semibold mb-4 text-center">Production Scheduling Table</h2>
+                        <h2 className="text-2xl font-semibold mb-4 text-center">{t("schedulingTitle")}</h2>
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -157,10 +157,10 @@ export default function SchedulingCard() {
                                 isSubmitted ?
                                     <>
                                         <Spinner />
-                                        <span className="ml-0">Submitting</span>
+                                        <span className="ml-0">{t("submitting")}</span>
                                     </>
                                     :
-                                    "APPLY SCHEDULE"
+                                    t("applySchedule")
                             }
                         </Button>
                     </div>

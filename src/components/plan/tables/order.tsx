@@ -16,6 +16,7 @@ import { toast } from 'sonner'
 import EditOrderTable from '../dialog/edit-order-table'
 import { Product } from '../../../../types/setup/product'
 import { Customer } from '../../../../types/setup/customer'
+import { useI18n } from '@/components/i18n/provider'
 
 type SortKey = keyof Order
 type SortRule = {
@@ -47,6 +48,7 @@ export default function OrderTable({ listOrders, listProducts, listCustomers, on
     const [openDialog, setOpenDialog] = useState<boolean>(false)
     const [orderData, setOrderData] = useState<Order>()
 
+    const { t } = useI18n();
     const [sortRules, setSortRules] = useState<SortRule[]>([
         { key: 'order_number', order: 'asc' },
     ])
@@ -110,9 +112,9 @@ export default function OrderTable({ listOrders, listProducts, listCustomers, on
         })
 
         if (res.ok) {
-            toast.success(`Order ${data.order_number} Has Been Deleted!`)
+            toast.success(`${t("order")} ${data.order_number} ${t("hasBeenDeleted")}`)
         } else {
-            toast.error(`Failed to Delete Order ${data.order_number}`)
+            toast.error(`${t("failDeleteOrder")} ${data.order_number}`)
         }
 
         onOrderUpdated?.()
@@ -137,24 +139,24 @@ export default function OrderTable({ listOrders, listProducts, listCustomers, on
             <Card className="w-full">
                 <CardHeader>
                     <CardTitle>
-                        <h2 className="text-2xl font-semibold mb-4 text-center">Order Table</h2>
+                        <h2 className="text-2xl font-semibold mb-4 text-center">{t("orderTable")}</h2>
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                {columns.map(({ key, label }) => (
+                                {columns.map(({ key }) => (
                                     <TableHead key={key} className="text-center">
                                         {key === 'action' ? (
-                                            <span className="font-semibold">{label}</span>
+                                            <span className="font-semibold">{t(key)}</span>
                                         ) : (
                                             <Button
                                                 variant="ghost"
                                                 onClick={() => handleSort(key as SortKey)}
                                                 className="font-semibold"
                                             >
-                                                {label}
+                                                {t(key)}
                                                 <SortIcon column={key as SortKey} />
                                             </Button>
                                         )}
@@ -167,7 +169,7 @@ export default function OrderTable({ listOrders, listProducts, listCustomers, on
                                 sortedData.length === 0 ?
                                     <TableRow>
                                         <TableCell colSpan={columns.length} className="text-center py-10 text-muted-foreground">
-                                            No data of order available for now
+                                            {t("noData")}
                                         </TableCell>
                                     </TableRow>
                                     :
@@ -205,13 +207,13 @@ export default function OrderTable({ listOrders, listProducts, listCustomers, on
                                                                             setOpenDialog(true)
                                                                         }}
                                                                     >
-                                                                        EDIT
+                                                                        {t("edit").toUpperCase()}
                                                                     </DropdownMenuItem>
                                                                     <DropdownMenuItem
                                                                         onClick={() => handleDelete(data)}
                                                                         className="cursor-pointer text-red-500 focus:text-red-600"
                                                                     >
-                                                                        DELETE
+                                                                        {t("delete").toUpperCase()}
                                                                     </DropdownMenuItem>
                                                                 </DropdownMenuContent>
                                                             </DropdownMenu>

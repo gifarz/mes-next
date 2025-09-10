@@ -13,6 +13,7 @@ import {
 import AddEditProduct from '../add-edit'
 import { DataProductProps, Product } from '../../../../../types/setup/product'
 import { useSidebarStore } from '../../../../../store/sidebarStore'
+import { useI18n } from '@/components/i18n/provider'
 
 type SortKey = keyof Product
 type SortRule = {
@@ -35,6 +36,7 @@ export default function ProductDataTable({ data, onProductUpdated }: DataProduct
     const [openDialog, setOpenDialog] = useState<boolean>(false);
     const [productData, setProductData] = useState<Product>();
     const { open } = useSidebarStore();
+    const { t } = useI18n();
 
     const [sortRules, setSortRules] = useState<SortRule[]>([
         { key: 'name', order: 'asc' },
@@ -125,17 +127,17 @@ export default function ProductDataTable({ data, onProductUpdated }: DataProduct
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            {columns.map(({ key, label }) => (
+                            {columns.map(({ key }) => (
                                 <TableHead key={key} className="text-center">
                                     {key === 'action' ? (
-                                        <span className="font-semibold">{label}</span>
+                                        <span className="font-semibold">{t(key).toUpperCase()}</span>
                                     ) : (
                                         <Button
                                             variant="ghost"
                                             onClick={() => handleSort(key as SortKey)}
                                             className="font-semibold"
                                         >
-                                            {label}
+                                            {t(key).toUpperCase()}
                                             <SortIcon column={key as SortKey} />
                                         </Button>
                                     )}
@@ -148,7 +150,7 @@ export default function ProductDataTable({ data, onProductUpdated }: DataProduct
                             sortedData.length === 0 ?
                                 <TableRow>
                                     <TableCell colSpan={columns.length} className="text-center py-10 text-muted-foreground">
-                                        No data of product available for now
+                                        {t("noData")}
                                     </TableCell>
                                 </TableRow>
                                 :
@@ -186,13 +188,13 @@ export default function ProductDataTable({ data, onProductUpdated }: DataProduct
                                                                         setProductData(product)
                                                                     }}
                                                                 >
-                                                                    EDIT
+                                                                    {t("edit").toUpperCase()}
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuItem
                                                                     onClick={() => handleDelete(product)}
                                                                     className="cursor-pointer text-red-600 focus:text-red-700"
                                                                 >
-                                                                    DELETE
+                                                                    {t("delete").toUpperCase()}
                                                                 </DropdownMenuItem>
                                                             </DropdownMenuContent>
                                                         </DropdownMenu>

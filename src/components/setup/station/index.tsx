@@ -30,6 +30,7 @@ import { useUserStore } from '../../../../store/userStore'
 import { formattedDate } from "@/lib/dateUtils"
 import { Station } from "../../../../types/setup/station"
 import { Machine } from "../../../../types/setup/machine"
+import { useI18n } from "@/components/i18n/provider";
 
 export default function StationCard() {
     const [search, setSearch] = useState("")
@@ -52,6 +53,7 @@ export default function StationCard() {
 
     const triggerRef = useRef<HTMLButtonElement | null>(null);
     const [contentWidth, setContentWidth] = useState<number>(0);
+    const { t } = useI18n();
 
     const toggleMachine = (machineName: string) => {
         setSelectedMachines((prev) =>
@@ -139,12 +141,12 @@ export default function StationCard() {
             });
 
             if (res.ok) {
-                toast.success("Successfully Update The Station!")
+                toast.success(t("successUpdateStation"))
                 setIsSubmitted(false)
                 setIsAddStation(false)
                 setIsEditStation(false)
             } else {
-                toast.error("Failed to Add Station!")
+                toast.error(t("failUpdateStation"))
                 setIsSubmitted(false)
 
             }
@@ -159,12 +161,12 @@ export default function StationCard() {
             });
 
             if (res.ok) {
-                toast.success("The Station Added Successfully!")
+                toast.success(t("successStation"))
                 setIsSubmitted(false)
                 setIsAddStation(false)
                 setIsEditStation(false)
             } else {
-                toast.error("Failed to Add Station!")
+                toast.error(t("failStation"))
                 setIsSubmitted(false)
 
             }
@@ -219,12 +221,12 @@ export default function StationCard() {
                 <div className="w-full max-h-full rounded">
                     <div className="flex flex-row items-center justify-between">
                         <h2 className="text-2xl font-semibold">
-                            Station Management
+                            {t("stationManagement")}
                         </h2>
                         <div className="flex gap-2 ml-auto">
                             <Input
                                 type="text"
-                                placeholder="Search station..."
+                                placeholder={t("searchStations")}
                                 value={search}
                                 onChange={(e) => {
                                     setSearch(e.target.value)
@@ -247,7 +249,7 @@ export default function StationCard() {
                                 }}
                             >
                                 {
-                                    isAddStation ? "Cancel" : "Add Station"
+                                    isAddStation ? t("cancel") : t("addStation")
                                 }
                             </Button>
                         </div>
@@ -258,15 +260,15 @@ export default function StationCard() {
                         <>
                             <h2 className="text-2xl font-semibold text-center my-8">
                                 {
-                                    isEditStation ? "Edit Station" : "Add Station"
+                                    isEditStation ? t("editStation") : t("addStation")
                                 }
                             </h2>
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div>
-                                    <Label htmlFor="stationNumber">Station Number</Label>
+                                    <Label htmlFor="stationNumber">{t("stationNumber")}</Label>
                                     <Input
                                         id="stationNumber"
-                                        placeholder="Enter Station Number"
+                                        placeholder={t("stationNumberPlaceholder")}
                                         type="text"
                                         value={stationNumber}
                                         onChange={(e) => setStationNumber(e.target.value)}
@@ -275,10 +277,10 @@ export default function StationCard() {
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="stationName">Station Name</Label>
+                                    <Label htmlFor="stationName">{t("stationName")}</Label>
                                     <Input
                                         id="stationName"
-                                        placeholder="Enter Station Name"
+                                        placeholder={t("stationNamePlaceholder")}
                                         type="text"
                                         value={stationName}
                                         onChange={(e) => setStationName(e.target.value)}
@@ -286,10 +288,10 @@ export default function StationCard() {
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="stationName">Station Line</Label>
+                                    <Label htmlFor="stationLine">{t("stationLine")}</Label>
                                     <Input
                                         id="stationLine"
-                                        placeholder="Enter Station Line"
+                                        placeholder={t("stationLinePlaceholder")}
                                         type="text"
                                         value={stationLine}
                                         onChange={(e) => setStationLine(e.target.value)}
@@ -297,10 +299,10 @@ export default function StationCard() {
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="stationName">Station Address</Label>
+                                    <Label htmlFor="stationAddress">{t("stationAddress")}</Label>
                                     <Input
                                         id="stationAddress"
-                                        placeholder="Enter Station Address"
+                                        placeholder={t("stationAddressPlaceholder")}
                                         type="text"
                                         value={stationAddress}
                                         onChange={(e) => setStationAddress(e.target.value)}
@@ -308,18 +310,18 @@ export default function StationCard() {
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="machine">Machine Name</Label>
+                                    <Label htmlFor="machine">{t("machineName")}</Label>
                                     <Popover>
                                         <PopoverTrigger asChild>
                                             <Button ref={triggerRef} variant="outline" className="w-full justify-start">
                                                 {selectedMachines.length > 0
                                                     ? selectedMachines.join(", ")
-                                                    : "Select machines"}
+                                                    : t("selectMachine")}
                                             </Button>
                                         </PopoverTrigger>
                                         <PopoverContent style={{ width: contentWidth }} className="p-2" align="start">
                                             {listMachines.length === 0 ? (
-                                                <p className="w-full text-gray-500">No machines available</p>
+                                                <p className="w-full text-gray-500">{t("noData")}</p>
                                             ) : (
                                                 <div className="flex gap-4">
                                                     {
@@ -356,11 +358,11 @@ export default function StationCard() {
                                         {isSubmitted ? (
                                             <>
                                                 <Spinner />
-                                                <span className="ml-0">Submitting</span>
+                                                <span className="ml-0">{t("submitting")}</span>
                                             </>
                                         ) :
 
-                                            isEditStation ? "UPDATE STATION" : "ADD STATION"
+                                            isEditStation ? t("updateStation").toUpperCase() : t("addStation").toUpperCase()
                                         }
                                     </Button>
                                 </div>
@@ -374,7 +376,7 @@ export default function StationCard() {
                         isFetched ? (
                             filteredStations.length === 0 ? (
                                 <div className="col-span-full text-center mt-10 text-muted-foreground">
-                                    No Stations Found.
+                                    {t("noStation")}
                                 </div>
                             ) : (
                                 filteredStations.map((station) => (
@@ -383,14 +385,14 @@ export default function StationCard() {
                                             <CardTitle className="text-center text-lg">{station.name}</CardTitle>
                                         </CardHeader>
                                         <CardContent className="space-y-1 text-sm">
-                                            <div><strong>Station Number:</strong> {station.number}</div>
+                                            <div><strong>{t("stationNumber")}:</strong> {station.number}</div>
                                             <Accordion
                                                 type="single"
                                                 collapsible
                                                 className="w-full"
                                             >
                                                 <AccordionItem value="item-1">
-                                                    <AccordionTrigger>List of Machines</AccordionTrigger>
+                                                    <AccordionTrigger>{t("listMachines")}</AccordionTrigger>
                                                     <AccordionContent className="flex flex-col gap-4 text-balance">
                                                         {station.machine_name.split(',').map((machine, index) => (
                                                             <li key={index}>{machine}</li>
@@ -398,21 +400,23 @@ export default function StationCard() {
                                                     </AccordionContent>
                                                 </AccordionItem>
                                             </Accordion>
-                                            <div><strong>Installation Date:</strong> {station.created_on}</div>
+                                            <div>
+                                                <strong>{t("installation")}:</strong> {station.created_on}
+                                            </div>
                                             <div className="flex flex-col gap-2 mt-4">
                                                 <Button
                                                     className="cursor-pointer"
                                                     variant="secondary"
                                                     onClick={() => handleEdit(station)}
                                                 >
-                                                    EDIT
+                                                    {t("edit").toUpperCase()}
                                                 </Button>
                                                 <Button
                                                     className="cursor-pointer"
                                                     variant="destructive"
                                                     onClick={() => handleDelete(station)}
                                                 >
-                                                    DELETE
+                                                    {t("delete").toUpperCase()}
                                                 </Button>
                                             </div>
                                         </CardContent>
@@ -429,9 +433,9 @@ export default function StationCard() {
                                     </CardHeader>
                                     <CardContent className="space-y-2 text-sm">
                                         <div className="flex flex-col gap-1">
-                                            <div><strong>Station Number:</strong> <Skeleton className="inline-block h-4 w-20 ml-2" /></div>
-                                            <div><strong>List of Machine(s):</strong> <Skeleton className="inline-block h-4 w-28 ml-2" /></div>
-                                            <div><strong>Installation Date:</strong> <Skeleton className="inline-block h-4 w-32 ml-2" /></div>
+                                            <div><strong>{t("stationNumber")}:</strong> <Skeleton className="inline-block h-4 w-20 ml-2" /></div>
+                                            <div><strong>{t("listMachines")}:</strong> <Skeleton className="inline-block h-4 w-28 ml-2" /></div>
+                                            <div><strong>{t("installation")}:</strong> <Skeleton className="inline-block h-4 w-32 ml-2" /></div>
                                         </div>
                                         <div className="flex flex-col gap-2 mt-4">
                                             <Skeleton className="h-9 w-full rounded" />

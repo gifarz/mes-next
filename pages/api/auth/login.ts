@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { comparePassword } from '@/lib/comparePassword';
 import { serialize } from 'cookie'
 import jwt from 'jsonwebtoken';
+import { insertUserLog } from '@/lib/userLogsHelper';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
@@ -37,12 +38,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                     res.setHeader('Set-Cookie', cookie);
 
-                    await db.query(
-                        `INSERT INTO mes.customer_logs (user_id, service, result_code, result_desc)
-                        VALUES ($1, $2, $3, $4)
-                        RETURNING *`,
-                        [user_id, "LOGIN", "00", "Success"]
-                    );
+                    const payload = {
+                        api: "LOGIN",
+                        resultCode: "00",
+                        resultDesc: "Success",
+                        user_id
+                    }
+                    insertUserLog(payload)
 
                     const factory = await db.query(
                         `SELECT * FROM mes.factories WHERE created_by = $1 `,
@@ -57,25 +59,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         }
                     );
                 } else {
-                    await db.query(
-                        `INSERT INTO mes.customer_logs (user_id, service, result_code, result_desc)
-                        VALUES ($1, $2, $3, $4)
-                        RETURNING *`,
-                        [user_id, "LOGIN", "02", "Password Does Not Match"]
-                    );
+
+                    const payload = {
+                        api: "LOGIN",
+                        resultCode: "03",
+                        resultDesc: "Wrong Credential",
+                        user_id
+                    }
+                    insertUserLog(payload)
+
                     res.status(403).json({ message: 'Account Not Found', data: result.rows[0] });
                 }
             } else {
-                await db.query(
-                    `INSERT INTO mes.customer_logs (user_id, service, result_code, result_desc)
-                    VALUES ($1, $2, $3, $4)
-                    RETURNING *`,
-                    [user_id, null, "LOGIN", "02", "Account does not exist"]
-                );
+                const payload = {
+                    api: "LOGIN",
+                    resultCode: "04",
+                    resultDesc: "Account Does Not Exist",
+                    user_id
+                }
+                insertUserLog(payload)
+
                 res.status(403).json({ message: 'Account Not Found', data: result.rows[0] });
             }
 
         } catch (error) {
+            const payload = {
+                api: "LOGIN",
+                resultCode: "99",
+                resultDesc: "Error Catch Login : " + error,
+                user_id
+            }
+            insertUserLog(payload)
             console.error('Fetching Error:', error);
             res.status(500).json({ error: 'Failed to Fetch Account' });
         }

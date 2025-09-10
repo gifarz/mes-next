@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
 import { DialogCustomerProps } from "../../../../../types/setup/customer"
 import { Spinner } from "@/components/ui/spinner"
+import { useI18n } from "@/components/i18n/provider"
 
 export default function AddEditCustomer({ isEdit, customerData, open, onOpenChange }: DialogCustomerProps) {
     const [firstName, setFirstName] = useState<string>("")
@@ -25,6 +26,7 @@ export default function AddEditCustomer({ isEdit, customerData, open, onOpenChan
     const [address, setAddress] = useState<string>("")
 
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
+    const { t } = useI18n();
 
     useEffect(() => {
         if (customerData) {
@@ -68,11 +70,11 @@ export default function AddEditCustomer({ isEdit, customerData, open, onOpenChan
             });
 
             if (res.ok) {
-                toast.success("The Customer Updated Successfully!")
+                toast.success(t("successUpdateCustomer"))
                 onOpenChange(false)
                 setIsSubmitted(false)
             } else {
-                toast.error("Failed to Update Customer!")
+                toast.error(t("failUpdateCustomer"))
                 setIsSubmitted(false)
             }
 
@@ -86,11 +88,11 @@ export default function AddEditCustomer({ isEdit, customerData, open, onOpenChan
             });
 
             if (res.ok) {
-                toast.success("The Customer Added Successfully!")
+                toast.success(t("successCustomer"))
                 setIsSubmitted(false)
                 onOpenChange(false)
             } else {
-                toast.error("Failed to Add Customer!")
+                toast.error(t("failCustomer"))
                 setIsSubmitted(false)
             }
         }
@@ -103,67 +105,67 @@ export default function AddEditCustomer({ isEdit, customerData, open, onOpenChan
                     <DialogHeader>
                         <DialogTitle>
                             {
-                                isEdit ? "Edit Customer" : "Add Customer"
+                                isEdit ? t("editCustomer") : t("addCustomer")
                             }
                         </DialogTitle>
                         <DialogDescription>
                             {
-                                isEdit ? "Please complete this form to edit the customer" : "Please complete this form to add the customer"
+                                isEdit ? t("editCustomerDesc") : t("addCustomerDesc")
                             }
                         </DialogDescription>
                     </DialogHeader>
                     <div>
-                        <h2 className="text-2xl font-semibold mb-4">Customer Information</h2>
+                        <h2 className="text-2xl font-semibold mb-4">{t("customerInformation")}</h2>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium">First Name</label>
+                                <label className="block text-sm font-medium">{t("firstName")}</label>
                                 <Input
                                     value={firstName}
                                     onChange={(e) => setFirstName(e.target.value)}
-                                    placeholder="Enter First Name"
+                                    placeholder={t("firstNamePlaceholder")}
                                     required
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium">Last Name</label>
+                                <label className="block text-sm font-medium">{t("lastName")}</label>
                                 <Input
                                     value={lastName}
                                     onChange={(e) => setLastName(e.target.value)}
-                                    placeholder="Enter Last Name"
+                                    placeholder={t("lastNamePlaceholder")}
                                     required
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium">Email</label>
+                                <label className="block text-sm font-medium">{t("email")}</label>
                                 <Input
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="Enter Email"
+                                    placeholder={t("emailPlaceholder")}
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium">Phone Number</label>
+                                <label className="block text-sm font-medium">{t("phoneNumber")}</label>
                                 <Input
                                     value={phoneNumber}
                                     onChange={(e) => setPhoneNumber(e.target.value)}
                                     type="number"
                                     min={0}
-                                    placeholder="Enter Phone Number"
+                                    placeholder={t("phoneNumberPlaceholder")}
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium">Address</label>
+                                <label className="block text-sm font-medium">{t("address")}</label>
                                 <Textarea
                                     value={address}
                                     onChange={(e) => setAddress(e.target.value)}
-                                    placeholder="Enter Address"
+                                    placeholder={t("addressPlaceholder")}
                                 />
                             </div>
                         </div>
                     </div>
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
+                            <Button variant="outline">{t("cancel").toUpperCase()}</Button>
                         </DialogClose>
                         <Button
                             className="cursor-pointer"
@@ -173,10 +175,10 @@ export default function AddEditCustomer({ isEdit, customerData, open, onOpenChan
                             {isSubmitted ? (
                                 <>
                                     <Spinner />
-                                    <span className="ml-0">Submitting</span>
+                                    <span className="ml-0">{t("submitting")}</span>
                                 </>
                             ) :
-                                "Submit"
+                                t("submit").toUpperCase()
                             }
                         </Button>
                     </DialogFooter>

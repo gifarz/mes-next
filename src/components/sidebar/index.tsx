@@ -16,6 +16,13 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import {
     Dialog,
     DialogClose,
     DialogContent,
@@ -27,6 +34,7 @@ import {
 } from "@/components/ui/dialog"
 import Image from "next/image"
 import { useMemo } from "react"
+import { useI18n } from '@/components/i18n/provider';
 
 // Menu items
 const items = [
@@ -40,6 +48,7 @@ const items = [
 export function AppSidebar({ role }: { role: string }) {
     const pathname = usePathname()
     const router = useRouter()
+    const { t, locale, setLocale } = useI18n();
 
     const handleLogout = async () => {
         try {
@@ -75,6 +84,19 @@ export function AppSidebar({ role }: { role: string }) {
                         />
                     </SidebarGroupLabel>
                     <SidebarGroupContent className="mt-28">
+                        <Select
+                            value={locale}
+                            onValueChange={setLocale}
+                        >
+                            <SelectTrigger className="w-full mb-4">
+                                <SelectValue placeholder="Select language" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="en">English</SelectItem>
+                                <SelectItem value="id">Bahasa</SelectItem>
+                                <SelectItem value="ja">日本語</SelectItem>
+                            </SelectContent>
+                        </Select>
                         <SidebarMenu>
                             {filteredItems.map((item) => {
                                 const isActive = pathname === item.url
@@ -90,7 +112,7 @@ export function AppSidebar({ role }: { role: string }) {
                                         >
                                             <Link href={item.url}>
                                                 <item.icon className="w-5 h-5" />
-                                                <span>{item.title}</span>
+                                                <span>{t(item.title.toLowerCase())}</span>
                                             </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
@@ -104,20 +126,20 @@ export function AppSidebar({ role }: { role: string }) {
                 <Dialog>
                     <DialogTrigger asChild>
                         <Button variant="destructive" className="w-full cursor-pointer">
-                            LOGOUT
+                            {t("logout").toUpperCase()}
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
-                            <DialogTitle>Logout</DialogTitle>
+                            <DialogTitle>{t("logout")}</DialogTitle>
                             <DialogDescription>
-                                Are you sure you want to logout?
+                                {t("confirm")}
                             </DialogDescription>
                         </DialogHeader>
                         <DialogFooter>
                             <DialogClose asChild>
                                 <Button className="cursor-pointer" variant="outline">
-                                    No
+                                    {t("no")}
                                 </Button>
                             </DialogClose>
                             <Button
@@ -125,7 +147,7 @@ export function AppSidebar({ role }: { role: string }) {
                                 className="cursor-pointer"
                                 onClick={handleLogout}
                             >
-                                Yes
+                                {t("yes")}
                             </Button>
                         </DialogFooter>
                     </DialogContent>

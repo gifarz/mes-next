@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { Spinner } from "@/components/ui/spinner"
 import { DialogInventoryProps } from "../../../../../types/setup/inventory"
+import { useI18n } from "@/components/i18n/provider"
 
 export default function AddEditInventory({ isEdit, inventoryData, open, onOpenChange }: DialogInventoryProps) {
     const [name, setName] = useState<string>("")
@@ -23,6 +24,7 @@ export default function AddEditInventory({ isEdit, inventoryData, open, onOpenCh
     const [quantity, setQuantity] = useState<string>("")
 
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
+    const { t } = useI18n();
 
     useEffect(() => {
         if (inventoryData) {
@@ -62,11 +64,11 @@ export default function AddEditInventory({ isEdit, inventoryData, open, onOpenCh
             });
 
             if (res.ok) {
-                toast.success("The Inventory Updated Successfully!")
+                toast.success(t("successUpdateInventory"))
                 onOpenChange(false)
                 setIsSubmitted(false)
             } else {
-                toast.error("Failed to Update Inventory!")
+                toast.error(t("failUpdateInventory"))
                 setIsSubmitted(false)
             }
 
@@ -80,11 +82,11 @@ export default function AddEditInventory({ isEdit, inventoryData, open, onOpenCh
             });
 
             if (res.ok) {
-                toast.success("The Inventory Added Successfully!")
+                toast.success(t("successInventory"))
                 onOpenChange(false)
                 setIsSubmitted(false)
             } else {
-                toast.error("Failed to Add Inventory!")
+                toast.error(t("failInventory"))
                 setIsSubmitted(false)
             }
         }
@@ -97,61 +99,61 @@ export default function AddEditInventory({ isEdit, inventoryData, open, onOpenCh
                     <DialogHeader>
                         <DialogTitle>
                             {
-                                isEdit ? "Edit Inventory" : "Add Inventory"
+                                isEdit ? t("editInventory") : t("addInventory")
                             }
                         </DialogTitle>
                         <DialogDescription>
                             {
-                                isEdit ? "Please complete this form to edit the inventory" : "Please complete this form to add the inventory"
+                                isEdit ? t("editInventoryDesc") : t("addInventoryDesc")
                             }
                         </DialogDescription>
                     </DialogHeader>
                     <div>
-                        <h2 className="text-2xl font-semibold mb-4">Inventory Information</h2>
+                        <h2 className="text-2xl font-semibold mb-4">{t("inventoryInformation")}</h2>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium">Name</label>
+                                <label className="block text-sm font-medium">{t("inventoryName")}</label>
                                 <Input
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    placeholder="Enter Inventory Name"
+                                    placeholder={t("inventoryNamePlaceholder")}
                                     required
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium">Code</label>
+                                <label className="block text-sm font-medium">{t("inventoryCode")}</label>
                                 <Input
                                     value={code}
                                     onChange={(e) => setCode(e.target.value)}
-                                    placeholder="Enter Code"
+                                    placeholder={t("inventoryCodePlaceholder")}
                                     required
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium">Cost</label>
+                                <label className="block text-sm font-medium">{t("cost")}</label>
                                 <Input
                                     value={cost}
                                     onChange={(e) => setCost(e.target.value)}
                                     type="number"
                                     min={0}
-                                    placeholder="Enter Cost"
+                                    placeholder={t("costPlaceholder")}
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium">Quantity</label>
+                                <label className="block text-sm font-medium">{t("quantity")}</label>
                                 <Input
                                     value={quantity}
                                     onChange={(e) => setQuantity(e.target.value)}
                                     type="number"
                                     min={0}
-                                    placeholder="Enter Quantity"
+                                    placeholder={t("quantityPlaceholder")}
                                 />
                             </div>
                         </div>
                     </div>
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
+                            <Button variant="outline">{t("cancel").toUpperCase()}</Button>
                         </DialogClose>
                         <Button
                             className="cursor-pointer"
@@ -161,10 +163,10 @@ export default function AddEditInventory({ isEdit, inventoryData, open, onOpenCh
                             {isSubmitted ? (
                                 <>
                                     <Spinner />
-                                    <span className="ml-0">Submitting</span>
+                                    <span className="ml-0">{t("submitting")}</span>
                                 </>
                             ) :
-                                "Submit"
+                                t("submit").toUpperCase()
                             }
                         </Button>
                     </DialogFooter>

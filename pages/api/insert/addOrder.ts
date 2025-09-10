@@ -5,6 +5,7 @@ import { getCookieFromServer } from '@/lib/cookie';
 import { decodeJWT } from '@/lib/decodeJWT';
 import { adjustDayWithTime, formattedDateOnly, workloadsTime } from '@/lib/dateUtils';
 import { getRandomIndex } from '@/lib/randFromArray';
+import { insertUserLog } from '@/lib/userLogsHelper';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
@@ -17,17 +18,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             total_length,
             stripping_front,
             stripping_rear,
+            stripping_half_front,
+            stripping_half_rear,
+            diameter_core,
+            setting_pieces,
+            current_pieces,
             delivery_date,
             status
         } = req.body;
 
-        try {
-            const uuid = generateUUID()
-            const cookieHeader = req.headers.cookie || ""
-            const token = getCookieFromServer(cookieHeader, "accessToken")
-            const decodedJwt = decodeJWT(token as string)
-            const created_by = decodedJwt.user_id
+        const uuid = generateUUID()
+        const cookieHeader = req.headers.cookie || ""
+        const token = getCookieFromServer(cookieHeader, "accessToken")
+        const decodedJwt = decodeJWT(token as string)
+        const created_by = decodedJwt.user_id
 
+        try {
             const getFactory = await db.query(`SELECT * FROM mes.factories`);
 
             if (getFactory.rowCount && getFactory.rowCount > 0) {
@@ -95,21 +101,48 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                             total_length,
                             stripping_front,
                             stripping_rear,
+                            stripping_half_front,
+                            stripping_half_rear,
+                            diameter_core,
+                            setting_pieces,
+                            current_pieces,
                             status,
                             created_by
                         )
-                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)
                         RETURNING *`,
-                        [uuid, factory_id, station_id, station_name, order_number, customer_name, product_name, product_code, part_name, part_code, quantity, formattedDateOnly(delivery_date), used_machine, total_length, stripping_front, stripping_rear, status, created_by]
+                        [uuid, factory_id, station_id, station_name, order_number, customer_name, product_name, product_code, part_name, part_code, quantity, formattedDateOnly(delivery_date), used_machine, total_length, stripping_front, stripping_rear, stripping_half_front, stripping_half_rear, diameter_core, setting_pieces, current_pieces, status, created_by]
                     );
 
                     if (result.rowCount && result.rowCount > 0) {
+                        const payload = {
+                            api: "ADD_ORDER",
+                            resultCode: "00",
+                            resultDesc: "Successfully Insert Order",
+                            user_id: created_by
+                        }
+                        insertUserLog(payload)
                         res.status(200).json({ message: 'Successfully Insert Order', data: result.rows[0] });
+
                     } else {
+                        const payload = {
+                            api: "ADD_ORDER",
+                            resultCode: "09",
+                            resultDesc: "Failed to Insert Order",
+                            user_id: created_by
+                        }
+                        insertUserLog(payload)
                         res.status(500).json({ message: 'Failed to Insert Order' });
                     }
 
                 } else {
+                    const payload = {
+                        api: "ADD_ORDER",
+                        resultCode: "10",
+                        resultDesc: "The Station Has Not Created Yet",
+                        user_id: created_by
+                    }
+                    insertUserLog(payload)
                     res.status(403).json({ message: 'The Station Has Not Created Yet' });
                 }
 
@@ -118,8 +151,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 res.status(500).json({ message: 'The User Has Not Factory Yet' });
             }
 
-
         } catch (error) {
+            const payload = {
+                api: "ADD_ORDER",
+                resultCode: "99",
+                resultDesc: "Error Catch Add Order : " + error,
+                user_id: created_by
+            }
+            insertUserLog(payload)
             console.error('Insert Error:', error);
             res.status(500).json({ error: 'Failed to Insert Order' });
         }

@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { generateUUID } from '@/lib/uuidGenerator';
 import { getCookieFromServer } from '@/lib/cookie';
 import { decodeJWT } from '@/lib/decodeJWT';
+import { insertUserLog } from '@/lib/userLogsHelper';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
@@ -14,12 +15,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             machine_name,
         } = req.body;
 
+        const uuid = generateUUID()
+        const cookieHeader = req.headers.cookie || ""
+        const token = getCookieFromServer(cookieHeader, "accessToken")
+        const decodedJwt = decodeJWT(token as string)
+        const created_by = decodedJwt.user_id
+
         try {
-            const uuid = generateUUID()
-            const cookieHeader = req.headers.cookie || ""
-            const token = getCookieFromServer(cookieHeader, "accessToken")
-            const decodedJwt = decodeJWT(token as string)
-            const created_by = decodedJwt.user_id
 
             const getFactory = await db.query(`SELECT * FROM mes.factories`);
 
@@ -43,13 +45,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 );
 
                 if (result.rowCount && result.rowCount > 0) {
+                    const payload = {
+                        api: "ADD_STATION",
+                        resultCode: "00",
+                        resultDesc: "Successfully Insert Station",
+                        user_id: created_by
+                    }
+                    insertUserLog(payload)
                     res.status(200).json({ message: 'Successfully Insert Station', data: result.rows[0] });
                 } else {
+                    const payload = {
+                        api: "ADD_STATION",
+                        resultCode: "07",
+                        resultDesc: "Failed to Insert Station",
+                        user_id: created_by
+                    }
+                    insertUserLog(payload)
                     res.status(500).json({ message: 'Failed to Insert Station' });
                 }
             }
 
         } catch (error) {
+            const payload = {
+                api: "ADD_STATION",
+                resultCode: "99",
+                resultDesc: "Error Catch Add Station : " + error,
+                user_id: created_by
+            }
+            insertUserLog(payload)
             console.error('Insert Error:', error);
             res.status(500).json({ error: 'Failed to Insert Station' });
         }
