@@ -197,6 +197,7 @@ export const en = {
   applySchedule: "APPLY SCHEDULE",
   addToSchedule: "ADD TO SCHEDULE",
   printOrderReport: "PRINT ORDER REPORT",
+  noRowSelected: "No Row Selected",
 
   scheduling: "Scheduling",
   orderTable: "Order Table",

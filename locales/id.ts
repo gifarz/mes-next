@@ -197,6 +197,7 @@ export const id = {
   applySchedule: "TERAPKAN JADWAL",
   addToSchedule: "TAMBAHKAN KE JADWAL",
   printOrderReport: "CETAK LAPORAN PESANAN",
+  noRowSelected: "Tidak Ada Baris yang Dipilih",
 
   scheduling: "Penjadwalan",
   orderTable: "Tabel Pesanan",

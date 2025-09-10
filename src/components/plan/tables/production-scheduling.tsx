@@ -31,27 +31,19 @@ const columns = [
 
 type ProductionSchedulingProps = {
     listData: Scheduling[]
-    selectedStation: string
     isSidebarOpen: boolean
     onSelectedRows: (stationName: string[]) => void
 }
 
-export default function ProductionScheduling({ listData, selectedStation, isSidebarOpen, onSelectedRows }: ProductionSchedulingProps) {
+export default function ProductionScheduling({ listData, isSidebarOpen, onSelectedRows }: ProductionSchedulingProps) {
     const [filteredData, setFilteredData] = useState<Scheduling[]>([])
     const [selectedRows, setSelectedRows] = useState<string[]>([])
     const { t } = useI18n();
 
     useEffect(() => {
         onSelectedRows(selectedRows)
-
-        if (selectedStation) {
-            setFilteredData(
-                listData.filter(order => order.station_name === selectedStation)
-            );
-        } else {
-            setFilteredData(listData)
-        }
-    }, [listData, selectedStation, selectedRows])
+        setFilteredData(listData)
+    }, [listData, selectedRows])
 
     const [sortRules, setSortRules] = useState<SortRule[]>([
         { key: 'order_number', order: 'asc' },

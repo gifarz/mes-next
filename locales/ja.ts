@@ -197,6 +197,7 @@ export const ja = {
   applySchedule: "スケジュールを適用",
   addToSchedule: "スケジュールに追加",
   printOrderReport: "注文レポートを印刷",
+  noRowSelected: "行が選択されていません",
 
   scheduling: "スケジューリング",
   orderTable: "注文表",

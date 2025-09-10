@@ -19,10 +19,8 @@ import { useI18n } from '@/components/i18n/provider';
 
 export default function SchedulingCard() {
     const [listOrders, setListOrders] = useState<Order[]>([]);
-    const [listStations, setListStations] = useState<Station[]>([]);
     const [listProducts, setListProducts] = useState<Product[]>([]);
     const [listCustomers, setListCustomers] = useState<Customer[]>([]);
-    const [selectedStation, setSelectedStation] = useState<string>("");
     const [selectedRows, setSelectedRows] = useState<string[]>([]);
     const [refreshKey, setRefreshKey] = useState<number>(0)
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
@@ -100,12 +98,10 @@ export default function SchedulingCard() {
             },
         });
 
-        const json = await res.json()
-
         if (res.ok) {
             toast.success(t("scheduled"))
         } else {
-            toast.error(json.message)
+            toast.error(t("noRowSelected"))
         }
 
         setIsSubmitted(false)
@@ -129,25 +125,6 @@ export default function SchedulingCard() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className='flex justify-end gap-4'>
-                        {/* <Select value={selectedStation} onValueChange={setSelectedStation}>
-                            <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select the station" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {listStations.length === 0 ?
-                                    <p className="p-2 text-sm text-gray-500">No station available</p>
-                                    :
-                                    listStations.map((station) => (
-                                        <SelectItem
-                                            value={station.name}
-                                            key={station.identifier}
-                                        >
-                                            {station.name}
-                                        </SelectItem>
-                                    ))
-                                }
-                            </SelectContent>
-                        </Select> */}
                         <Button
                             className='cursor-pointer'
                             variant="destructive"
@@ -166,7 +143,6 @@ export default function SchedulingCard() {
                     </div>
                     <ProductionScheduling
                         listData={listOrders}
-                        selectedStation={selectedStation}
                         isSidebarOpen={open}
                         onSelectedRows={setSelectedRows}
                     />
