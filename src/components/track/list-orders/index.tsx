@@ -349,11 +349,11 @@ export default function ListOrdersCard() {
                                             {/* <InfoRow label="Estimate Start" value={order.estimate_start} />
                                             <InfoRow label="Estimate End" value={order.estimate_end} /> */}
                                             <InfoRow
-                                                label={t("actual_start")}
+                                                label={t("actualStart")}
                                                 value={order.actual_start ? order.actual_start : "N/A"}
                                             />
                                             <InfoRow
-                                                label={t("actual_end")}
+                                                label={t("actualEnd")}
                                                 value={order.actual_end ? order.actual_end : "N/A"}
                                             />
                                             <InfoRow

@@ -149,14 +149,14 @@ export default function OrderTable({ listOrders, listProducts, listCustomers, on
                                 {columns.map(({ key }) => (
                                     <TableHead key={key} className="text-center">
                                         {key === 'action' ? (
-                                            <span className="font-semibold">{t(key)}</span>
+                                            <span className="font-semibold">{t(key).toUpperCase()}</span>
                                         ) : (
                                             <Button
                                                 variant="ghost"
                                                 onClick={() => handleSort(key as SortKey)}
                                                 className="font-semibold"
                                             >
-                                                {t(key)}
+                                                {t(key).toUpperCase()}
                                                 <SortIcon column={key as SortKey} />
                                             </Button>
                                         )}

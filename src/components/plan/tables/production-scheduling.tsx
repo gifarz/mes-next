@@ -138,7 +138,7 @@ export default function ProductionScheduling({ listData, selectedStation, isSide
                                     onClick={() => handleSort(key as SortKey)}
                                     className="font-semibold"
                                 >
-                                    {t(key)}
+                                    {t(key).toUpperCase()}
                                     <SortIcon column={key as SortKey} />
                                 </Button>
                             </TableHead>

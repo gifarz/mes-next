@@ -299,7 +299,7 @@ export default function WarehouseCard() {
                             {columns.map(({ key }) => (
                                 <TableHead key={key} className="text-center">
                                     {key === 'action' ? (
-                                        <span className="font-semibold">{t(key)}</span>
+                                        <span className="font-semibold">{t(key).toUpperCase()}</span>
                                     ) : (
                                         <Button
                                             variant="ghost"
