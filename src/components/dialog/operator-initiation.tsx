@@ -9,6 +9,7 @@ import { useEffect, useState } from "react"
 import { Station } from "../../../types/setup/station"
 import { Account } from "../../../types/settings/account"
 import { useUserStore } from "../../../store/userStore"
+import { useI18n } from "../i18n/provider"
 
 export default function OperatorInitiation() {
     const [open, setOpen] = useState<boolean>(true)
@@ -23,6 +24,8 @@ export default function OperatorInitiation() {
 
     const name = useUserStore((state) => state.name)
     const operatorStore = useUserStore((state) => state.setOperator)
+
+    const { t } = useI18n();
 
     useEffect(() => {
         if (!name) return
@@ -88,12 +91,12 @@ export default function OperatorInitiation() {
                 onEscapeKeyDown={(e) => e.preventDefault()} // block Esc key
             >
                 <DialogHeader>
-                    <DialogTitle className="text-center">Please Fill The Form</DialogTitle>
+                    <DialogTitle className="text-center">{t("pleaseFillForm")}</DialogTitle>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <Label htmlFor="operator">Operator</Label>
+                        <Label htmlFor="operator">{t("operator")}</Label>
                         <Input
                             disabled
                             id="operator"
@@ -102,13 +105,13 @@ export default function OperatorInitiation() {
                     </div>
 
                     <div>
-                        <Label htmlFor="shift">Choose Shift</Label>
+                        <Label htmlFor="shift">{t("chooseShift")}</Label>
                         <Select
                             value={selectedShift}
                             onValueChange={setSelectedShift}
                         >
                             <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select the Shift" />
+                                <SelectValue placeholder={t("selectShift")} />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value='1'>1</SelectItem>
@@ -120,7 +123,7 @@ export default function OperatorInitiation() {
                     </div>
 
                     <div>
-                        <Label htmlFor="line">Choose the Station</Label>
+                        <Label htmlFor="line">{t("chooseStation")}</Label>
                         <Select
                             value={selectedStationId}
                             onValueChange={(id) => {
@@ -132,12 +135,14 @@ export default function OperatorInitiation() {
                             }}
                         >
                             <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select the Station" />
+                                <SelectValue placeholder={t("selectStation")} />
                             </SelectTrigger>
 
                             <SelectContent>
                                 {listStations.length === 0 ? (
-                                    <p className="p-2 text-sm text-gray-500">No station available</p>
+                                    <p className="p-2 text-sm text-gray-500">
+                                        {t("noData")}
+                                    </p>
                                 ) : (
                                     listStations.map((station) => (
                                         <SelectItem value={station.identifier} key={station.identifier}>
@@ -150,20 +155,20 @@ export default function OperatorInitiation() {
                     </div>
 
                     <div>
-                        <Label htmlFor="line">Choose Leader</Label>
+                        <Label htmlFor="line">{t("chooseLeader")}</Label>
                         <Input
                             id="leader"
-                            placeholder="Enter Your Leader"
+                            placeholder={t("enterLeader")}
                             value={selectedLeader}
                             onChange={(e) => setSelectedLeader(e.target.value)}
                         />
                     </div>
 
                     <div>
-                        <Label htmlFor="foreman">Foreman</Label>
+                        <Label htmlFor="foreman">{t("foreman")}</Label>
                         <Input
                             id="foreman"
-                            placeholder="Enter Your Foreman"
+                            placeholder={t("enterForeman")}
                             value={foreman}
                             onChange={(e) => setForeman(e.target.value)}
                         />
@@ -174,7 +179,7 @@ export default function OperatorInitiation() {
                         type="submit"
                         className="w-full cursor-pointer"
                     >
-                        SUBMIT
+                        {t("submit").toUpperCase()}
                     </Button>
                 </form>
             </DialogContent>

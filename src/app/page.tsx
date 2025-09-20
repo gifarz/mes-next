@@ -6,7 +6,7 @@ import Image from "next/image";
 export default function page() {
   return (
     <>
-      <Navbar />
+      <Navbar isAuthPage={false}/>
       <main className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4">
         <Image
           src="/logo.png"

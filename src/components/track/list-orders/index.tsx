@@ -225,8 +225,8 @@ export default function ListOrdersCard() {
         <div>
             <Toaster position="top-right" />
             <DeleteConfirmation
-                title='Order Delete'
-                description={`Are you sure want to delete Order Number : ${orderNumber} ? this can be reverse`}
+                title={t("orderDelete")}
+                description={`${t("deleteOrderConfirmation")} : ${orderNumber} ? ${t("cantBeReverse")}`}
                 open={openDialog}
                 onOpenChange={setOpenDialog}
                 onClickYes={() => handleDelete(identifier)}
@@ -236,19 +236,19 @@ export default function ListOrdersCard() {
                     <div className="grid grid-cols-3 gap-4">
                         {/* Name */}
                         <div className="flex flex-col space-y-2">
-                            <Label htmlFor="name">Operator</Label>
+                            <Label htmlFor="name">{t("operator")}</Label>
                             <Input id="name" disabled value={name ? name : "-"} />
                         </div>
 
                         {/* Line */}
                         <div className="flex flex-col space-y-2">
-                            <Label htmlFor="line">Line</Label>
+                            <Label htmlFor="line">{t("line")}</Label>
                             <Input id="line" disabled value={line ? line : "-"} />
                         </div>
 
                         {/* Shift */}
                         <div className="flex flex-col space-y-2">
-                            <Label htmlFor="shift">Shift</Label>
+                            <Label htmlFor="shift">{t("shift")}</Label>
                             <Input id="shift" disabled value={shift ? shift : "-"} />
                         </div>
 
@@ -256,13 +256,13 @@ export default function ListOrdersCard() {
                         <div className="col-span-3 flex justify-center gap-6">
                             {/* Leader */}
                             <div className="flex flex-col space-y-2 w-1/3">
-                                <Label htmlFor="leader">Leader</Label>
+                                <Label htmlFor="leader">{t("leader")}</Label>
                                 <Input id="leader" disabled value={leader ? leader : "-"} />
                             </div>
 
                             {/* Foreman */}
                             <div className="flex flex-col space-y-2 w-1/3">
-                                <Label htmlFor="foreman">Foreman</Label>
+                                <Label htmlFor="foreman">{t("foreman")}</Label>
                                 <Input id="foreman" disabled value={foreman ? foreman : "-"} />
                             </div>
                         </div>

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { Calendar, Home, Inbox, Search, Settings, AlarmClock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
     Sidebar,
@@ -42,6 +42,7 @@ const items = [
     { title: "Setup", url: "/app/setup", icon: Inbox },
     { title: "Plan", url: "/app/plan", icon: Calendar },
     { title: "Track", url: "/app/track", icon: Search },
+    { title: "Alarm", url: "/app/alarm", icon: AlarmClock },
     { title: "Settings", url: "/app/settings", icon: Settings },
 ]
 
