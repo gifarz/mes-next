@@ -12,6 +12,7 @@ import {
 import {
     Button
 } from "@/components/ui/button"
+import { useI18n } from '../i18n/provider'
 
 interface DeleteConfirmationProps {
     title: string
@@ -22,6 +23,9 @@ interface DeleteConfirmationProps {
 }
 
 export default function DeleteConfirmation({ title, description, open, onOpenChange, onClickYes }: DeleteConfirmationProps) {
+
+    const { t } = useI18n();
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[425px]">
@@ -33,14 +37,16 @@ export default function DeleteConfirmation({ title, description, open, onOpenCha
                 </DialogHeader>
                 <DialogFooter>
                     <DialogClose asChild>
-                        <Button className="cursor-pointer" variant="outline">No</Button>
+                        <Button className="cursor-pointer" variant="outline">
+                            {t("no").toUpperCase()}
+                        </Button>
                     </DialogClose>
                     <Button
                         variant="destructive"
                         className="cursor-pointer"
                         onClick={onClickYes}
                     >
-                        Yes
+                        {t("yes").toUpperCase()}
                     </Button>
                 </DialogFooter>
             </DialogContent>
